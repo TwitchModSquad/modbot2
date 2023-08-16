@@ -1,4 +1,5 @@
 const express = require("express");
+const bodyParser = require("body-parser");
 const router = express.Router();
 
 const utils = require("../../../utils/");
@@ -21,6 +22,13 @@ router.use(async (req, res, next) => {
         return;
     }
 
+    for (let i = 0; i < twitchUsers.length; i++) {
+        if (!twitchUsers[i].follower_count) {
+            await twitchUsers[i].fetchFollowers();
+            await twitchUsers[i].save();
+        }
+    }
+
     const streamerRoles = await req.session.identity.getStreamers();
 
     req.twitchUsers = twitchUsers;
@@ -35,6 +43,8 @@ router.get("/", async (req, res) => {
         twitchUsers: req.twitchUsers,
         discordUsers: req.discordUsers,
         streamerRoles: req.streamerRoles,
+        error: req?.query?.error ? req.query.error : null,
+        comma: utils.comma,
     });
 });
 
@@ -43,6 +53,8 @@ router.get("/:streamer", async (req, res) => {
         const twitchUsers = await req.session.identity.getTwitchUsers();
         const userIds = twitchUsers.map(x => x._id);
         const streamer = await utils.Twitch.getUserByName(req.params.streamer, true);
+        await streamer.fetchFollowers();
+        await streamer.save();
         const mods = await streamer.fetchMods();
         if (mods.find(x => userIds.includes(x.moderator._id))) {
             res.json({ok: true, streamer: streamer.public()});
@@ -51,6 +63,74 @@ router.get("/:streamer", async (req, res) => {
         }
     } catch(e) {
         res.json({ok: false, error: e});
+    }
+});
+
+router.use(bodyParser.urlencoded({extended: true}));
+
+router.post("/", async (req, res) => {
+    const error = msg => {
+        res.redirect(`/auth/verify?error=${encodeURIComponent(msg)}`);
+    }
+
+    if (req?.body?.users && typeof(req.body.users) === "object") {
+        const twitchUsers = await req.session.identity.getTwitchUsers();
+        let streamers = [];
+        for (let i = 0; i < twitchUsers.length; i++) {
+            streamers = [
+                ...streamers,
+                ...await twitchUsers[i].getStreamers(),
+            ]
+        }
+
+        let warnings = "";
+
+        for (let i = 0; i < req.body.users.length; i++) {
+            try {
+                const user = await utils.Twitch.getUserById(req.body.users[i]);
+                if (twitchUsers.find(x => x._id === user._id) || streamers.find(x => x.streamer._id === user._id)) {
+                    let canChange = true;
+                    if (!twitchUsers.find(x => x._id === user._id)) {
+                        const otherMods = await user.getMods();
+                        for (let m = 0; m < otherMods.length; m++) {
+                            const modUser = otherMods[m];
+                            if (modUser.identity) {
+                                const identity = await utils.Schemas.Identity.findById(modUser.identity);
+                                if (identity && identity.authenticated) {
+                                    canChange = false;
+                                    continue;
+                                }
+                            }
+                        }
+                    }
+                    if (!canChange) {
+                        if (warnings !== "") warnings += "\n";
+                        warnings += `User ${user.display_name} could not be monitored using TMS as they already have authenticated mods.`;
+                        continue;
+                    }
+                    let listen = req.body.hasOwnProperty(`listen-${user._id}`) && (req.body[`listen-${user._id}`] === "on" || req.body[`listen-${user._id}`] === "true");
+                    user.chat_listen = listen;
+                    try {
+                        await user.save();
+                    } catch(e) {
+                        console.error(e);
+                    }
+                } else {
+                    return error(`User ${user.display_name} is not listed as a moderator for ${twitchUsers.map(x => x.display_name).join(", ")}`);
+                }
+            } catch(e) {
+                return error(`Unable to retrieve user with ID ${req.body.users[i]}!`);
+            }
+
+        }
+
+        if (warnings === "") {
+            res.redirect("/auth/join");
+        } else {
+            res.redirect(`/auth/join?warnings=${encodeURIComponent(warnings)}`);
+        }
+    } else {
+        error("Expected parameter 'users' of type Object!");
     }
 });
 

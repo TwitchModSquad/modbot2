@@ -7,6 +7,8 @@ const config = require("../../../config.json");
 const discord = require("./discord");
 const twitch = require("./twitch");
 const verify = require("./verify");
+const join = require("./join");
+const login = require("./login");
 
 router.use(async (req, res, next) => {
     const {cookies} = req;
@@ -36,5 +38,7 @@ router.use(async (req, res, next) => {
 router.use("/discord", discord);
 router.use("/twitch", twitch);
 router.use("/verify", verify);
+router.use("/join", join);
+router.use("/login", login);
 
 module.exports = router;
