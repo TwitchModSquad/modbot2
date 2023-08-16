@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Twitch Mod Squad - Login</title>
+<%- include("../../partials/head") %>
+</head>
+<body class="narrow-page">
+    <main>
+        <h1><img src="/assets/images/logo.webp" alt="Twitch Mod Squad Logo"> TwitchModSquad <span>login</span></h1>
+        <p>
+            Sign in or join to view The Mod Squad panel!
+        </p>
+        <div class="twitch-users">
+            <% twitchUsers.forEach(user => { %>
+                <%- include("../../partials/objects/twitchUser", {account: user, comma: comma}) %>
+            <% }) %>
+        </div>
+        <a class="button full next" href="<%= twitchURI %>"><i class="fa-brands fa-twitch"></i> Add <%= twitchUsers.length === 0 ? "a" : "another" %> Twitch account</a>
+        <div class="discord-users">
+            <% discordUsers.forEach(user => { %>
+                <%- include("../../partials/objects/discordUser", {account: user}) %>
+            <% }) %>
+        </div>
+    </main>
+    
+    <div class="notifications"></div>
+<%- include("../../partials/javascript") %>
+<script src="/assets/js/join.js"> </script>
+</body>
+</html>
