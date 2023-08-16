@@ -22,7 +22,36 @@ button.full,
     display: block;
     position: relative;
     width: 100%;
+    padding: .8em 1em;
     font-weight: 600;
+}
+
+.button.full i, .button.full img {
+    font-size: 1.4rem;
+    position: absolute;
+    left: 0.8em;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+a.button.full {
+    width: calc(100% - 2em);
+}
+
+.button.full.next::after {
+    font-family: "Font Awesome 6 Pro";
+    font-weight: 400;
+    content: '\f061';
+    font-size: .8rem;
+    position: absolute;
+    right: 1.2em;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: 0.4s;
+}
+
+.button.full.next:hover::after {
+    right: .8em;
 }
 
 .button-holder {
