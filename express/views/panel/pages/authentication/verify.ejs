@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitch Mod Squad</title>
+
+    <link rel="stylesheet" href="/assets/css/master.css">
+    <link rel="stylesheet" href="/assets/css/form.css">
+    <link rel="stylesheet" href="/assets/css/button.css">
+</head>
+<body class="narrow-page">
+    <main>
+        <h1><img src="/assets/images/logo.webp" alt="Twitch Mod Squad Logo"> TwitchModSquad <span>verify</span></h1>
+        <p>
+            Use the text field below to add streamers that you moderate for.
+        </p>
+        <p>
+            Check the checkbox next to each streamer to enable listening on that channel.
+            <br>
+            <strong>Chat listening can ONLY be turned off by the streamer if multiple moderators are authenticated on TMS.</strong>
+        </p>
+        <form method="post" class="verify">
+            <input class="full" type="text" name="streamer" id="streamer" placeholder="Twitch Username" />
+
+            <button class="full" type="button">Next</button>
+        </form>
+    </main>
+    <script src="/assets/js/jquery.js"> </script>
+    <script src="/assets/js/verify.js"> </script>
+</body>
+</html>
