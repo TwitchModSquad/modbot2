@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Twitch Mod Squad</title>
-
-    <link rel="stylesheet" href="/assets/css/master.css">
-    <link rel="stylesheet" href="/assets/css/form.css">
-    <link rel="stylesheet" href="/assets/css/button.css">
+    <title>Twitch Mod Squad - Verify</title>
+<%- include("../../partials/head") %>
 </head>
 <body class="narrow-page">
     <main>
         <h1><img src="/assets/images/logo.webp" alt="Twitch Mod Squad Logo"> TwitchModSquad <span>verify</span></h1>
+        <% if (locals?.error) { %>
+        <div class="alert alert-danger" onclick="$(this).remove()">
+            <strong>An error occurred!</strong>
+            <%= error %>
+        </div>
+        <% } %>
         <p>
             Use the text field below to add streamers that you moderate for.
         </p>
@@ -20,13 +21,32 @@
             <br>
             <strong>Chat listening can ONLY be turned off by the streamer if multiple moderators are authenticated on TMS.</strong>
         </p>
-        <form method="post" class="verify">
+        <form method="post" class="add-user">
             <input class="full" type="text" name="streamer" id="streamer" placeholder="Twitch Username" />
-
-            <button class="full" type="button">Next</button>
+        </form>
+        <form method="post" class="verify">
+            <div class="streamers">
+                <% twitchUsers.forEach(user => { %>
+                    <label class="user-selector">
+                        <input type="hidden" name="users[]" value="<%= user._id %>">
+                        <input type="checkbox" name="listen-<%= user._id %>"<%- user.chat_listen ? ` checked="checked"` : "" %>>
+                        <%- include("../../partials/objects/twitchUser", {account: user, comma: comma}) %>
+                    </label>
+                <% }) %>
+                <% streamerRoles.forEach(role => { user = role.streamer; %>
+                    <label class="user-selector">
+                        <input type="hidden" name="users[]" value="<%= user._id %>">
+                        <input type="checkbox" name="listen-<%= user._id %>"<%- user.chat_listen ? ` checked="checked"` : "" %>>
+                        <%- include("../../partials/objects/twitchUser", {account: user, comma: comma}) %>
+                    </label>
+                <% }) %>
+            </div>
+            <button class="button full next" type="submit">Next</button>
         </form>
     </main>
-    <script src="/assets/js/jquery.js"> </script>
-    <script src="/assets/js/verify.js"> </script>
+    
+    <div class="notifications"></div>
+<%- include("../../partials/javascript") %>
+<script src="/assets/js/verify.js"> </script>
 </body>
 </html>

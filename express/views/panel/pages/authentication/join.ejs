@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Twitch Mod Squad - Verify</title>
+<%- include("../../partials/head") %>
+</head>
+<body class="narrow-page">
+    <main>
+        <h1><img src="/assets/images/logo.webp" alt="Twitch Mod Squad Logo"> TwitchModSquad <span>join</span></h1>
+        <% if (locals?.warnings) { %>
+        <div class="alert alert-info" onclick="$(this).remove()">
+            <strong>Verification Warnings</strong>
+            <%= warnings %>
+        </div>
+        <% } %>
+        <p>
+            Use the buttons below to join your desired TMS communities!
+        </p>
+        <div class="communities">
+            <% if (join.modSquad) { %>
+            <div class="community">
+                <img src="/assets/images/logos/logo-green.png" alt="Twitch Mod Squad Logo">
+                <div class="info">
+                    <h3>
+                        Twitch Mod Squad
+                    </h3>
+                    Main Mod Squad community for streamers which have over 5,000 followers or Twitch partnership and their streamers!
+                </div>
+                <a href="#">
+                    <button class="join tms">Join!</button>
+                </a>
+            </div>
+            <% } if (join.littleModSquad) { %>
+            <div class="community">
+                <img src="/assets/images/logos/logo-blue.png" alt="The Little Mod Squad Logo">
+                <div class="info">
+                    <h3>
+                        The Little Mod Squad
+                    </h3>
+                    Sister community to The Mod Squad providing any streamers and their moderators a place to call home!
+                </div>
+                <a href="#">
+                    <button class="join tlms">Join!</button>
+                </a>
+            </div>
+            <% } if (join.communityLobbies) { %>
+            <div class="community">
+                <img src="/assets/images/logos/logo.png" alt="Community Lobbies Logo">
+                <div class="info">
+                    <h3>
+                        Community Lobbies
+                    </h3>
+                    Join or host lobbies within The Mod Squad and participating communities!
+                </div>
+                <a href="#">
+                    <button class="join cl">Join!</button>
+                </a>
+            </div>
+            <% } %>
+            <a href="/auth/login" class="button full next">Next</a>
+            <small>Don't see the community you're looking for? <a href="/auth/verify">Go back and add more streamers</a></small>
+        </div>
+    </main>
+    
+    <div class="notifications"></div>
+<%- include("../../partials/javascript") %>
+<script src="/assets/js/join.js"> </script>
+</body>
+</html>
