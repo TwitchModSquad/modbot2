@@ -5,12 +5,12 @@ const config = require("../../config.json");
 
 const CHANNEL_MAXIMUM = 15;
 
-let channel = null;
-
 const listener = {
     name: "banAnnounce",
     eventName: "ban",
     listener: async (client, streamer, chatter, timebanned, userstate, bpm) => {
+        const startTime = Date.now();
+
         let ban;
         try {
             ban = await utils.Schemas.TwitchBan.create({
@@ -26,21 +26,11 @@ const listener = {
 
         if (bpm > 5) return;
 
-        if (!channel) {
-            try {
-                channel = await global.client.modbot.channels.fetch(config.discord.modbot.channels.ban);
-            } catch(err) {
-                console.error(err);
-                return;
-            }
-        }
-
         const embed = new EmbedBuilder()
                 .setTitle("User has been banned!")
                 .setDescription(`User \`${cleanCodeBlockContent(chatter.display_name)}\` was banned from channel \`${cleanCodeBlockContent(streamer.display_name)}\``)
                 .setThumbnail(chatter.profile_image_url)
                 .setAuthor({iconURL: streamer.profile_image_url, name: streamer.display_name, url: `https://twitch.tv/${streamer.login}`})
-                .setFooter({text: `Bans per Minute: ${bpm}`, iconURL: config.iconURI})
                 .setColor(0xe3392d);
 
         const components = [];
@@ -62,6 +52,7 @@ const listener = {
         const channelHistoryDistinct = await utils.Schemas.TwitchChat
                 .distinct("streamer", {chatter: chatter._id});
 
+        let memberChannelHistory = [];
         let channelHistory = [];
         for (let i = 0; i < channelHistoryDistinct.length; i++) {
             const channelId = channelHistoryDistinct[i];
@@ -78,14 +69,34 @@ const listener = {
                         .exists({streamer: channelId, chatter: chatter._id, time_end: null});
                 lastMessage.timedOutIn = await utils.Schemas.TwitchTimeout
                         .exists({streamer: channelId, chatter: chatter._id, time_end: {$gt: Date.now()}});
-                channelHistory.push(lastMessage);
+
+                if (lastMessage.streamer.chat_listen) {
+                    memberChannelHistory.push(lastMessage);
+                } else {
+                    channelHistory.push(lastMessage);
+                }
             }
         }
 
         channelHistory.sort((a, b) => b.time_sent - a.time_sent);
+        memberChannelHistory.sort((a, b) => b.time_sent - a.time_sent);
 
         let channelHistoryTable = [["Channel", "Last Active", ""]];
-        for (let i = 0; i < Math.min(channelHistory.length, CHANNEL_MAXIMUM); i++) {
+
+        if (memberChannelHistory.length > 0)
+            channelHistoryTable.push(["", "Member Channels", ""]);
+
+        for (let i = 0; i < Math.min(memberChannelHistory.length, CHANNEL_MAXIMUM); i++) {
+            let lastMessage = memberChannelHistory[i];
+            channelHistoryTable.push([lastMessage.streamer.display_name, utils.parseDate(lastMessage.time_sent), (lastMessage.bannedIn ? "[❌banned]" : "") + (lastMessage.timedOutIn ? "[⏲️t/o]" : "")])
+        }
+
+        const otherChannelCount = Math.min(channelHistory.length, CHANNEL_MAXIMUM) - memberChannelHistory.length;
+
+        if (otherChannelCount > 0)
+            channelHistoryTable.push(["", "Other Channels", ""]);
+
+        for (let i = 0; i < otherChannelCount; i++) {
             let lastMessage = channelHistory[i];
             channelHistoryTable.push([lastMessage.streamer.display_name, utils.parseDate(lastMessage.time_sent), (lastMessage.bannedIn ? "[❌banned]" : "") + (lastMessage.timedOutIn ? "[⏲️t/o]" : "")])
         }
@@ -111,7 +122,15 @@ const listener = {
                     .setMinValues(1)
                     .setMaxValues(1);
 
-            for (let i = 0; i < Math.min(channelHistory.length, 25); i++) {
+            for (let i = 0; i < Math.min(memberChannelHistory.length, 25); i++) {
+                const lastMessage = memberChannelHistory[i];
+                selectMenu.addOptions({
+                    label: lastMessage.streamer.display_name,
+                    value: `${lastMessage.streamer._id}:${lastMessage.chatter}`,
+                })
+            }
+
+            for (let i = 0; i < (Math.min(channelHistory.length, 25) - memberChannelHistory.length); i++) {
                 const lastMessage = channelHistory[i];
                 selectMenu.addOptions({
                     label: lastMessage.streamer.display_name,
@@ -125,7 +144,11 @@ const listener = {
             components.push(row);
         }
 
-        channel.send({embeds: [embed], components: components}).then(async message => {
+        const elapsedTime = Date.now() - startTime;
+
+        embed.setFooter({text: `Bans per Minute: ${bpm} • Generated in ${elapsedTime} ms`, iconURL: config.iconURI});
+
+        utils.Discord.channels.ban.send({embeds: [embed], components: components}).then(async message => {
             try {
                 await utils.Schemas.DiscordMessage.create({
                     _id: message.id,
@@ -135,6 +158,8 @@ const listener = {
                 console.error(e);
             }
         }, console.error);
+
+        utils.EventManager.fire("banAnnounce", streamer, chatter, {embeds: [embed], components: components}, bpm);
     }
 };
 
