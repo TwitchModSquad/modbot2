@@ -5,11 +5,14 @@ const config = require("../config.json");
 const Twitch = require("./twitch/");
 const Discord = require("./discord/");
 
+const Authentication = require("./authentication/");
+
 const EventManager = require("./EventManager");
 
 const DiscordGuild = require("./discord/DiscordGuild");
 const DiscordUser = require("./discord/DiscordUser");
 const DiscordMessage = require("./discord/DiscordMessage");
+const DiscordToken = require("./discord/DiscordToken");
 
 const Stream = require("./twitch/TwitchStream");
 const TwitchBan = require("./twitch/TwitchBan");
@@ -17,10 +20,18 @@ const TwitchUser = require("./twitch/TwitchUser");
 const TwitchChat = require("./twitch/TwitchChat");
 const TwitchTimeout = require("./twitch/TwitchTimeout");
 const TwitchRole = require("./twitch/TwitchRole");
+const TwitchToken = require("./twitch/TwitchToken");
 
 const Identity = require("./Identity");
+const Session = require("./Session");
 
 class Utils {
+
+    /**
+     * Holds Authentication methods for Twitch & Discord
+     * @type {Authentication}
+     */
+    Authentication = new Authentication();
 
     /**
      * Global API for Twitch objects
@@ -45,6 +56,7 @@ class Utils {
         DiscordGuild: DiscordGuild,
         DiscordUser: DiscordUser,
         DiscordMessage: DiscordMessage,
+        DiscordToken: DiscordToken,
         TwitchBan: TwitchBan,
         TwitchChat: TwitchChat,
         TwitchGame: Stream.TwitchGame,
@@ -54,6 +66,8 @@ class Utils {
         TwitchTimeout: TwitchTimeout,
         TwitchUser: TwitchUser,
         TwitchRole: TwitchRole,
+        TwitchToken: TwitchToken,
+        Session: Session,
     }
 
     /**TODO: Create transaction
@@ -118,6 +132,21 @@ class Utils {
 
             resolve(identity);
         });
+    }
+
+    /**
+     * Generates a random string of (length) length.
+     * @param {number} length 
+     * @returns {string} Generated String
+     */
+    stringGenerator(length = 32) {
+        let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let str = '';
+        for (let i = 0; i < length; i++) {
+            str += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+
+        return str;
     }
 
     /**
