@@ -1,0 +1,51 @@
+.user-selector {
+    display: flex;
+}
+
+.user,
+.community {
+    display: flex;
+    background-color: rgba(255,255,255,0.025);
+    margin: .6em;
+    padding: .6em;
+    border: .1em solid rgba(255,255,255,0.05);
+    border-radius: 8px;
+    flex-grow: 1;
+}
+
+.user > img,
+.community > img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    margin-right: .6em;
+}
+
+.user .info,
+.community .info {
+    color: var(--tertiary-text-color);
+    font-size: .8rem;
+    flex-grow: 1;
+    text-align: left;
+}
+
+.user .info span,
+.community .info {
+    color: var(--secondary-text-color);
+}
+
+.user h3,
+.community h3 {
+    color: var(--primary-text-color);
+    font-size: 1.4rem;
+    font-weight: 300;
+}
+
+.user h3 img {
+    height: 1.4rem;
+}
+
+.user.twitch > img {
+    border-color: var(--primary-twitch-color);
+}
