@@ -1,6 +1,7 @@
 const STREAMS_PER_PAGE = 100;
 
 const utils = require("../utils/");
+const config = require("../config.json");
 const {TwitchLivestream, TwitchGame, TwitchTag, TwitchStreamStatus} = require("../utils/twitch/TwitchStream");
 
 const listenClients = require("../twitch/");
@@ -16,6 +17,8 @@ const interval = {
     interval: 600000,
     onStartup: true,
     run: async () => {
+        if (!config.crawl) return;
+
         try {
             const streams = await utils.Twitch.Helix.helix.streams.getStreams({after: lastCursor, limit: STREAMS_PER_PAGE, language: "en"});
             lastCursor = streams.cursor;
