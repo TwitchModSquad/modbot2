@@ -1,7 +1,7 @@
 const client = global.client.modbot;
 
 const listener = {
-    name: 'readyMessage',
+    name: 'updateGuilds',
     eventName: 'ready',
     eventType: 'once',
     async listener () {
