@@ -38,6 +38,24 @@ client.listeners.forEach(listener => {
     client[listener.eventType](listener.eventName, listener.listener);
 });
 
+setInterval(() => {
+    let totalChannels = 0;
+
+    totalChannels += global.client.listen.member.channels.length;
+    totalChannels += global.client.listen.partner.channels.length;
+    totalChannels += global.client.listen.affiliate.channels.length;
+
+    client.user.setPresence({
+        activities: [
+            {
+                name: `${totalChannels} Twitch channels`,
+                type: Discord.ActivityType.Watching,
+            }
+        ],
+        status: "online",
+    })
+}, 30000);
+
 client.login(config.discord.modbot.token);
 
 // Register slash commands.
