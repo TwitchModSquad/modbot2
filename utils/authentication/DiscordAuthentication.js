@@ -55,6 +55,35 @@ class DiscordAuthentication {
         return await userResult.json();
     }
 
+    /**
+     * Utilizes a refresh token to obtain an access token for a user.
+     * @param {string} refresh_token 
+     * @returns {Promise<string>}
+     */
+    getAccessToken(refresh_token) {
+        return new Promise(async (resolve, reject) => {
+            const oauthResult = await fetch("https://discord.com/api/oauth2/token", {
+                method: 'POST',
+                body: new URLSearchParams({
+                    client_id: config.discord.auth.client_id,
+                    client_secret: config.discord.auth.secret_id,
+                    refresh_token: refresh_token,
+                    grant_type: "refresh_token",
+                }),
+            });
+        
+            oauthResult.json().then(oauthData => {
+                if (oauthData?.access_token) {
+                    resolve(oauthData);
+                } else {
+                    console.error(oauthData);
+
+                    reject("Unable to request access token, reason: " + oauthData?.message);
+                }
+            }, reject);
+        });
+    }
+
 }
 
 module.exports = DiscordAuthentication;
