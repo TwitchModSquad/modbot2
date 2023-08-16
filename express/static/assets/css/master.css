@@ -26,6 +26,10 @@
     --dark-discord-color: #2e379c;
 }
 
+html, body {
+    min-height: 100%;
+}
+
 body {
     background-color: var(--primary-background-color);
     background: url('/assets/images/banners/banner-large.png');
@@ -69,4 +73,8 @@ h1 img {
 h1 span {
     color: var(--secondary-text-color);
     font-weight: 300;
+}
+
+a, small {
+    color: var(--secondary-text-color);
 }
