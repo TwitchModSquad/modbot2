@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/TwitchModSquad/modbot2#readme",
   "dependencies": {
+    "body-parser": "^1.20.2",
     "cookie-parser": "^1.4.6",
     "discord.js": "^14.12.1",
     "ejs": "^3.1.9",
