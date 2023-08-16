@@ -1,7 +1,5 @@
 const { StringSelectMenuInteraction, EmbedBuilder, codeBlock, cleanCodeBlockContent } = require("discord.js");
 
-const utils = require("../../../../utils/");
-
 const listener = {
     name: 'chatHistorySelect',
     /**
@@ -19,27 +17,32 @@ const listener = {
         const startTime = Date.now();
         const [streamerID, chatterID] = interaction.values[0].split(":");
         try {
-            const streamer = await utils.Twitch.getUserById(streamerID, false, true);
-            const chatter = await utils.Twitch.getUserById(chatterID, false, true);
+            const streamer = await global.utils.Twitch.getUserById(streamerID, false, true);
+            const chatter = await global.utils.Twitch.getUserById(chatterID, false, true);
 
-            const chatHistory = await utils.Schemas.TwitchChat.find({streamer: streamer._id, chatter: chatter._id})
+            const chatHistory = await global.utils.Schemas.TwitchChat.find({streamer: streamer._id, chatter: chatter._id})
                     .sort({time_sent: -1})
-                    .limit(20);
+                    .limit(25);
 
-            const bans = await utils.Schemas.TwitchBan.find({
+            const bans = await global.utils.Schemas.TwitchBan.find({
                         streamer: streamer._id,
                         chatter: chatter._id,
                         time_end: null,
                         time_start: {
-                            $gt: chatHistory[0].time_sent,
-                            $lt: chatHistory[chatHistory.length - 1].time_sent,
+                            $gt: chatHistory[chatHistory.length - 1].time_sent,
                         }
                     });
 
             let chatHistoryString = "";
+            let lastTime = Date.now();
             chatHistory.forEach(ch => {
                 if (chatHistoryString !== "") chatHistoryString += "\n";
-                chatHistoryString += utils.formatTime(ch.time_sent) + ` [${chatter.display_name}] ${ch.message}`;
+                const bansFilter = bans.filter(x => x.time_start < lastTime && x.time_start > ch.time_sent);
+                bansFilter.forEach(ban => {
+                    chatHistoryString += `${global.utils.formatTime(ban.time_start)} [#${streamer.login}] ${chatter.display_name} was banned!\n`;
+                });
+                chatHistoryString += `${global.utils.formatTime(ch.time_sent)} [${chatter.display_name}] ${ch.message}`;
+                lastTime = ch.time_sent;
             });
 
             const elapsedTime = Date.now() - startTime;
@@ -53,7 +56,8 @@ const listener = {
 
             interaction.reply({embeds: [embed], ephemeral: true});
         } catch (err) {
-            interaction.error(err);
+            console.error(err);
+            interaction.error(String(err));
         }
     }
 };
