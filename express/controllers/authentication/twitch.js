@@ -64,7 +64,7 @@ router.get("/", async (req, res) => {
                 res.redirect(utils.Authentication.Discord.getURL());
             } else {
                 if (session.identity.authenticated) {
-                    res.redirect("/panel/");
+                    res.redirect("/auth/login");
                 } else {
                     res.redirect("/auth/verify");
                 }

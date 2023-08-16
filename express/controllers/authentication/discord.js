@@ -56,7 +56,7 @@ router.get("/", async (req, res) => {
                 res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users"));
             } else {
                 if (session.identity.authenticated) {
-                    res.redirect("/panel/");
+                    res.redirect("/auth/login");
                 } else {
                     res.redirect("/auth/verify");
                 }
@@ -66,7 +66,7 @@ router.get("/", async (req, res) => {
             res.send("Unable to retrieve user!");
         });
     } else {
-        res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users"));
+        res.redirect(utils.Authentication.Discord.getURL());
     }
 });
 
