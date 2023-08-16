@@ -23,6 +23,7 @@ const listener = {
                 console.error(e);
             }
         });
+        console.log(`[MBM] Found and updated ${guilds.size} guild(s)`);
     }
 };
 

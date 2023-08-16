@@ -1,1 +1,2 @@
 require("./modbot/");
+require("./mbm/");
