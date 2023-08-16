@@ -7,11 +7,12 @@ const interval = {
     onStartup: false,
     run: async () => {
         console.log(
-            `Member Channels: ${listenClients.member.channels.length}\n` +
-            `Partner Channels: ${listenClients.partner.channels.length}\n` +
-            `Affiliate Channels: ${listenClients.affiliate.channels.length}\n` +
+            `Member Channels: ${utils.comma(listenClients.member.channels.length)}\n` +
+            `Partner Channels: ${utils.comma(listenClients.partner.channels.length)}\n` +
+            `Affiliate Channels: ${utils.comma(listenClients.affiliate.channels.length)}\n` +
             "-------------------------\n" +
-            `Cached Twitch Users: ${Object.keys(utils.Twitch.userCache.objectStore).length}\n` +
+            `Cached Twitch  Users: ${utils.comma(Object.keys(utils.Twitch.userCache.objectStore).length)}\n` +
+            `Cached Discord Users: ${utils.comma(Object.keys(utils.Discord.userCache.objectStore).length)}\n` +
             "-------------------------"
             );
     },
