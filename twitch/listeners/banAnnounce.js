@@ -111,7 +111,7 @@ const listener = {
                 name: `Channel Activity (${channelHistory.length} channel${channelHistory.length === 1 ? "" : "s"})`,
                 value: codeBlock(
                     cleanCodeBlockContent(
-                        utils.stringTable(channelHistoryTable)
+                        utils.stringTable(channelHistoryTable, 2)
                     )
                 ),
             });
