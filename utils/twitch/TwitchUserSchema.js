@@ -61,6 +61,24 @@ userSchema.pre("save", function(next) {
     next();
 });
 
+userSchema.methods.public = function() {
+    return {
+        id: this._id,
+        login: this.login,
+        display_name: this.display_name,
+        type: this.type,
+        broadcaster_type: this.broadcaster_type,
+        follower_count: this.follower_count,
+        description: this.description,
+        profile_image_url: this.profile_image_url,
+        offline_image_url: this.offline_image_url,
+        chat_listen: this.chat_listen,
+        blacklisted: this.blacklisted,
+        created_at: this.created_at,
+        updated_at: this.updated_at,
+    };
+}
+
 userSchema.methods.fetchFollowers = async function () {
     const followers = (await global.utils.Twitch.Helix.helix.users.getFollows({followedUser: this._id, limit: 1})).total;
     this.follower_count = followers;
@@ -97,6 +115,14 @@ userSchema.methods.createIdentity = async function() {
 
 userSchema.methods.getMods = async function(includeInactive = false) {
     let data = {streamer: this};
+    if (!includeInactive) data.time_end = null;
+    return await TwitchRole.find(data)
+            .populate("streamer")
+            .populate("moderator");
+}
+
+userSchema.methods.getStreamers = async function(includeInactive = false) {
+    let data = {moderator: this};
     if (!includeInactive) data.time_end = null;
     return await TwitchRole.find(data)
             .populate("streamer")
