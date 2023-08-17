@@ -275,6 +275,27 @@ class Utils {
     }
 
     /**
+     * Formats a time (in seconds) to a clock HH:MM:SS
+     * @param {number} time 
+     */
+    formatElapsed(time) {
+        let hour = Math.floor(time / 60 / 60);
+        time -= hour * 60 * 60;
+        let minute = Math.floor(time / 60);
+        time -= minute * 60;
+        let second = time;
+
+        hour = String(hour);
+        minute = String(minute);
+        second = String(second);
+
+        if (hour.length === 1) hour = "0" + hour;
+        if (minute.length === 1) minute = "0" + minute;
+        if (second.length === 1) second = "0" + second;
+        return `${hour}:${minute}:${second}`;
+    }
+
+    /**
      * Initializes schema for all Utils objects
      */
     async schema() {
