@@ -112,6 +112,7 @@ class ListenClient {
      */
     join(channel) {
         channel = channel.replace("#", "").toLowerCase();
+        if (this.channels.includes(channel)) return;
         this.channels.push(channel);
         if (this.client)
             this.client.join(channel).catch(err => {
