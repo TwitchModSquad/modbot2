@@ -15,12 +15,16 @@
                 <%- include("../../partials/objects/twitchUser", {account: user, comma: comma}) %>
             <% }) %>
         </div>
-        <a class="button full next" href="<%= twitchURI %>"><i class="fa-brands fa-twitch"></i> Add <%= twitchUsers.length === 0 ? "a" : "another" %> Twitch account</a>
+        <a class="button full next twitch" href="<%= twitchURI %>"><i class="fa-brands fa-twitch"></i> Add <%= twitchUsers.length === 0 ? "a" : "another" %> Twitch account</a>
         <div class="discord-users">
             <% discordUsers.forEach(user => { %>
                 <%- include("../../partials/objects/discordUser", {account: user}) %>
             <% }) %>
         </div>
+        <a class="button full next discord" href="<%= discordURI %>"><i class="fa-brands fa-discord"></i> Add <%= discordUsers.length === 0 ? "a" : "another" %> Discord account</a>
+        <% if (identity.authenticated) { %>
+        <a class="button full next" href="/panel/"><img src="/assets/images/logos/logo_guy.png" alt="The Mod Squad Guy"> Sign on to the TMS panel</a>
+        <% } %>
     </main>
     
     <div class="notifications"></div>
