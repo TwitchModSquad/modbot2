@@ -1,13 +1,9 @@
-<div class="user twitch">
-    <img src="<%= account.profile_image_url %>" alt="Profile picture for <%= account.display_name %>">
+<<%- locals?.link ? `a href="/panel/user/${account?._id ? account._id : account.id}"` : "div" %> class="user discord">
+    <img src="<%= account.avatarURL() %>" alt="Profile picture for <%= account.globalName %>">
     <div class="info">
-        <h3 class="username"><%= account.display_name %><%- account.broadcaster_type === "partner" ? ` <img src="/assets/images/badges/twitch/partner.png" alt="Partner badge">` : "" %></h3>
+        <h3 class="username"><%= account.globalName %><%= account.discriminator === "0" ? "" : `<span>#${account.discriminator}</span>` %></h3>
         <div class="data">
             <span class="id"><%= account?._id ? account._id : account.id %></span>
-            <% if (account.follower_count) { %>
-            &bullet;
-            <span class="followers"><%= comma(account.follower_count) %> follower<%= account.follower_count === 1 ? "" : "s" %></span>
-            <% } %>
         </div>
     </div>
-</div>
+</<%= locals?.link ? "a" : "div" %>>
