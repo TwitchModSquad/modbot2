@@ -1,3 +1,5 @@
+global.startTime = Date.now();
+
 const fs = require('fs');
 
 global.client = {};
