@@ -49,4 +49,14 @@ userSchema.methods.createIdentity = async function() {
     return identity;
 }
 
+userSchema.methods.avatarURL = function(size = 64) {
+    if (this.avatar)
+        return `https://cdn.discordapp.com/avatars/${this._id}/${this.avatar}.png?size=${size}`;
+
+    if (this.discriminator === "0") {
+        return `https://cdn.discordapp.com/embed/avatars/${(this._id >> 22) % 5}.png?size=${size}`;
+    } else
+        return `https://cdn.discordapp.com/embed/avatars/${Number(this.discriminator) % 5}.png?size=${size}`;
+}
+
 module.exports = userSchema;
