@@ -1,5 +1,5 @@
 select {
-    background-color: var(--secondary-background-color);
+    background-color: var(--primary-background-color);
     border: 1px solid var(--tertiary-background-color);
     color: var(--primary-text-color);
     box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
@@ -16,7 +16,7 @@ select {
 .search-box-results {
     display: none;
     width: calc(100% - 1.2em - 2px);
-    background-color: var(--secondary-background-color);
+    background-color: var(--primary-background-color);
     color: var(--primary-text-color);
     border: 1px solid var(--tertiary-background-color);
     border-top: none;
@@ -41,7 +41,7 @@ select {
 
 input[type=search],
 input[type=text] {
-    background-color: var(--secondary-background-color);
+    background-color: var(--primary-background-color);
     color: var(--primary-text-color);
     border: 1px solid var(--tertiary-background-color);
     border-radius: .3em;

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Twitch Mod Squad - Panel Home</title>
+<%- include("../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/panel/panel.css">
+</head>
+<body class="panel">
+<%- include("../partials/header") %>
+
+    <div class="sidebar-container">
+        <%- include("../partials/sidebar", {active: "home"}) %>
+        
+        <main class="container container-md">
+            <div class="col-4">
+                <section>
+                    <h2><i class="fa-brands fa-twitch"></i> Twitch Users</h2>
+                    <% twitchUsers.forEach(user => { %>
+                        <%- include("../partials/objects/twitchUser", {account: user, comma: comma, link: true}) %>
+                    <% }) %>
+                </section>
+                <section>
+                    <h2><i class="fa-brands fa-discord"></i> Discord Users</h2>
+                    <% discordUsers.forEach(user => { %>
+                        <%- include("../partials/objects/discordUser", {account: user, link: true}) %>
+                    <% }) %>
+                </section>
+            </div>
+            <div class="col-4">
+                <section>
+                    <h2><i class="fa-solid fa-signal-stream"></i> Streamers</h2>
+                    <% streamers.forEach(role => { %>
+                        <%- include("../partials/objects/twitchUser", {account: role.streamer, comma: comma, link: true}) %>
+                    <% }) %>
+                </section>
+            </div>
+            <div class="col-4">
+                <section>
+                    <h2><img src="/assets/images/logos/logo_guy.png" alt="TMS Logo"> TMS Stats</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% stats.forEach(stat => { %>
+                                <tr>
+                                    <td><%= stat[0] %></td>
+                                    <td><%= stat[1] %></td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+        </main>
+    </div>
+    
+    <div class="notifications"></div>
+<%- include("../partials/javascript") %>
+    <script src="/assets/js/panel.js"> </script>
+</body>
+</html>

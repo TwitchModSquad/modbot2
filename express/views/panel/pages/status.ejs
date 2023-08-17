@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Twitch Mod Squad - Bot Status</title>
+<%- include("../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/panel/panel.css">
+</head>
+<body class="panel">
+<%- include("../partials/header") %>
+
+    <div class="sidebar-container">
+        <%- include("../partials/sidebar", {active: "status"}) %>
+        
+        <main class="container container-md">
+            <div class="col-4">
+                <section>
+                    <h2><img src="/assets/images/logos/logo_guy.png" alt="The Mod Squad Logo"> Members</h2>
+                    <% members.forEach(user => { %>
+                        <%- include("../partials/objects/twitchUser", {account: user, comma: comma, link: true}) %>
+                    <% }) %>
+                </section>
+            </div>
+            <div class="col-4">
+                <section>
+                    <h2><img src="/assets/images/badges/twitch/partner.png" alt="Twitch Partner Badge">Partners</h2>
+                    <% partners.forEach(user => { %>
+                        <%- include("../partials/objects/twitchUser", {account: user, comma: comma, link: true}) %>
+                    <% }) %>
+                </section>
+            </div>
+            <div class="col-4">
+                <section>
+                    <h2><i class="fa-solid fa-user"></i> Affiliates</h2>
+                    <% affiliates.forEach(user => { %>
+                        <%- include("../partials/objects/twitchUser", {account: user, comma: comma, link: true}) %>
+                    <% }) %>
+                </section>
+            </div>
+        </main>
+    </div>
+    
+    <div class="notifications"></div>
+<%- include("../partials/javascript") %>
+    <script src="/assets/js/panel.js"> </script>
+</body>
+</html>

@@ -44,3 +44,9 @@ const parse = {
         }
     }
 }
+
+$(function() {
+    $(".user img").on("error", function() {
+        $(this).attr("src", "/assets/images/blank-profile.webp");
+    })
+});

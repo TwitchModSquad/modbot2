@@ -32,20 +32,20 @@ html, body {
 
 body {
     background-color: var(--primary-background-color);
-    background: url('/assets/images/banners/banner-large.png');
-    background-repeat: no-repeat;
-    background-size: cover;
     color: var(--primary-text-color);
     font-family: "Noto Sans", sans-serif;
     margin: 0;
     padding: 0;
 }
 
-main {
-    background-color: var(--primary-background-color);
+body:not(.panel) {
+    background: url('/assets/images/banners/banner-large.png');
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 body.narrow-page main {
+    background-color: var(--secondary-background-color);
     width: calc(100% - 3em);
     max-width: 30em;
     margin: 3em auto;

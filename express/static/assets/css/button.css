@@ -11,6 +11,16 @@ button, .button {
     transition: 0.2s background-color;
 }
 
+button.discord,
+.button.discord {
+    background-color: var(--primary-discord-color);
+}
+
+button.twitch,
+.button.twitch {
+    background-color: var(--primary-twitch-color);
+}
+
 button[disabled="disabled"],
 .button[disabled="disabled"] {
     background-color: var(--primary-background-color);
@@ -22,6 +32,7 @@ button.full,
     display: block;
     position: relative;
     width: 100%;
+    margin: .8em 0;
     padding: .8em 1em;
     font-weight: 600;
 }
@@ -32,6 +43,11 @@ button.full,
     left: 0.8em;
     top: 50%;
     transform: translateY(-50%);
+}
+
+.button.full img {
+    width: 30px;
+    height: 30px;
 }
 
 a.button.full {

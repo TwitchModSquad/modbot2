@@ -1,0 +1,97 @@
+header {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    display: flex;
+    background-color: var(--primary-tms-color);
+    text-shadow: var(--shadow);
+}
+
+header a {
+    background-color: var(--primary-tms-color);
+    color: var(--primary-text-color);
+    position: relative;
+    width: 2.5em;
+    height: 2.5em;
+    padding: .4em;
+    transition: 0.2s background-color;
+}
+
+header a:hover {
+    background-color: var(--secondary-tms-color);
+}
+
+header a i {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+header h1 {
+    font-size: 1.5rem;
+    font-weight: 300;
+    flex-grow: 1;
+    padding: .4em;
+}
+
+.sidebar {
+    background-color: var(--secondary-background-color);
+    width: 16em;
+    height: calc(100vh - 3.3em);
+    position: fixed;
+    top: 3.3em;
+    left: 0;
+    transition: .3s;
+}
+
+.sidebar ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar .separator {
+    font-size: .85em;
+    font-weight: 600;
+    background-color: rgba(0,0,0,0.2);
+    text-transform: uppercase;
+    padding: .4em;
+    text-align: center;
+}
+
+.sidebar .link a {
+    display: block;
+    color: var(--secondary-text-color);
+    text-decoration: none;
+    padding: 1em;
+}
+
+.sidebar .link:hover a {
+    background-color: rgba(0,0,0,0.05);
+}
+
+.sidebar .link.active a {
+    background-color: rgba(0,0,0,0.1);
+    color: var(--primary-text-color);
+}
+
+.sidebar .link a i {
+    display: inline-block;
+    margin-right: .8em;
+}
+
+main {
+    margin-top: 3.3em;
+    margin-left: 16em;
+    transition: .3s margin-left;
+}
+
+.sidebar-collapse .sidebar {
+    left: -16em;
+}
+
+.sidebar-collapse main {
+    margin-left: 0;
+}

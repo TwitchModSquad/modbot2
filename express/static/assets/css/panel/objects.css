@@ -11,6 +11,7 @@
     border: .1em solid rgba(255,255,255,0.05);
     border-radius: 8px;
     flex-grow: 1;
+    text-decoration: none;
 }
 
 .user > img,
@@ -48,4 +49,8 @@
 
 .user.twitch > img {
     border-color: var(--primary-twitch-color);
+}
+
+.user.discord > img {
+    border-color: var(--primary-discord-color);
 }

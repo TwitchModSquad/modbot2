@@ -7,12 +7,26 @@ section {
     box-shadow: var(--shadow);
 }
 
-section h2,
-section h3 {
+section > h2,
+section > h3 {
     font-weight: 600;
     font-size: 1rem;
     padding: .8rem;
     margin: -.8rem;
     margin-bottom: .8rem;
     border-bottom: 1px solid rgba(0,0,0,0.2);
+}
+
+section > h2 i,
+section > h3 i {
+    display: inline-block;
+    margin-right: .2em;
+}
+
+section > h2 img,
+section > h3 img {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    margin-right: .2em;
 }
