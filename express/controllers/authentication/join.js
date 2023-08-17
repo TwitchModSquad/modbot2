@@ -65,30 +65,30 @@ router.get("/tms", async (req, res) => {
 
     streamers.forEach(role => {
         if (role.streamer.broadcaster_type === "partner") {
-            if (!resolvedRoles.includes(config.discord.modbot.roles.moderator.partnered)) {
-                resolvedRoles.push(config.discord.modbot.roles.moderator.partnered);
+            if (!resolvedRoles.includes(config.discord.tms.roles.moderator.partnered)) {
+                resolvedRoles.push(config.discord.tms.roles.moderator.partnered);
             }
-        } else if (role.streamer.follower_count >= 5000) {
-            if (!resolvedRoles.includes(config.discord.modbot.roles.moderator.partnered)) {
-                resolvedRoles.push(config.discord.modbot.roles.moderator.partnered);
+        } else if (role.streamer.broadcaster_type === "affiliate" && role.streamer.follower_count >= 5000) {
+            if (!resolvedRoles.includes(config.discord.tms.roles.moderator.affiliate)) {
+                resolvedRoles.push(config.discord.tms.roles.moderator.affiliate);
             }
         }
     });
 
     twitchUsers.forEach(user => {
         if (user.broadcaster_type === "partner") {
-            if (!resolvedRoles.includes(config.discord.modbot.roles.streamer.partnered)) {
-                resolvedRoles.push(config.discord.modbot.roles.streamer.partnered);
+            if (!resolvedRoles.includes(config.discord.tms.roles.streamer.partnered)) {
+                resolvedRoles.push(config.discord.tms.roles.streamer.partnered);
             }
-        } else if (user?.follower_count >= 5000) {
-            if (!resolvedRoles.includes(config.discord.modbot.roles.streamer.affiliate)) {
-                resolvedRoles.push(config.discord.modbot.roles.streamer.affiliate);
+        } else if (user.broadcaster_type === "affiliate" && user?.follower_count >= 5000) {
+            if (!resolvedRoles.includes(config.discord.tms.roles.streamer.affiliate)) {
+                resolvedRoles.push(config.discord.tms.roles.streamer.affiliate);
             }
         }
     });
 
     if (resolvedRoles.length > 0) {
-        const guild = await global.client.mbm.guilds.fetch(config.discord.guilds.modsquad);
+        const guild = utils.Discord.guilds.tms;
         for (let i = 0; i < discordUsers.length; i++) {
             const user = discordUsers[i];
             const token = await utils.Schemas.DiscordToken.findOne({user: user._id});
@@ -118,6 +118,99 @@ router.get("/tms", async (req, res) => {
     } else {
         res.json({ok: false, error: "You are unable to join The Mod Squad currently!"});
     }
+});
+
+router.get("/tlms", async (req, res) => {
+    const twitchUsers = await req.session.identity.getTwitchUsers();
+    const discordUsers = await req.session.identity.getDiscordUsers();
+
+    const streamers = await req.session.identity.getStreamers();
+
+    let resolvedRoles = [];
+
+    streamers.forEach(role => {
+        if (role.streamer.broadcaster_type === "partner") {
+            if (!resolvedRoles.includes(config.discord.tlms.roles.moderator.partnered)) {
+                resolvedRoles.push(config.discord.tlms.roles.moderator.partnered);
+            }
+        } else if (role.streamer.broadcaster_type === "affiliate") {
+            if (!resolvedRoles.includes(config.discord.tlms.roles.moderator.affiliate)) {
+                resolvedRoles.push(config.discord.tlms.roles.moderator.affiliate);
+            }
+        }
+    });
+
+    twitchUsers.forEach(user => {
+        if (user.broadcaster_type === "partner") {
+            if (!resolvedRoles.includes(config.discord.tlms.roles.streamer.partnered)) {
+                resolvedRoles.push(config.discord.tlms.roles.streamer.partnered);
+            }
+        } else if (user?.follower_count >= 5000) {
+            if (!resolvedRoles.includes(config.discord.tlms.roles.streamer.affiliate)) {
+                resolvedRoles.push(config.discord.tlms.roles.streamer.affiliate);
+            }
+        }
+    });
+
+    const guild = utils.Discord.guilds.tlms;
+    for (let i = 0; i < discordUsers.length; i++) {
+        const user = discordUsers[i];
+        const token = await utils.Schemas.DiscordToken.findOne({user: user._id});
+        if (token) {
+            try {
+                const newToken = await utils.Authentication.Discord.getAccessToken(token.refresh_token);
+                token.refresh_token = newToken.refresh_token;
+                await token.save();
+                try {
+                    await guild.members.add(user._id, {accessToken: newToken.access_token, roles: resolvedRoles});
+                } catch(e) {
+                    console.error(e);
+                    res.json({ok: false, error: `Unable to add user ${user.globalName}!`});
+                    return;
+                }
+            } catch(e) {
+                console.error(e);
+                res.json({ok: false, error: `Unable to refresh access token for Discord user ${user.globalName}!`});
+                return;
+            }
+        } else {
+            res.json({ok: false, error: `Unable to find token for Discord user ${user.globalName}!`})
+            return;
+        }
+    }
+    res.json({ok: true});
+});
+
+router.get("/cl", async (req, res) => {
+    const discordUsers = await req.session.identity.getDiscordUsers();
+
+    const guild = utils.Discord.guilds.cl;
+    for (let i = 0; i < discordUsers.length; i++) {
+        const user = discordUsers[i];
+        const token = await utils.Schemas.DiscordToken.findOne({user: user._id});
+        if (token) {
+            try {
+                const newToken = await utils.Authentication.Discord.getAccessToken(token.refresh_token);
+                token.refresh_token = newToken.refresh_token;
+                await token.save();
+                try {
+                    await guild.members.add(user._id, {accessToken: newToken.access_token});
+                } catch(e) {
+                    console.error(e);
+                    res.json({ok: false, error: `Unable to add user ${user.globalName}!`});
+                    return;
+                }
+            } catch(e) {
+                console.error(e);
+                res.json({ok: false, error: `Unable to refresh access token for Discord user ${user.globalName}!`});
+                return;
+            }
+        } else {
+            res.json({ok: false, error: `Unable to find token for Discord user ${user.globalName}!`})
+            return;
+        }
+    }
+    res.json({ok: true});
 });
 
 module.exports = router;
