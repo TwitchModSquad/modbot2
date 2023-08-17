@@ -1,4 +1,4 @@
-const { TextChannel, Message, codeBlock } = require("discord.js");
+const { TextChannel, Message, codeBlock, Guild } = require("discord.js");
 
 const config = require("../../config.json");
 
@@ -15,6 +15,16 @@ class Discord {
      * @type {Cache}
      */
     userCache = new Cache(1 * 60 * 60 * 1000); // 1 hour cache
+
+    /**
+     * Various Discord guilds
+     * @type {{tms:Guild,tlms:Guild,cl:Guild}}
+     */
+    guilds = {
+        tms: null,
+        tlms: null,
+        cl: null,
+    }
 
     /**
      * Various Discord channels
@@ -195,6 +205,10 @@ class Discord {
      * @returns {Promise<null>}
      */
     async init() {
+        this.guilds.tms = await global.client.mbm.guilds.fetch(config.discord.guilds.modsquad);
+        this.guilds.tlms = await global.client.mbm.guilds.fetch(config.discord.guilds.little_modsquad);
+        this.guilds.cl = await global.client.mbm.guilds.fetch(config.discord.guilds.community_lobbies);
+
         this.channels.ban = await global.client.modbot.channels.fetch(config.discord.modbot.channels.ban);
         this.channels.live = await global.client.modbot.channels.fetch(config.discord.modbot.channels.live);
 
@@ -230,6 +244,7 @@ class Discord {
         this.banContent = this.messages.globalBan.content;
 
         console.log(
+            `[MB] Using guilds: TMS [${this.guilds.tms.name}] TLMS [${this.guilds.tlms.name}] CL [${this.guilds.cl.name}]\n` +
             `[MB] Using channel #${this.channels.ban.name} for bans, #${this.channels.live.name} for livestreams\n` +
             `[MB] Using message ${this.messages.globalTimeout.id} for timeouts, ${this.messages.globalBan.id} for bans`
         );
