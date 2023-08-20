@@ -23,7 +23,7 @@ const roleSchema = new mongoose.Schema({
     },
     source: {
         type: String,
-        enum: ["legacy", "gql", "helix", "3v.fi"],
+        enum: ["legacy", "gql", "tmi", "helix", "3v.fi"],
         default: "legacy",
     }
 });
