@@ -3,6 +3,10 @@
     <div class="info">
         <h3 class="username"><%= account.display_name %><%- account.broadcaster_type === "partner" ? ` <img src="/assets/images/badges/twitch/partner.png" alt="Partner badge">` : "" %></h3>
         <div class="data">
+            <% if (account.login !== account.display_name.toLowerCase()) { %>
+            <span class="login"><%= account.login %></span>
+            &bullet;
+            <% } %>
             <span class="id"><%= account?._id ? account._id : account.id %></span>
             <% if (account.follower_count) { %>
             &bullet;
