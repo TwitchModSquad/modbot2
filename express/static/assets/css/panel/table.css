@@ -13,7 +13,7 @@ th {
     font-weight: 700;
 }
 
-tr {
+table:not(.chat) tr {
     border-bottom: rgba(255,255,255,0.1) solid 1px;
 }
 
