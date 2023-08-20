@@ -10,6 +10,7 @@
         <p>
             Sign in or join to view The Mod Squad panel!
         </p>
+        <% if (identity) { %>
         <div class="twitch-users">
             <% twitchUsers.forEach(user => { %>
                 <%- include("../../partials/objects/twitchUser", {account: user, comma: comma}) %>
@@ -22,8 +23,11 @@
             <% }) %>
         </div>
         <a class="button full next discord" href="<%= discordURI %>"><i class="fa-brands fa-discord"></i> Add <%= discordUsers.length === 0 ? "a" : "another" %> Discord account</a>
-        <% if (identity.authenticated) { %>
+        <% if (identity?.authenticated) { %>
         <a class="button full next" href="/panel/"><img src="/assets/images/logos/logo_guy.png" alt="The Mod Squad Guy"> Sign on to the TMS panel</a>
+        <% }} else { %>
+            <a class="button full next twitch" href="<%= twitchURI %>"><i class="fa-brands fa-twitch"></i> Log in with Twitch</a>
+            <a class="button full next discord" href="<%= discordURI %>"><i class="fa-brands fa-discord"></i> Log in with Discord</a>
         <% } %>
     </main>
     
