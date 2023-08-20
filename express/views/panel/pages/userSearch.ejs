@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Twitch Mod Squad - Search for Users</title>
+<%- include("../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/panel/panel.css">
+    <link rel="stylesheet" href="/assets/css/panel/userSelector.css">
+    <link rel="stylesheet" href="/assets/css/panel/userSearch.css">
+</head>
+<body class="panel">
+<%- include("../partials/header") %>
+
+    <div class="sidebar-container">
+        <%- include("../partials/sidebar", {active: "user-search"}) %>
+        
+        <main class="container container-md">
+            <% if (locals?.error) { %>
+            <div class="alert alert-danger col-12" onclick="$(this).remove()">
+                <strong>An error occurred!</strong>
+                <%= error %>
+            </div>
+            <% } %>
+            <section class="col-12">
+                <h2><i class="fa-solid fa-user-magnifying-glass"></i> User Search</h2>
+                <%- include("../partials/userSelector", {type: "all", name: "user", label: "User Search", user: locals?.user ? locals.user : null, comma: comma}) %>
+            </section>
+
+            <% if (locals?.type === "twitch") { %>
+            <div class="large-user-container twitch col-12 container container-lg container-limit container-limit-50">
+                <section class="col-4">
+                    <h2><i class="fa-solid fa-circle-info"></i> User Information <small>Generated in <%= elapsed %> ms</small></h2>
+                    <div class="large-info overflow-container">
+                        <img src="<%= user.profile_image_url %>" class="large-profile-picture" alt="Profile picture for <%= user.display_name %>">
+                        <h3>
+                            <%= user.display_name %>
+                            <% if (user.broadcaster_type === "partner") { %><img src="/assets/images/badges/twitch/partner.png" alt="Partner Badge"><% } %>
+                            <small><%= user._id %></small>
+                        </h3>
+                        <a href="https://twitch.tv/<%= user.login %>" target="__blank">twitch.tv/<%= user.login %></a>
+                        <% if (channelHistory.member.length > 0 || channelHistory.other.length > 0) { %><br><a href="/panel/chat-history?chatter=<%= user._id %>">View Chat History</a><% } %>
+                        <% if (user?.description && user.description !== "") { %><pre><%= user.description %></pre><% } %>
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <th>User Created</th>
+                                    <td><%= parseDate(user.created_at) %></td>
+                                </tr>
+                                <% if (user.follower_count) { %>
+                                <tr>
+                                    <th>Follower Count</th>
+                                    <td><%= comma(user.follower_count) %> followers</td>
+                                </tr>
+                                <% } if (locals?.lastLive) { %>
+                                <tr>
+                                    <th>Last Live</th>
+                                    <td><%= !lastLive.endDate ? "Live Now" : parseDate(lastLive.endDate) %></td>
+                                </tr>
+                                <% } if (channelHistory.member.length > 0 || channelHistory.other.length > 0) { %>
+                                <tr>
+                                    <th>Channel History (Member/Other/Total)</th>
+                                    <td><%= channelHistory.member.length %>/<%= channelHistory.other.length %>/<%= channelHistory.member.length + channelHistory.other.length %></td>
+                                </tr>
+                                <% } if (listeningClients?.length > 0) { %>
+                                <tr>
+                                    <th>TMS Listening Clients</th>
+                                    <td><%= listeningClients.join(", ") %></td>
+                                </tr>
+                                <% } %>
+                                <tr>
+                                    <th>Punishments (TOs/Bans)</th>
+                                    <td>
+                                        <%= timeouts.length %>/<%= bans.length %>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <small>
+                            User information last updated <%= parseDate(user.updated_at) %>
+                            <br>
+                            <a href="/panel/user/<%= user._id %>/force">Force update this user</a>
+                        </small>
+                    </div>
+                </section>
+                <section class="col-4">
+                    <h2><i class="fa-solid fa-ban"></i> Twitch Bans</h2>
+                    <div class="overflow-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Banned In</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                    <th>Chat History</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% bans.forEach(ban => { %>
+                                    <tr class="punishment">
+                                        <td>
+                                            <img src="<%= ban.streamer.profile_image_url %>" alt="Profile picture for <%= ban.streamer.display_name %>">
+                                            <%= ban.streamer.display_name %>
+                                        </td>
+                                        <td>
+                                            <%= parseDate(ban.time_start) %>
+                                        </td>
+                                        <td>
+                                            <%= ban.time_end ? parseDate(ban.time_end) : "Active" %>
+                                        </td>
+                                        <td>
+                                            <a href="#" class="history-popup" data-streamer="<%= ban.streamer._id %>" data-chatter="<%= user._id %>" data-before="<%= Math.floor(ban.time_start / 1000) %>" data-after="<%= Math.floor(ban.time_start / 1000) - (3 * 60 * 60) %>">View Logs</a>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                                <% if (bans.length === 0) { %>
+                                    <tr>
+                                        <td colspan="4">This user has not been banned (yet)!</td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                <section class="col-4">
+                    <h2><i class="fa-solid fa-timer"></i> Twitch Timeouts</h2>
+                    <div class="overflow-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Time Out In</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                    <th>Chat History</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% timeouts.forEach(timeout => { %>
+                                    <tr class="punishment">
+                                        <td>
+                                            <img src="<%= timeout.streamer.profile_image_url %>" alt="Profile picture for <%= timeout.streamer.display_name %>">
+                                            <%= timeout.streamer.display_name %>
+                                        </td>
+                                        <td>
+                                            <%= parseDate(timeout.time_start) %>
+                                        </td>
+                                        <td>
+                                            <%= timeout.time_end ? parseDate(timeout.time_end) : "Active" %>
+                                        </td>
+                                        <td>
+                                            <a href="#" class="history-popup" data-streamer="<%= timeout.streamer._id %>" data-chatter="<%= user._id %>" data-before="<%= Math.floor(timeout.time_start / 1000) %>" data-after="<%= Math.floor(timeout.time_start / 1000) - (3 * 60 * 60) %>">View Logs</a>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                                <% if (timeouts.length === 0) { %>
+                                    <tr>
+                                        <td colspan="4">This user has not been timed out (yet)!</td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+            <div class="large-user-container container container-md col-12 container-limit container-limit-30">
+                <section class="col-6">
+                    <h2><i class="fa-solid fa-rectangle-vertical-history"></i> Active Communities</h2>
+                    <div class="overflow-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Community</th>
+                                    <th>Last Active</th>
+                                    <th>Chat History</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (channelHistory.member.length > 0) { %>
+                                <tr>
+                                    <th colspan="3">Member Communities</th>
+                                </tr>
+                                <% } %>
+                                <% channelHistory.member.forEach(channel => { %>
+                                <tr class="community-tab">
+                                    <td>
+                                        <img src="<%= channel.streamer.profile_image_url %>" alt="Profile picture for <%= channel.streamer.display_name %>">
+                                        <%= channel.streamer.display_name %>
+                                    </td>
+                                    <td>
+                                        <%= parseDate(channel.time_sent) %>
+                                    </td>
+                                    <td>
+                                        <a href="#" class="history-popup" data-streamer="<%= channel.streamer._id %>" data-chatter="<%= user._id %>" data-before="all" data-after="all">View Logs</a>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                                <% if (channelHistory.other.length > 0) { %>
+                                <tr>
+                                    <th colspan="3">Other Communities</th>
+                                </tr>
+                                <% } %>
+                                <% channelHistory.other.forEach(channel => { %>
+                                <tr class="community-tab">
+                                    <td>
+                                        <img src="<%= channel.streamer.profile_image_url %>" alt="Profile picture for <%= channel.streamer.display_name %>">
+                                        <%= channel.streamer.display_name %>
+                                    </td>
+                                    <td>
+                                        <%= parseDate(channel.time_sent) %>
+                                    </td>
+                                    <td>
+                                        <a href="#" class="history-popup" data-streamer="<%= channel.streamer._id %>" data-chatter="<%= user._id %>" data-before="all" data-after="all">View Logs</a>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                                <% if (channelHistory.other.length + channelHistory.member.length === 0) { %>
+                                <tr>
+                                    <td colspan="3">No active communities!</td>
+                                </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                <section class="col-6">
+                    <h2><i class="fa-solid fa-box-archive"></i> Archive Entries</h2>
+                    <div class="overflow-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Archive ID</th>
+                                    <th>Offense</th>
+                                    <th>File Count</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="3">No archive entries!</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+            <% if (streamers.length + moderators.length > 0) { %>
+                <div class="large-user-container container container-md col-12 container-limit container-limit-30">
+                    <section class="col-6">
+                        <h2><i class="fa-solid fa-tower-broadcast"></i> Moderated Channels</h2>
+                        <div class="overflow-container">
+                            <% if (streamers.length === 0) { %>No moderated channels!<% } %>
+                            <% streamers.forEach(role => { %>
+                                <%- include("../partials/objects/twitchUser", {account: role.streamer, comma: comma, link: true}) %>
+                            <% }) %>
+                        </div>
+                    </section>
+                    <section class="col-6">
+                        <h2><i class="fa-solid fa-swords"></i> Channel Moderators</h2>
+                        <div class="overflow-container">
+                            <% if (moderators.length === 0) { %>No channel moderators!<% } %>
+                            <% moderators.forEach(role => { %>
+                                <%- include("../partials/objects/twitchUser", {account: role.moderator, comma: comma, link: true}) %>
+                            <% }) %>
+                        </div>
+                    </section>
+                </div>
+            <% } %>
+            <% } else if (locals?.type === "discord") { %>
+            <div class="large-user-container discord col-12 container container-md">
+                <section class="col-4">
+                    <h2><i class="fa-solid fa-circle-info"></i> User Information <small>Generated in <%= elapsed %> ms</small></h2>
+                    <div class="large-info">
+                        <img src="<%= user.avatarURL(128) %>" class="large-profile-picture" alt="Profile picture for <%= user.globalName %>">
+                        <h3><%= user.globalName %> <small><%= user._id %></small></h3>
+                    </div>
+                </section>
+            </div>
+            <% } %>
+        </main>
+    </div>
+    
+    <div class="notifications"></div>
+<%- include("../partials/javascript") %>
+    <script src="/assets/js/panel.js"> </script>
+    <script src="/assets/js/userSelector.js"> </script>
+    <script src="/assets/js/userSearch.js"> </script>
+</body>
+</html>

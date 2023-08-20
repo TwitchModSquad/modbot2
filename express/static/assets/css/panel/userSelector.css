@@ -1,0 +1,66 @@
+.user-selector {
+    display: block;
+    width: 100%;
+}
+
+.user-selector h2 {
+    font-size: 1em;
+    font-weight: 400;
+    margin-left: 1em;
+}
+
+.user-selector .user {
+    cursor: pointer;
+}
+
+.search-box .input-holder,
+.search-box .search-box-results {
+    background-color: rgba(255,255,255,0.05);
+    margin: 0.6em;
+    padding: 0.6em;
+    border: 0.1em solid rgba(255,255,255,0.05);
+    border-radius: 8px;
+}
+
+.search-box .search-box-results {
+    background-color: rgba(25, 25, 25, 0.3);
+    position: absolute;
+    width: 20em;
+}
+
+.search-box .input-holder {
+    position: relative;
+}
+
+.search-box .input-holder > i {
+    position: absolute;
+    top: 50%;
+    left: 1em;
+    transform: translateY(-50%);
+}
+
+.search-box a {
+    position: absolute;
+    top: 50%;
+    right: 1em;
+    transform: translateY(-50%);
+}
+
+.search-box a.revert {
+    right: 2.5em;
+}
+
+.search-box input[type=search] {
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    padding: .6em 3em .6em 3em;
+}
+
+@supports (-webkit-backdrop-filter: none) or (backdrop-filter: none) {
+    .search-box-results {
+        background-color: var(--primary-background-color);
+        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(20px);
+    }
+}

@@ -1,0 +1,31 @@
+<div class="user-selector" data-type="<%= type %>">
+    <input type="hidden" name="<%= name %>" value="<%= locals?.user ? locals.user._id : "none" %>">
+    <div class="user-container">
+        <h2 class="label">
+            <%= label %>
+        </h2>
+        <form class="search-box" style="display: none;">
+            <div class="input-holder">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="search" name="<%= name %>-text" id="<%= name %>-text" placeholder="Search for a user...">
+                <a href="#" class="revert" aria-label="Unselect User" title="Unselect User"><i class="fa-solid fa-rotate-left"></i></a>
+                <a href="#" class="close" aria-label="Close Search" title="Close Search"><i class="fa-solid fa-xmark"></i></a>
+            </div>
+            <div class="search-box-results" style="display: none;"></div>
+        </form>
+        <% if (locals?.user) {
+        if (user.discriminator) { %>
+        <%- include("./objects/discordUser", {account: user}) %>
+        <% } else { %>
+        <%- include("./objects/twitchUser", {account: user, comma: comma}) %>
+        <% }} else { %>
+        <div class="user <%= type %>">
+            <img src="/assets/images/blank-profile.webp" alt="Blank profile picture">
+            <div class="info">
+                <h3 class="username">Select a Profile</h3>
+                Click to select a profile
+            </div>
+        </div>
+        <% } %>
+    </div>
+</div>

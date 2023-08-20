@@ -1,0 +1,45 @@
+.large-profile-picture {
+    display: block;
+    width: 100%;
+    max-width: 128px;
+    margin: 1em auto;
+    border-radius: 50%;
+    border: .3em solid transparent;
+}
+
+.twitch .large-profile-picture {
+    border-color: var(--primary-twitch-color);
+}
+
+.discord .large-profile-picture {
+    border-color: var(--primary-discord-color);
+}
+
+.large-info {
+    text-align: center;
+}
+
+.large-info h3 {
+    font-size: 1.4em;
+    font-weight: 300;
+}
+
+.large-info h3 img {
+    height: 1.2em;
+}
+
+.large-info pre {
+    font-family: 'Noto Sans Mono', monospace;
+    font-size: .8em;
+    background-color: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 1em;
+    border-radius: 4px;
+    white-space: normal;
+}
+
+.punishment img,
+.community-tab img {
+    height: 1.5em;
+    border-radius: 50%;
+}
