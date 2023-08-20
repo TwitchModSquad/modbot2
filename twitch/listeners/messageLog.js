@@ -5,7 +5,7 @@ const listener = {
     eventName: "message",
     listener: async (client, streamer, chatter, tags, message, self) => {
         try {
-            const chatMessage = await utils.Schemas.TwitchChat.create({
+            await utils.Schemas.TwitchChat.create({
                 _id: tags["id"],
                 streamer: streamer,
                 chatter: chatter,
@@ -14,6 +14,21 @@ const listener = {
                 emotes: tags["emotes-raw"],
                 message: message,
             });
+
+            if (tags?.mod) {
+                await utils.Schemas.TwitchRole.findOneAndUpdate({
+                    streamer: streamer,
+                    moderator: chatter,
+                }, {
+                    streamer: streamer,
+                    moderator: chatter,
+                    time_end: null,
+                    source: "tmi",
+                }, {
+                    upsert: true,
+                    new: true,
+                });
+            }
         } catch(e) {
             console.error(e);
         }
