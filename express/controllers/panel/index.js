@@ -5,29 +5,10 @@ const utils = require("../../../utils/");
 
 const listenClients = require("../../../twitch/");
 
+const chatHistory = require("./chatHistory");
 const live = require("./live");
 const status = require("./status");
-
-router.use(async (req, res, next) => {
-    const {cookies} = req;
-
-    const redirect = () => {
-        res.redirect("/auth/login");
-    }
-
-    if (cookies?.session) {
-        const session = await utils.Schemas.Session.findById(cookies.session)
-                .populate("identity");
-        if (session && session.identity.authenticated) {
-            req.session = session;
-            next();
-        } else {
-            redirect();
-        }
-    } else {
-        redirect();
-    }
-});
+const user = require("./user");
 
 router.get("/", async (req, res) => {
     const twitchUsers = await req.session.identity.getTwitchUsers();
@@ -60,7 +41,9 @@ router.get("/", async (req, res) => {
     });
 });
 
+router.use("/chat-history", chatHistory);
 router.use("/live", live);
 router.use("/status", status);
+router.use("/user", user);
 
 module.exports = router;
