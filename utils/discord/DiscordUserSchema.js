@@ -1,4 +1,7 @@
 const mongoose = require("mongoose");
+const mongoosastic = require("mongoosastic");
+
+const config = require("../../config.json");
 
 const userSchema = new mongoose.Schema({
     _id: {
@@ -10,6 +13,9 @@ const userSchema = new mongoose.Schema({
         maxLength: 32,
         required: true,
         index: true,
+        es_type: "completion",
+        es_search_analyzer: "simple",
+        es_indexed: true,
     },
     displayName: {
         type: String,
@@ -37,6 +43,19 @@ userSchema.pre("save", function(next) {
     next();
 });
 
+userSchema.methods.public = function() {
+    return {
+        id: this._id,
+        globalName: this.globalName,
+        displayName: this.displayName,
+        discriminator: this.discriminator,
+        avatar: this.avatar,
+        avatarURL: this.avatarURL(),
+        identity: this.identity,
+        updated_at: this.updated_at,
+    };
+}
+
 userSchema.methods.createIdentity = async function() {
     if (this.identity) {
         await this.populate("identity");
@@ -58,5 +77,7 @@ userSchema.methods.avatarURL = function(size = 64) {
     } else
         return `https://cdn.discordapp.com/embed/avatars/${Number(this.discriminator) % 5}.png?size=${size}`;
 }
+
+userSchema.plugin(mongoosastic, config.elasticsearch);
 
 module.exports = userSchema;

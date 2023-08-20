@@ -1,5 +1,6 @@
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const mongoose = require("mongoose");
+const mongoosastic = require("mongoosastic");
 
 const TwitchRole = require("./TwitchRole");
 
@@ -15,6 +16,9 @@ const userSchema = new mongoose.Schema({
         maxLength: 25,
         required: true,
         index: true,
+        es_type: "completion",
+        es_search_analyzer: "simple",
+        es_indexed: true,
     },
     display_name: {
         type: String,
@@ -175,5 +179,7 @@ userSchema.methods.fetchMods = async function() {
         throw "Json not returned in response";
     }
 }
+
+userSchema.plugin(mongoosastic, config.elasticsearch);
 
 module.exports = userSchema;
