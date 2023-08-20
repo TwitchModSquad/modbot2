@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Twitch Mod Squad - Chat History</title>
+<%- include("../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/panel/panel.css">
+    <link rel="stylesheet" href="/assets/css/panel/chat.css">
+    <link rel="stylesheet" href="/assets/css/panel/userSelector.css">
+</head>
+<body class="panel" style="margin: 1em 1.5em;">
+    <table class="chat">
+        <tbody>
+            <% if (history.length === 0) { %>
+                <tr>
+                    <td>There are no chat logs with this query!</td>
+                </tr>
+            <% } %>
+            <% history.forEach(row => { %>
+                <% if (row.type === "message") { %>
+            <tr>
+                <% if (!locals?.streamer) { %><td class="channel">#<%= row.streamer.login %></td><% } %>
+                <td class="date"><%= parseDate(row.time_sent) %></td>
+                <td class="message">
+                    <% if (row.badges) { %>
+                        <% if (row.badges.includes("broadcaster/")) { %><img src="/assets/images/badges/twitch/broadcaster.png" alt="Twitch Broadcastter" title="Twitch Broadcaster"><% } %>
+                        <% if (row.badges.includes("moderator/")) { %><img src="/assets/images/badges/twitch/moderator.png" alt="Twitch Moderator" title="Twitch Moderator"><% } %>
+                        <% if (row.badges.includes("subscriber/")) { %><img src="/assets/images/badges/twitch/subscriber.png" alt="Twitch Subscriber" title="Twitch Subscriber"><% } %>
+                        <% if (row.badges.includes("partner/")) { %><img src="/assets/images/badges/twitch/partner.png" alt="Twitch Partner" title="Twitch Partner"><% } %>
+                        <% if (row.badges.includes("vip/")) { %><img src="/assets/images/badges/twitch/vip.png" alt="Twitch Channel VIP" title="Twitch Channel VIP"><% } %>
+                    <% } %>
+                    <span style="color: <%= row.color ? row.color : "var(--secondary-text-color)" %>;"><%= row.chatter.display_name %></span>:
+                    <%= row.message %>
+                </td>
+            </tr>
+                <% } else if (row.type === "ban") { %>
+            <tr>
+                <% if (!locals?.streamer) { %><td class="channel">#<%= row.streamer.login %></td><% } %>
+                <td class="date"><%= parseDate(row.time_start) %></td>
+                <td class="message"><span class="punishment-message">User <%= row.chatter.display_name %> was banned in channel #<%= row.streamer.login %>!<%- row.time_end ? " <strong><em>(inactive)</em></strong>" : "" %></span></td>
+            </tr>
+                <% } else if (row.type === "timeout") { %>
+            <tr>
+                <% if (!locals?.streamer) { %><td class="channel">#<%= row.streamer.login %></td><% } %>
+                <td class="date"><%= parseDate(row.time_start) %></td>
+                <td class="message"><span class="punishment-message">User <%= row.chatter.display_name %> was timed out in channel #<%= row.streamer.login %> for <%= comma(row.duration) %> seconds!<%- Date.now() > row.time_end ? " <strong><em>(inactive)</em></strong>" : "" %></span></td>
+            </tr>
+                <% } %>
+            <% }) %>
+        </tbody>
+    </table>
+<%- include("../partials/javascript") %>
+    <script src="/assets/js/panel.js"> </script>
+    <script src="/assets/js/chatHistory.js"> </script>
+</body>
+</html>

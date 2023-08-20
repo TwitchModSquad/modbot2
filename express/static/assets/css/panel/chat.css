@@ -1,0 +1,55 @@
+table.chat td {
+    font-family: 'Noto Sans Mono', monospace;
+    font-size: .9rem;
+    padding: .05em;
+    padding-left: .6em;
+    white-space: nowrap;
+    text-align: left;
+    vertical-align: top;
+}
+
+table.chat td:first-of-type {
+    padding-left: .05em;
+}
+
+table.chat td.channel {
+    color: var(--secondary-text-color);
+    text-align: right;
+}
+
+table.chat td.channel[data-id] {
+    cursor: pointer;
+}
+
+table.chat td.date {
+    color: var(--tertiary-text-color);
+}
+
+table.chat td.message {
+    width: 100%;
+    white-space: normal;
+    padding-left: 1.6em;
+    text-indent: -1em;
+}
+
+table.chat td.message a {
+    text-decoration: none;
+}
+
+table.chat td.message span {
+    text-shadow: 1px 1px 5px rgba(255,255,255,0.05);
+}
+
+table.chat .punishment-message {
+    color: #de4747;
+}
+
+table.chat img {
+    height: .9rem;
+}
+
+@media only screen and (max-width: 900px) {
+    table.chat td.date {
+        display: none;
+    }
+}
