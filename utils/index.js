@@ -8,6 +8,7 @@ const Discord = require("./discord/");
 const Authentication = require("./authentication/");
 
 const EventManager = require("./EventManager");
+const Flag = require("./flag/Flag");
 
 const DiscordGuild = require("./discord/DiscordGuild");
 const DiscordUser = require("./discord/DiscordUser");
@@ -17,6 +18,7 @@ const DiscordToken = require("./discord/DiscordToken");
 const Stream = require("./twitch/TwitchStream");
 const TwitchBan = require("./twitch/TwitchBan");
 const TwitchUser = require("./twitch/TwitchUser");
+const TwitchUserFlag = require("./twitch/TwitchUserFlag");
 const TwitchChat = require("./twitch/TwitchChat");
 const TwitchTimeout = require("./twitch/TwitchTimeout");
 const TwitchRole = require("./twitch/TwitchRole");
@@ -52,6 +54,7 @@ class Utils {
     EventManager = new EventManager();
 
     Schemas = {
+        Flag: Flag,
         Identity: Identity,
         DiscordGuild: DiscordGuild,
         DiscordUser: DiscordUser,
@@ -65,6 +68,7 @@ class Utils {
         TwitchTag: Stream.TwitchTag,
         TwitchTimeout: TwitchTimeout,
         TwitchUser: TwitchUser,
+        TwitchUserFlag: TwitchUserFlag,
         TwitchRole: TwitchRole,
         TwitchToken: TwitchToken,
         Session: Session,
