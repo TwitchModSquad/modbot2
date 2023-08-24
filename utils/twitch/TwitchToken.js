@@ -23,14 +23,19 @@ const tokenSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    uses: {
+        type: Number,
+        default: 0,
+    }
 });
 
-const updateLastUsed = async function(obj) {
-    obj.last_used = Date.now();
-    await obj.save();
-}
+tokenSchema.methods.use = async function() {
+    if (this.uses) {
+        this.uses++;
+    } else this.uses = 1;
+    this.last_used = Date.now();
 
-tokenSchema.post("find", updateLastUsed);
-tokenSchema.post("findOne", updateLastUsed);
+    await this.save();
+}
 
 module.exports = mongoose.model("TwitchToken", tokenSchema);

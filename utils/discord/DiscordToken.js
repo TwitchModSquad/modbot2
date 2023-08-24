@@ -23,9 +23,17 @@ const tokenSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    uses: {
+        type: Number,
+        default: 0,
+    },
 });
 
 const updateLastUsed = async function(obj) {
+    if (!obj || !obj.save) return;
+    if (obj.uses) {
+        obj.uses++;
+    } else obj.uses = 1;
     obj.last_used = Date.now();
     await obj.save();
 }
