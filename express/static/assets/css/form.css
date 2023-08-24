@@ -10,12 +10,17 @@ select {
 }
 
 input[type=search],
-input[type=text] {
-    background-color: var(--primary-background-color);
+input[type=text],
+textarea {
+    background-color: rgba(255,255,255,0.025);
     color: var(--primary-text-color);
-    border: 1px solid var(--tertiary-background-color);
+    border: .1em solid rgba(255,255,255,0.05);
     border-radius: .3em;
     padding: .8em;
+}
+
+textarea {
+    font-family: "Noto Sans", sans-serif;
 }
 
 input[type=search] {
@@ -26,8 +31,25 @@ input[type=search] {
     outline: none;
 }
 
-input.full {
+input.full,
+textarea {
     display: block;
     width: calc(100% - 1.6em);
+    margin-top: .5em;
     margin-bottom: 1em;
+}
+
+.length-counter {
+    display: block;
+}
+
+.length-counter .length {
+    display: none;
+    font-size: .8em;
+    margin-top: -.5em;
+    opacity: .8;
+}
+
+.length-counter:focus-within .length {
+    display: block;
 }
