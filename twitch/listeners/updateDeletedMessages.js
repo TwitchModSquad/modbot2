@@ -2,7 +2,7 @@ const utils = require("../../utils/");
 
 const listener = {
     name: "updateDeletedMessages",
-    eventName: "messageDeleted",
+    eventName: "messagedeleted",
     listener: async (channel, username, deletedMessage, userstate) => {
         try {
             console.log(userstate);
