@@ -1,4 +1,5 @@
 global.startTime = Date.now();
+global.rootDir = __dirname;
 
 const fs = require('fs');
 
