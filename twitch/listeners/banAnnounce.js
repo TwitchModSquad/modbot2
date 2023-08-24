@@ -26,12 +26,41 @@ const listener = {
 
         if (bpm > 5) return;
 
+        let banData = null;
+        try {
+            const streamerTokens = await streamer.getTokens(["moderator:manage:banned_users"]);
+            let accessToken = null;
+            for (let i = 0; i < streamerTokens.length; i++) {
+                try {
+                    accessToken = await utils.Authentication.Twitch.getAccessToken(streamerTokens[i].refresh_token);
+                    await streamerTokens[i].use();
+                } catch(e) {}
+            }
+            if (accessToken) {
+                banData = await utils.Authentication.Twitch.getBan(accessToken, streamer._id, chatter._id);
+            }
+        } catch(e) {
+            console.error(e);
+        }
+
         const embed = new EmbedBuilder()
                 .setTitle("User has been banned!")
                 .setDescription(`User \`${cleanCodeBlockContent(chatter.display_name)}\` was banned from channel \`${cleanCodeBlockContent(streamer.display_name)}\``)
                 .setThumbnail(chatter.profile_image_url)
                 .setAuthor({iconURL: streamer.profile_image_url, name: streamer.display_name, url: `https://twitch.tv/${streamer.login}`})
                 .setColor(0xe3392d);
+
+        if (banData) {
+            embed.addFields({
+                name: "Moderator",
+                value: codeBlock(banData.moderator_name),
+                inline: true,
+            }, {
+                name: "Reason",
+                value: codeBlock(cleanCodeBlockContent(banData.reason ? banData.reason : "No reason")),
+                inline: true,
+            });
+        }
 
         const components = [];
 
