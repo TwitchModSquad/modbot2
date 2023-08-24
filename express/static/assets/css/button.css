@@ -74,3 +74,7 @@ a.button.full {
     text-align: center;
     margin: 2.5em 0;
 }
+
+.container button {
+    margin: .5em;
+}
