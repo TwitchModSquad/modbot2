@@ -46,7 +46,7 @@ textarea {
 .length-counter .length {
     display: none;
     font-size: .8em;
-    margin-top: -.5em;
+    margin: -.5em 0 .5em 0;
     opacity: .8;
 }
 
