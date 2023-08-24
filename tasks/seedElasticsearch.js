@@ -1,6 +1,6 @@
 const utils = require("../utils/");
 
-const twitchUserStream = utils.Schemas.TwitchUser.synchronize();
+const twitchUserStream = utils.Schemas.TwitchUser.synchronize({}, {saveOnSynchronize: false});
 let twitchUserCount = 0;
 
 twitchUserStream.on("data", function(err, doc) {
@@ -18,7 +18,7 @@ twitchUserStream.on("error", function(err) {
     console.error(err);
 });
 
-const discordUserStream = utils.Schemas.DiscordUser.synchronize();
+const discordUserStream = utils.Schemas.DiscordUser.synchronize({}, {saveOnSynchronize: false});
 let discordUserCount = 0;
 
 discordUserStream.on("data", function(err, doc) {
