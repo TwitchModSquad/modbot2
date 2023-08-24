@@ -119,7 +119,8 @@ class Twitch {
      */
     getUserById(id, bypassCache = false, requestIfUnavailable = false) {
         return this.userCache.get(id, async (resolve, reject) => {
-            const user = await TwitchUser.findById(id);
+            const user = await TwitchUser.findById(id)
+                    .populate("identity");
             if (user) {
                 resolve(user);
             } else {

@@ -37,6 +37,11 @@
                             <% if (user.broadcaster_type === "partner") { %><img src="/assets/images/badges/twitch/partner.png" alt="Partner Badge"><% } %>
                             <small><%= user._id %></small>
                         </h3>
+                        <% if (user?.identity?.admin) { %>
+                            <span style="color: #ed4242;text-shadow: 2px 2px 6px rgba(255,255,255,0.2);">The Mod Squad Administrator</span><br>
+                        <% } else if (user?.identity?.moderator) { %>
+                            <span style="color: #39db51;text-shadow: 2px 2px 6px rgba(255,255,255,0.2);">The Mod Squad Moderator</span><br>
+                        <% } %>
                         <a href="https://twitch.tv/<%= user.login %>" target="__blank">twitch.tv/<%= user.login %></a>
                         <% if (channelHistory.member.length > 0 || channelHistory.other.length > 0) { %><br><a href="/panel/chat-history?chatter=<%= user._id %>">View Chat History</a><% } %>
                         <% if (user?.description && user.description !== "") { %><pre><%= user.description %></pre><% } %>
