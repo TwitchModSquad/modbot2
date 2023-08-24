@@ -1,0 +1,20 @@
+<tr>
+    <td>
+        <span title="<%= token._id.toString() %>"><%= token._id.toString().substring(token._id.toString().length - 6) %></span>
+    </td>
+    <td>
+        <%= token.friendlyScopes %>
+    </td>
+    <td>
+        <%= parseDate(token.created_at) %>
+    </td>
+    <td>
+        <%= parseDate(token.last_used) %>
+    </td>
+    <td>
+        <%= token.uses ? token.uses : "No" %> uses
+    </td>
+    <td>
+        <a href="/panel/manage/tokens/<%= token._id %>/delete" aria-label="Delete"><i class="fa-solid fa-trash-can"></i></a>
+    </td>
+</tr>
