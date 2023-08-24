@@ -95,3 +95,24 @@ a, small {
     box-shadow: inset 0 0 6px rgba(0,0,0,0.1);
     border-radius: 3px;
 }
+
+code {
+    font-family: "Noto Sans Mono", monospace;
+    font-size: .8em;
+    background-color: rgba(255,255,255,0.02);
+    border: .1em solid rgba(255,255,255,0.025);
+    padding: .2em .3em;
+    border-radius: 2px;
+}
+
+code.block {
+    padding: .5em;
+    margin: .2em 0;
+    display: block;
+    white-space: pre-wrap;
+}
+
+code.block img {
+    height: 1.2em;
+    border-radius: 50%;
+}
