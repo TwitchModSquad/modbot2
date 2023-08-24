@@ -24,6 +24,7 @@ const sessionSchema = new mongoose.Schema({
 });
 
 const updateLastUsed = async function(obj) {
+    if (!obj) return;
     obj.last_used = Date.now();
     await obj.save();
 }
