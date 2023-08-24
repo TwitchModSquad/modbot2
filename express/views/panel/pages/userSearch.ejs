@@ -229,13 +229,19 @@
                                 <tr>
                                     <th>Archive ID</th>
                                     <th>Offense</th>
+                                    <th>User Count</th>
                                     <th>File Count</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td colspan="3">No archive entries!</td>
-                                </tr>
+                                <% archive.forEach(entry => { %>
+                                    <tr>
+                                        <td title="<%= entry._id %>"><a href="/panel/archive/<%= entry._id %>" target="__blank"><%= entry._id.toString().substring(entry._id.toString().length-6) %></a></td>
+                                        <td><%= entry.offense %></td>
+                                        <td><%= entry.userCount %> user<%= entry.userCount === 1 ? "" : "s" %></td>
+                                        <td><%= entry.fileCount %> file<%= entry.fileCount === 1 ? "" : "s" %></td>
+                                    </tr>
+                                <% }) %>
                             </tbody>
                         </table>
                     </div>

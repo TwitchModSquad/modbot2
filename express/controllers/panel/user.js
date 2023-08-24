@@ -126,6 +126,22 @@ router.get("/:query", async (req, res) => {
                 other: channelHistory,
             }
 
+            const userSearchQuery = {};
+            if (data.type === "twitch") {
+                userSearchQuery.twitchUser = twitchUser._id;
+            } else userSearchQuery.discordUser = discordUser._id;
+
+            const archiveUsers = await utils.Schemas.ArchiveUser.find(userSearchQuery)
+                    .populate("entry");
+
+            data.archive = [];
+            for (let i = 0; i < archiveUsers.length; i++) {
+                const entry = archiveUsers[i].entry;
+                entry.fileCount = (await entry.getFiles()).length;
+                entry.userCount = (await entry.getUsers()).length;
+                data.archive.push(entry);
+            }
+
             data.listeningClients = [];
 
             if (member.channels.includes(twitchUser.login)) data.listeningClients.push("Member");
