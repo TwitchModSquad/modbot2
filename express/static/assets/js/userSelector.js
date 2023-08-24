@@ -28,8 +28,8 @@ function closeUserSelector(selector) {
 function updateUser(selector, user, type) {
     const element = $(parse.user[type](user));
     element.on("click", openUserSelector);
-    selector.find("input[type=hidden]").val(user.id).trigger("change");
     selector.find(".user").replaceWith(element);
+    selector.find("input[type=hidden]").val(user.id).trigger("change");
     closeUserSelector(selector);
 }
 
