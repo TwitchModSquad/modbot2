@@ -5,7 +5,6 @@ const listener = {
     eventName: "messagedeleted",
     listener: async (channel, username, deletedMessage, userstate) => {
         try {
-            console.log(userstate);
             const message = await utils.Schemas.TwitchChat.findById(userstate.id);
             if (message) {
                 message.deleted = true;
