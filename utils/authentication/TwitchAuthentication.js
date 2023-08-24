@@ -197,7 +197,7 @@ class TwitchAuthentication {
     /**
      * Gets bans via access token and broadcaster ID
      * @param {string} accessToken 
-     * @param {number} broadcasterId 
+     * @param {string} broadcasterId 
      * @returns {Promise<TwitchUser>}
      */
     getBans(accessToken, broadcasterId) {
@@ -230,6 +230,49 @@ class TwitchAuthentication {
                     } else break;
                 }
                 resolve(result);
+            } catch(err) {
+                reject(err);
+                return;
+            }
+        });
+    }
+
+    /**
+     * Gets ban via access token, broadcaster ID and chatter ID
+     * @param {string} accessToken 
+     * @param {string} broadcasterId 
+     * @param {string} chatterId
+     * @param {number} timeBanned
+     * @param {number} padding
+     * @returns {Promise<TwitchUser>}
+     */
+    getBan(accessToken, broadcasterId, chatterId, timeBanned = Date.now(), padding = 10000) {
+        return new Promise(async (resolve, reject) => {
+            const get = async () => {
+                return await fetch(`https://api.twitch.tv/helix/moderation/banned?first=100&broadcaster_id=${encodeURIComponent(broadcasterId)}&user_id=${encodeURIComponent(chatterId)}`, {
+                    method: 'GET',
+                    headers: {
+                        ["Client-ID"]: config.twitch.client_id,
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                });
+            }
+
+            try {
+                const getBans = await get();
+                const json = await getBans.json();
+                if (getBans.status === 200) {
+                    for (let i = 0; i < json.data.length; i++) {
+                        const ban = json.data[i];
+                        const at = (new Date(ban.created_at)).getTime();
+                        if (Math.abs(at - timeBanned) <= padding) {
+                            return resolve(ban);
+                        }
+                    }
+                    reject("No bans found!");
+                } else {
+                    reject(json?.message ? json.message : getBans.status);
+                }
             } catch(err) {
                 reject(err);
                 return;
