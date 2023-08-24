@@ -21,4 +21,6 @@ utils.schema().then(async () => {
     require("./twitch/");
     require("./discord/");
     require("./express/");
+
+    console.log("Startup completed!");
 }, console.error);
