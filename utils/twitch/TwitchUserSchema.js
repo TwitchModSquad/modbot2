@@ -133,6 +133,21 @@ userSchema.methods.getStreamers = async function(includeInactive = false) {
             .populate("moderator");
 }
 
+userSchema.methods.getTokens = async function(requiredScopes = []) {
+    const tokens = await global.utils.Schemas.TwitchToken.find({user: this._id});
+    let finalTokens = [];
+    for (let i = 0; i < tokens.length; i++) {
+        const token = tokens[i];
+        const scopes = token.scope.split(" ");
+        let validToken = true;
+        for (let s = 0; s < requiredScopes.length; s++) {
+            if (!scopes.includes(requiredScopes[s])) validToken = false;
+        }
+        if (validToken) finalTokens.push(token);
+    }
+    return finalTokens;
+}
+
 userSchema.methods.fetchMods = async function() {
     const results = await fetch(config.twitch.gql.uri, {
         method: "POST",
