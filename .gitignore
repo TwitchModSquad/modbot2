@@ -131,3 +131,6 @@ dist
 
 # Local config file
 config.json
+
+# Uploads folder
+uploads/
