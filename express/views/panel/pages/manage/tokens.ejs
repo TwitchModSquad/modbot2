@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Twitch Mod Squad - Panel Home</title>
+<%- include("../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/panel/panel.css">
+</head>
+<body class="panel">
+<%- include("../../partials/header") %>
+
+    <div class="sidebar-container">
+        <%- include("../../partials/sidebar", {active: "manage-tokens"}) %>
+        
+        <main class="container container-md">
+            <section class="col-12">
+                <h2><i class="fa-brands fa-twitch"></i> Twitch Tokens</h2>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>
+                                ID
+                            </th>
+                            <th>
+                                Scopes
+                            </th>
+                            <th>
+                                Created
+                            </th>
+                            <th>
+                                Last Used
+                            </th>
+                            <th>
+                                Uses
+                            </th>
+                            <th>
+                                Delete
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% twitchTokens.forEach(token => { %>
+                            <%- include("../../partials/objects/token", {token: token, parseDate: parseDate}) %>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </section>
+            <section class="col-12">
+                <h2><i class="fa-brands fa-discord"></i> Discord Tokens</h2>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>
+                                ID
+                            </th>
+                            <th>
+                                Scopes
+                            </th>
+                            <th>
+                                Created
+                            </th>
+                            <th>
+                                Last Used
+                            </th>
+                            <th>
+                                Uses
+                            </th>
+                            <th>
+                                Delete
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% discordTokens.forEach(token => { %>
+                            <%- include("../../partials/objects/token", {token: token, parseDate: parseDate}) %>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+    
+    <div class="notifications"></div>
+<%- include("../../partials/javascript") %>
+    <script src="/assets/js/panel.js"> </script>
+</body>
+</html>
