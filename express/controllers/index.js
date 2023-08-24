@@ -39,4 +39,8 @@ router.use("/", public);
 
 router.use("/panel", panel);
 
+router.get("/join", (req, res) => {
+    res.redirect("/auth/login");
+})
+
 module.exports = router;
