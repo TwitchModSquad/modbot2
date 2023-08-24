@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Twitch Mod Squad - View Archive</title>
+<%- include("../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/panel/panel.css">
+    <link rel="stylesheet" href="/assets/css/panel/userSelector.css">
+</head>
+<body class="panel">
+<%- include("../../partials/header") %>
+
+    <div class="sidebar-container">
+        <%- include("../../partials/sidebar", {active: "archive-view"}) %>
+        
+        <main class="container container-md">
+            <section class="col-4">
+                <h2><i class="fa-solid fa-users"></i> Users</h2>
+                <% users.forEach(user => { %>
+                <% if (user.twitchUser) { %>
+                    <%- include("../../partials/objects/twitchUser", {account: user.twitchUser, comma: comma}) %>
+                <% } %>
+                <% if (user.discordUser) { %>
+                    <%- include("../../partials/objects/discordUser", {account: user.discordUser}) %>
+                <% } %>
+                <% if (user.raw) { %>
+                    <div style="padding: .5em 1em;">
+                        <i class="fa-solid fa-user"></i> Raw User: <code><%= user.raw %></code>
+                    </div>
+                <% } %>
+                <% }) %>
+            </section>
+            <section class="col-8">
+                <h2><i class="fa-solid fa-circle-info"></i> Information</h2>
+                <% if (owners.length > 0) { %>
+                <strong>Posted By</strong>
+                <code class="block"><% owners.forEach(owner => { %><img src="<%= owner.profile_image_url %>" alt="Profile picture for <%= owner.display_name %>"> <%= owner.display_name %> <% }) %></code>
+                <% } %>
+                <strong>Offense</strong>
+                <code class="block"><%= archive.offense %></code>
+                <strong>Description</strong>
+                <code class="block"><%= archive.description %></code>
+            </section>
+            <section class="col-12">
+                <h2><i class="fa-solid fa-file"></i> Files &amp; Links</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Label</th>
+                            <th>Image/Remote URI</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <% files.forEach(file => { %>
+                        <tr>
+                            <td><%= file.label %></td>
+                            <% if (file?.image?.data) { %>
+                                <td><a href="/panel/archive/image/<%= file._id %>" target="__blank"><img src="/panel/archive/image/<%= file._id %>" alt="<%= file.label %>" style="max-height:10em;"></a></td>
+                            <% } else if (file.remote) { %>
+                                <td><a href="<%= file.remote %>" target="__blank"><%= file.remote %></a></td>
+                            <% } %>
+                        </tr>
+                    <% }) %>
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+    
+    <div class="notifications"></div>
+<%- include("../../partials/javascript") %>
+    <script src="/assets/js/panel.js"> </script>
+    <script src="/assets/js/userSelector.js"> </script>
+    <script src="/assets/js/archive/create.js"> </script>
+</body>
+</html>

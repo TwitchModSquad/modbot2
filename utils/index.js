@@ -10,6 +10,12 @@ const Authentication = require("./authentication/");
 const EventManager = require("./EventManager");
 const Flag = require("./flag/Flag");
 
+const Archive = require("./archive/Archive");
+const ArchiveFile = require("./archive/ArchiveFile");
+const ArchiveLog = require("./archive/ArchiveLog");
+const ArchiveMessage = require("./archive/ArchiveMessage");
+const ArchiveUser = require("./archive/ArchiveUser");
+
 const DiscordGuild = require("./discord/DiscordGuild");
 const DiscordUser = require("./discord/DiscordUser");
 const DiscordMessage = require("./discord/DiscordMessage");
@@ -56,6 +62,11 @@ class Utils {
     Schemas = {
         Flag: Flag,
         Identity: Identity,
+        Archive: Archive,
+        ArchiveFile: ArchiveFile,
+        ArchiveLog: ArchiveLog,
+        ArchiveMessage: ArchiveMessage,
+        ArchiveUser: ArchiveUser,
         DiscordGuild: DiscordGuild,
         DiscordUser: DiscordUser,
         DiscordMessage: DiscordMessage,

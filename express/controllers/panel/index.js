@@ -5,6 +5,7 @@ const utils = require("../../../utils/");
 
 const listenClients = require("../../../twitch/");
 
+const archive = require("./archive");
 const chatHistory = require("./chatHistory");
 const live = require("./live");
 const manage = require("./manage");
@@ -42,6 +43,7 @@ router.get("/", async (req, res) => {
     });
 });
 
+router.use("/archive", archive);
 router.use("/chat-history", chatHistory);
 router.use("/live", live);
 router.use("/manage", manage);

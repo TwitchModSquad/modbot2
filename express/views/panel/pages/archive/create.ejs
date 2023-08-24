@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Twitch Mod Squad - Create Archive</title>
+<%- include("../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/panel/panel.css">
+    <link rel="stylesheet" href="/assets/css/panel/userSelector.css">
+</head>
+<body class="panel">
+<%- include("../../partials/header") %>
+
+    <div class="sidebar-container">
+        <%- include("../../partials/sidebar", {active: "archive-create"}) %>
+        
+        <main class="container container-md">
+            <section class="col-6">
+                <h2><i class="fa-solid fa-magnifying-glass"></i> Search for a User</h2>
+                <%- include("../../partials/userSelector", {type: "all", name: "user", label: "Archive Search", comma: comma}) %>
+            </section>
+            <section class="col-6">
+                <h2><i class="fa-solid fa-input-text"></i> Input a User</h2>
+                <form method="get" id="raw-input">
+                    <label>
+                        Raw User Input
+                        <input type="text" name="user-raw" id="user-raw" class="full" maxlength="256">
+                    </label>
+                </form>
+            </section>
+            <form method="post" class="container container-md col-12" enctype="multipart/form-data">
+                <section class="col-4">
+                    <h2><i class="fa-solid fa-users"></i> Archive Users</h2>
+                    <span class="no-users">Add a user using the fields above.</span>
+                    <div id="users"></div>
+                </section>
+                <section class="col-8">
+                    <h2><i class="fa-solid fa-circle-info"></i> Archive Information</h2>
+                    <label class="length-counter">
+                        Offense
+                        <input type="text" class="full input" name="offense" id="offense" placeholder="Harrassment" minlength="3" maxlength="256" required="required">
+                        <span class="length"></span>
+                    </label>
+                    <label class="length-counter">
+                        Description
+                        <textarea name="description" class="input" id="description" required="required" placeholder="Bad person" minlength="50" maxlength="2048" rows="5"></textarea>
+                        <span class="length"></span>
+                    </label>
+                </section>
+                <section class="col-12">
+                    <h2><i class="fa-solid fa-file"></i> Archive Files</h2>
+                    <div class="container container-md">
+                        <button type="button" id="remote-link" class="col-6"><i class="fa-solid fa-link"></i> Add a Remote Link</button>
+                        <button type="button" id="file" class="col-6"><i class="fa-solid fa-file"></i> Add a File</button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Label</th>
+                                <th>Link/File</th>
+                                <th>Remove</th>
+                            </tr>
+                        </thead>
+                        <tbody id="files"></tbody>
+                    </table>
+                </section>
+                <section class="col-12">
+                    <h2><i class="fa-solid fa-paper-plane-top"></i> Submit</h2>
+                    <input type="submit" class="button" value="Submit">
+                </section>
+            </form>
+        </main>
+    </div>
+    
+    <div class="notifications"></div>
+<%- include("../../partials/javascript") %>
+    <script src="/assets/js/panel.js"> </script>
+    <script src="/assets/js/userSelector.js"> </script>
+    <script src="/assets/js/archive/create.js"> </script>
+</body>
+</html>
