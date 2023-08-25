@@ -126,7 +126,7 @@ const updateStats = async () => {
     console.log(`Sorted in ${Date.now() - sortTime} ms - ${Date.now() - startTime} ms total`)
 }
 
-setInterval(updateStats, 600000);
+setInterval(updateStats, 3600000);
 
 setTimeout(updateStats, 1000);
 
