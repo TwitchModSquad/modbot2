@@ -111,20 +111,22 @@ router.post("/create", upload.any(), async (req, res) => {
                 const input = req.body["user-raw"][i];
                 if (!isNaN(Number(input))) {
                     try {
-                        const user = await utils.Twitch.getUserById(input, true, true);
-                        users.push(await utils.Schemas.ArchiveUser.create({
-                            entry: archive._id,
-                            twitchUser: user._id,
-                        }));
-                        continue;
-                    } catch(e) {}
-                    try {
                         const user = await utils.Discord.getUserById(input, true, true);
                         users.push(await utils.Schemas.ArchiveUser.create({
                             entry: archive._id,
                             discordUser: user._id,
                         }));
                         continue;
+                    } catch(e) {}
+                    try {
+                        if (input.length < 10) {
+                            const user = await utils.Twitch.getUserById(input, true, true);
+                            users.push(await utils.Schemas.ArchiveUser.create({
+                                entry: archive._id,
+                                twitchUser: user._id,
+                            }));
+                            continue;
+                        }
                     } catch(e) {}
                 }
                 users.push(await utils.Schemas.ArchiveUser.create({
