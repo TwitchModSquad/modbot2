@@ -45,6 +45,13 @@ const userSchema = new mongoose.Schema({
     description: String,
     profile_image_url: String,
     offline_image_url: String,
+    commands: {
+        prefix: String,
+        blacklist: Boolean,
+        join: Boolean,
+        stats: Boolean,
+        tmsstats: Boolean,
+    },
     chat_listen: {
         type: Boolean,
         default: false,
