@@ -32,7 +32,7 @@ const command = {
                             `#2. ${top2.display_name} (${utils.comma(stats[1].total)} msgs) | ` +
                             `#3. ${top3.display_name} (${utils.comma(stats[2].total)} msgs) | ` +
                             `#4. ${top4.display_name} (${utils.comma(stats[3].total)} msgs) | ` +
-                            `#5. ${top5.display_name} (${utils.comma(stats[4].total)} msgs) | `);
+                            `#5. ${top5.display_name} (${utils.comma(stats[4].total)} msgs)`);
                 } catch(e) {
                     console.error(e);
                     reply("unable to retrieve top users!");
