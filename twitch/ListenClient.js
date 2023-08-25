@@ -51,6 +51,7 @@ class ListenClient {
         message: async (channel, tags, message, self) => {
             try {
                 if (tags.hasOwnProperty("message-type") && tags["message-type"] === "whisper") return;
+                if (!tags.hasOwnProperty("room-id") || !tags.hasOwnProperty("user-id")) return;
                 
                 let streamer = await utils.Twitch.getUserById(tags["room-id"], false, true);
                 let chatter = await utils.Twitch.getUserById(tags["user-id"], false, true);
