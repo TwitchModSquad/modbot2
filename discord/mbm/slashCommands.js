@@ -24,7 +24,7 @@ module.exports = (async client => {
 			{ body: commands },
 		);
 
-        console.log('[MB] Successfully set commands');
+        console.log('[MBM] Successfully set commands');
     } catch (error) {
         console.error(error);
     }
