@@ -21,6 +21,9 @@ const DiscordUser = require("./discord/DiscordUser");
 const DiscordMessage = require("./discord/DiscordMessage");
 const DiscordToken = require("./discord/DiscordToken");
 
+const Group = require("./group/Group");
+const GroupUser = require("./group/GroupUser");
+
 const Stream = require("./twitch/TwitchStream");
 const TwitchBan = require("./twitch/TwitchBan");
 const TwitchUser = require("./twitch/TwitchUser");
@@ -71,6 +74,8 @@ class Utils {
         DiscordUser: DiscordUser,
         DiscordMessage: DiscordMessage,
         DiscordToken: DiscordToken,
+        Group: Group,
+        GroupUser: GroupUser,
         TwitchBan: TwitchBan,
         TwitchChat: TwitchChat,
         TwitchGame: Stream.TwitchGame,
