@@ -1,12 +1,10 @@
 const express = require("express");
 const router = express.Router();
 
+const ban = require("./ban");
 const user = require("./user");
 
-const twitch = require("./twitch/");
-
+router.use("/ban", ban);
 router.use("/user", user);
-
-router.use("/twitch", twitch);
 
 module.exports = router;

@@ -54,3 +54,70 @@
 .user.discord > img {
     border-color: var(--primary-discord-color);
 }
+
+.ban {
+    background-color: #2c2222;
+    padding: .8em .6em;
+    margin: 1.2em 1em;
+    border: .05em solid #382828;
+    border-radius: 3px;
+}
+
+.ban h2 {
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+.ban h3 {
+    font-size: .9em;
+    font-weight: 600;
+    margin-bottom: .6em;
+}
+
+.ban.twitch-ban {
+    border-left: .2em solid var(--primary-twitch-color);
+}
+
+.ban.discord-ban {
+    border-left: .2em solid var(--primary-discord-color);
+}
+
+.ban.twitch-ban h2 {
+    color: var(--primary-twitch-color);
+}
+
+.ban.discord-ban h2 {
+    color: var(--primary-discord-color);
+}
+
+.ban > div {
+    margin: .6em 0;
+}
+
+.ban .info {
+    line-height: 1.6em;
+    font-size: .9em;
+}
+
+.ban code {
+    white-space: nowrap;
+}
+
+.ban .footer {
+    font-size: .7em;
+    color: var(--secondary-text-color);
+    margin: .2em -.2em -.2em -.2em;
+}
+
+.ban img,
+code img {
+    width: 1.3em;
+    height: 1.3em;
+    border-radius: 50%;
+    vertical-align: middle;
+    margin-right: .3em;
+}
+
+.ban .chat {
+    white-space: normal;
+}

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const chatSchema = new mongoose.Schema({
+const banSchema = new mongoose.Schema({
     streamer: {
         type: String,
         ref: "TwitchUser",
@@ -23,4 +23,14 @@ const chatSchema = new mongoose.Schema({
     }
 });
 
-module.exports = mongoose.model("TwitchBan", chatSchema);
+banSchema.methods.public = function() {
+    return {
+        id: this._id,
+        streamer: this.streamer.public(),
+        chatter: this.chatter.public(),
+        time_start: this.time_start,
+        time_end: this.time_end,
+    };
+}
+
+module.exports = mongoose.model("TwitchBan", banSchema);

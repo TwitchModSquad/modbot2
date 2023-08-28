@@ -19,7 +19,6 @@ const chatSchema = new mongoose.Schema({
     emotes: String,
     message: {
         type: String,
-        default: false,
     },
     deleted: {
         type: Boolean,
@@ -41,5 +40,26 @@ const chatSchema = new mongoose.Schema({
         },
     }
 });
+
+chatSchema.methods.public = function() {
+    const obj = {
+        id: this._id,
+        streamer: this.streamer.public(),
+        chatter: this.chatter.public(),
+        color: this.color,
+        badges: this.badges,
+        emotes: this.emotes,
+        message: this.message,
+        deleted: this.deleted,
+        time_sent: this.time_sent,
+    };
+    if (this?.percent?.caps || this?.percent?.emotes) {
+        obj.percent = {
+            caps: this.percent.caps,
+            emotes: this.percent.emotes,
+        };
+    }
+    return obj;
+}
 
 module.exports = mongoose.model("TwitchChat", chatSchema);

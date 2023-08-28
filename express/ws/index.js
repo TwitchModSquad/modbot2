@@ -26,6 +26,20 @@ router.use(async (req, res, next) => {
 
 let websockets = [];
 
+router.ws("/ban", (ws, req) => {
+    ws.id = utils.stringGenerator(32);
+    ws.identity = req.session.identity;
+
+    ws.type = "ban";
+    ws.scope = "all";
+
+    websockets.push(ws);
+
+    ws.on("close", () => {
+        websockets = websockets.filter(x => x.id !== ws.id);
+    });
+});
+
 router.ws("/chat", (ws, req) => {
     ws.id = utils.stringGenerator(32);
     ws.identity = req.session.identity;

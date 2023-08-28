@@ -1,0 +1,33 @@
+<div class="ban twitch-ban" onclick="showBan('<%= ban._id %>')">
+    <h2>Twitch Ban</h2>
+    <div class="info">
+        User
+        <code data-user-id="<%= ban.chatter._id %>"><img src="<%= ban.chatter.profile_image_url %>" alt="Profile picture for <%= ban.chatter.display_name %>"><%= ban.chatter.display_name %></code>
+        was banned in channel
+        <code data-user-id="<%= ban.streamer._id %>"><img src="<%= ban.streamer.profile_image_url %>" alt="Profile picture for <%= ban.streamer.display_name %>">#<%= ban.streamer.login %></code>!
+    </div><% if (ban?.chatHistory?.length > 0) { %>
+    <div class="chat-history">
+        <h3>
+            Chat Log in
+            <code data-user-id="<%= ban.streamer._id %>"><img src="<%= ban.streamer.profile_image_url %>" alt="Profile picture for <%= ban.streamer.display_name %>">#<%= ban.streamer.login %></code>
+        </h3>
+        <code class="block">
+        <% ban.chatHistory.forEach(chat => { %>
+            <div class="chat">
+                <span class="username" style="color: <%= chat.color ? chat.color : "var(--secondary-text-color)" %>;"><%= ban.chatter.display_name %></span>:
+                <%= chat.message %>
+            </div>
+        <% }) %>
+        </code>
+    </div>
+    <% } if (ban?.alsoBannedIn?.length > 0) { %>
+        <div class="also-banned">
+            <h3>
+                Also Banned In
+            </h3>
+            <% ban.alsoBannedIn.forEach(streamer => { %>
+            <code class="block" data-user-id="<%= streamer._id %>"><img src="<%= streamer.profile_image_url %>" alt="Profile picture for <%= streamer.display_name %>">#<%= streamer.login %></code>
+            <% }) %>
+        </div>
+        <% } %><div class="footer"><img src="<%= iconURI %>" alt="The Mod Squad Icon"> TMS Ban - <%= ban._id %> - <span class="relative-time" data-timestamp="<%=ban.time_start %>"></span></div>
+</div>
