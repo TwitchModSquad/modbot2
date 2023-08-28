@@ -80,7 +80,6 @@ const updateStats = async () => {
     let allowedUsers = await utils.Schemas.TwitchUser.find({chat_listen: true})
             .select("_id");
     allowedUsers = allowedUsers.map(x => x._id);
-    console.log(allowedUsers);
     const chats = await utils.Schemas.TwitchChat.aggregate([
         {
             $match: {
