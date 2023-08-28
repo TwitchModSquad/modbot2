@@ -91,7 +91,8 @@ class Discord {
      */
     getUserById(id, overrideCache = false, requestIfUnavailable = false) {
         return this.userCache.get(id, async (resolve, reject) => {
-            const discordUser = await DiscordUser.findById(id);
+            const discordUser = await DiscordUser.findById(id)
+                    .populate("identity");
             if (discordUser) {
                 resolve(discordUser);
             } else {
