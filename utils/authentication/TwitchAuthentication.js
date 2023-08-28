@@ -195,6 +195,44 @@ class TwitchAuthentication {
     }
 
     /**
+     * Bans a user in the specified channel utilizing an access token of the moderator or broadcaster
+     * @param {string} broadcaster_id 
+     * @param {string} moderator_id 
+     * @param {string} access_token 
+     * @param {string} user_id 
+     * @param {string} reason 
+     * @returns {Promise<void>}
+     */
+    banUser(broadcaster_id, moderator_id, access_token, user_id, reason) {
+        return new Promise(async (resolve, reject) => {
+            const oauthResult = await fetch(`https://api.twitch.tv/helix/moderation/bans?broadcaster_id=${encodeURIComponent(broadcaster_id)}&moderator_id=${encodeURIComponent(moderator_id)}`, {
+                method: 'POST',
+                headers: {
+                    Authorization: "Bearer " + access_token,
+                    "Client-Id": config.twitch.client_id,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({data:{user_id: user_id, reason: reason}}),
+            });
+        
+            if (oauthResult.status === 200) {
+                resolve();
+            } else {
+                try {
+                    const json = await oauthResult.json();
+                    if (json?.message) {
+                        reject(json.message);
+                    } else {
+                        reject(oauthResult.statusText);
+                    }
+                } catch(err) {
+                    reject(err);
+                }
+            }
+        });
+    }
+
+    /**
      * Gets bans via access token and broadcaster ID
      * @param {string} accessToken 
      * @param {string} broadcasterId 

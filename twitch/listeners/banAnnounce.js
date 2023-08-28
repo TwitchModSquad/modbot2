@@ -1,4 +1,4 @@
-const { EmbedBuilder, codeBlock, cleanCodeBlockContent, StringSelectMenuBuilder, ActionRowBuilder } = require("discord.js");
+const { EmbedBuilder, codeBlock, cleanCodeBlockContent, StringSelectMenuBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const utils = require("../../utils");
 
 const config = require("../../config.json");
@@ -176,6 +176,24 @@ const listener = {
         const elapsedTime = Date.now() - startTime;
 
         embed.setFooter({text: `Bans per Minute: ${bpm} • Generated in ${elapsedTime} ms`, iconURL: config.iconURI});
+
+        components.push(
+            new ActionRowBuilder()
+                .setComponents(
+                    new ButtonBuilder()
+                        .setCustomId(`cb-t-${chatter._id}`)
+                        .setLabel("Crossban")
+                        .setStyle(ButtonStyle.Danger),
+                    new ButtonBuilder()
+                        .setCustomId("hide-ban")
+                        .setLabel("Hide Ban")
+                        .setStyle(ButtonStyle.Secondary),
+                    new ButtonBuilder()
+                        .setCustomId("flag")
+                        .setLabel("Add Flag")
+                        .setStyle(ButtonStyle.Primary)
+                )
+        );
 
         utils.Discord.channels.ban.send({embeds: [embed], components: components}).then(async message => {
             try {
