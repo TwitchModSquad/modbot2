@@ -17,7 +17,9 @@ const listener = {
                     const emote = emotes[i].split(":");
                     const locations = emote[1].split(",");
                     const [loc1, loc2] = locations[0].split("-");
-                    messageWithoutEmotes = messageWithoutEmotes.replace(RegExp(message.substring(Number(loc1), Number(loc2)+1), "g"), "");
+                    try {
+                        messageWithoutEmotes = messageWithoutEmotes.replace(RegExp(message.substring(Number(loc1), Number(loc2)+1), "g"), "");
+                    } catch(e) {}
                 }
                 messageWithoutEmotes = messageWithoutEmotes.trim();
                 percentEmotes = 1 - (messageWithoutEmotes.length / message.length);
