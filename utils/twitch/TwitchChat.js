@@ -30,6 +30,16 @@ const chatSchema = new mongoose.Schema({
         default: Date.now,
         index: true,
     },
+    percent: {
+        caps: {
+            type: Number,
+            index: true,
+        },
+        emotes: {
+            type: Number,
+            index: true,
+        },
+    }
 });
 
 module.exports = mongoose.model("TwitchChat", chatSchema);
