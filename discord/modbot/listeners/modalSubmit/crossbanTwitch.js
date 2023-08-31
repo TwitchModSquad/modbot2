@@ -73,7 +73,7 @@ const listener = {
                     }
                     bansRemaining = bansRemaining.filter(x => !successfulBans.find(y => y === x));
                 } else {
-                    return interaction.error("Unable to retrieve any access token! Please [login to TMS](https://tms.to/auth/login)")
+                    return interaction.error("Unable to retrieve any access token! Please [log in to TMS](https://v2.tms.to/auth/login)")
                 }
                 if (bansRemaining.length === 0) break;
             }
