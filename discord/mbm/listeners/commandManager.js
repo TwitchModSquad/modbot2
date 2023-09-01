@@ -1,11 +1,18 @@
-const {EmbedBuilder} = require("discord.js");
+const {EmbedBuilder, ChatInputCommandInteraction} = require("discord.js");
 const client = global.client.mbm;
+
+const utils = require("../../../utils");
+const config = require("../../../config.json");
 
 const listener = {
     name: 'commandManager',
     eventName: 'interactionCreate',
     eventType: 'on',
-    listener (interaction) {
+    /**
+     * Execution function for this command
+     * @param {ChatInputCommandInteraction} interaction 
+     */
+    async listener (interaction) {
         if (!interaction.isCommand()) return;
     
         if (!client.commands.has(interaction.commandName)) return;
@@ -33,11 +40,24 @@ const listener = {
         interaction.success = success;
         interaction.error = error;
 
-        try {
-            cmd.execute(interaction);
-        } catch (error) {
-            global.api.Logger.warning(error);
-            interaction.reply('***There was an error trying to execute that command!***');
+        interaction.tms = {
+            guild: await utils.Schemas.DiscordGuild.findById(interaction.guildId),
+            user: await utils.Discord.getUserById(interaction.user.id, false, true),
+        };
+
+        if (!interaction.tms.user?.identity?.authenticated) {
+            return interaction.error(`You must be authenticated to use TMS commands! [Authenticate](${config.express.domain.root}auth/login)`)
+        }
+
+        if (interaction.tms.guild && interaction.tms.guild.commands[interaction.commandName]) {
+            try {
+                cmd.execute(interaction);
+            } catch (error) {
+                global.api.Logger.warning(error);
+                interaction.reply('***There was an error trying to execute that command!***');
+            }
+        } else {
+            interaction.error(`This command is disabled in this guild!${interaction?.guild?.ownerId === interaction?.user?.id ? `\nSince you own this guild, you may enable this command at ${config.express.domain.root}panel/commands/discord/${interaction.guildId}` : ""}`);
         }
     }
 };
