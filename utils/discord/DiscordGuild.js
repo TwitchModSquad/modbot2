@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const banSchema = new mongoose.Schema({
+const schema = new mongoose.Schema({
     _id: {
         type: String,
     },
@@ -16,6 +16,14 @@ const banSchema = new mongoose.Schema({
     },
     icon: String,
     banner: String,
+    commands: {
+        chatdump: Boolean,
+        user: Boolean,
+    }
 });
 
-module.exports = mongoose.model("DiscordGuild", banSchema);
+schema.methods.iconURL = function() {
+    return `https://cdn.discordapp.com/icons/${this._id}/${this.icon}.png`;
+}
+
+module.exports = mongoose.model("DiscordGuild", schema);
