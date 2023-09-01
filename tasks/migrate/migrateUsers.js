@@ -6,8 +6,8 @@ const utils = require("../../utils/");
 await utils.schema();
 global.utils = utils;
 
-console.log("Getting twitch users...");let users = []
-// let users = await con.pquery("select * from twitch__user;");
+console.log("Getting twitch users...");
+let users = await con.pquery("select * from twitch__user;");
 console.log(`Got ${users.length} Twitch users`);
 
 console.log("Importing...");
@@ -44,7 +44,7 @@ for (let i = 0; i < users.length; i++) {
 }
 console.log("Imported Twitch users!");
 console.log("Getting discord users...")
-// users = await con.pquery("select * from discord__user;");
+users = await con.pquery("select * from discord__user;");
 console.log(`Got ${users.length} Discord users`);
 
 console.log("Importing...");
@@ -69,8 +69,7 @@ for (let i = 0; i < users.length; i++) {
 console.log("Imported discord users");
 
 console.log("Getting identities");
-identities = []
-// let identities = await con.pquery("select * from identity;");
+let identities = await con.pquery("select * from identity;");
 console.log(`Got ${identities.length} identities`);
 
 for (let i = 0; i < identities.length; i++) {
