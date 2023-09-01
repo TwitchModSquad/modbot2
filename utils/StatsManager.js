@@ -145,7 +145,7 @@ class StatsManager {
      * Saves the current hourly activity to the database
      */
     async saveHourlyActivity() {
-        await this.currentHourlyActivity.save();
+        if (this.currentHourlyActivity) await this.currentHourlyActivity.save();
     }
 
     /**
