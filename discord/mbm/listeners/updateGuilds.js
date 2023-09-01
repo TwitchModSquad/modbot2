@@ -6,7 +6,7 @@ const listener = {
     eventType: 'once',
     async listener () {
         const guilds = await client.guilds.fetch();
-        guilds.forEach(async guild => {
+        for (const [, guild] of guilds) {
             try {
                 await global.utils.Schemas.DiscordGuild.findOneAndUpdate({
                     _id: guild.id,
@@ -22,7 +22,7 @@ const listener = {
             } catch(e) {
                 console.error(e);
             }
-        });
+        }
         console.log(`[MBM] Found and updated ${guilds.size} guild(s)`);
     }
 };
