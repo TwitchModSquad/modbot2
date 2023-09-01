@@ -5,6 +5,7 @@ const mongoosastic = require("mongoosastic");
 const TwitchRole = require("./TwitchRole");
 
 const config = require("../../config.json");
+const { EmbedBuilder, codeBlock, cleanCodeBlockContent } = require('discord.js');
 
 const userSchema = new mongoose.Schema({
     _id: {
@@ -72,6 +73,61 @@ userSchema.pre("save", function(next) {
     this.updated_at = Date.now();
     next();
 });
+
+userSchema.methods.embed = async function() {
+    const mods = await this.getMods();
+    const streamers = await this.getStreamers();
+
+    const bans = await this.getBans();
+
+    const embed = new EmbedBuilder()
+            .setAuthor({name: this.display_name, iconURL: this.profile_image_url, url: `https://twitch.tv/${this.login}`})
+            .setThumbnail(this.profile_image_url)
+            .setColor(0x9147ff)
+            .setDescription(
+                `${codeBlock(this._id)}` +
+                `**Name:** ${this.display_name}\n` +
+                (this.follower_count ? `**Followers:** ${global.utils.comma(this.follower_count)}\n` : "") +
+                `[Profile](https://twitch.tv/${this.login}) | [TMS User Log](${config.express.domain.root}panel/user/${this._id})` +
+                (this.description !== "" ? `\n**Description**${codeBlock(cleanCodeBlockContent(this.description))}` : "")
+            );
+
+    if (mods.length > 0) {
+        embed.addFields({
+            name: "Moderators",
+            value: mods.map(x => x.moderator.display_name).join(", "),
+            inline: true,
+        })
+    }
+
+    if (streamers.length > 0) {
+        embed.addFields({
+            name: "Streamers",
+            value: streamers.map(x => x.streamer.display_name).join(", "),
+            inline: true,
+        })
+    }
+
+    if (bans.length > 0) {
+        let banString = "";
+        for (let i = 0; i < bans.length; i++) {
+            const ban = bans[i];
+            if (banString !== "") banString += "\n";
+            if (ban.message) {
+                banString += `[${ban.streamer.display_name} on ${ban.time_start.toLocaleDateString()}](https://discord.com/channels/${config.discord.guilds.modsquad}/${config.discord.modbot.channels.ban}/${ban.message._id})`
+            } else {
+                banString += `${ban.streamer.display_name} on ${ban.time_start.toLocaleDateString()}`;
+            }
+        }
+        embed.addFields({
+            name: "Bans",
+            value: banString,
+            inline: false,
+        })
+    }
+    
+    return embed;
+}
 
 userSchema.methods.public = function() {
     return {
@@ -154,6 +210,16 @@ userSchema.methods.getTokens = async function(requiredScopes = []) {
         if (validToken) finalTokens.push(token);
     }
     return finalTokens;
+}
+
+userSchema.methods.getBans = async function() {
+    const bans = await global.utils.Schemas.TwitchBan.find({chatter: this._id})
+            .populate("streamer")
+            .populate("chatter");
+    for (let i = 0; i < bans.length; i++) {
+        bans[i].message = await global.utils.Schemas.DiscordMessage.findOne({twitchBan: bans[i]._id});
+    }
+    return bans;
 }
 
 userSchema.methods.fetchMods = async function() {

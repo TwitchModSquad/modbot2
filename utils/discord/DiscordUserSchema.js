@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const mongoosastic = require("mongoosastic");
 
 const config = require("../../config.json");
+const { EmbedBuilder, codeBlock } = require("discord.js");
 
 const userSchema = new mongoose.Schema({
     _id: {
@@ -11,7 +12,6 @@ const userSchema = new mongoose.Schema({
         type: String,
         minLength: 2,
         maxLength: 32,
-        required: true,
         index: true,
         es_type: "completion",
         es_search_analyzer: "simple",
@@ -91,6 +91,18 @@ userSchema.methods.avatarURL = function(size = 64) {
         return `https://cdn.discordapp.com/embed/avatars/${(this._id >> 22) % 5}.png?size=${size}`;
     } else
         return `https://cdn.discordapp.com/embed/avatars/${Number(this.discriminator) % 5}.png?size=${size}`;
+}
+
+userSchema.methods.embed = async function() {
+    const embed = new EmbedBuilder()
+            .setAuthor({name: this.displayName, iconURL: this.avatarURL()})
+            .setColor(0x5865f2)
+            .setDescription(
+                `${codeBlock(this._id)}` +
+                `**Display Name:** ${this.displayName}`
+            );
+
+    return embed;
 }
 
 userSchema.plugin(mongoosastic, config.elasticsearch);
