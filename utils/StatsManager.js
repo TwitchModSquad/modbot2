@@ -8,6 +8,13 @@ class StatsManager {
     hourlyActivity = [];
     currentHourlyActivity;
 
+    generalStatistics = {
+        bans: 0,
+        timeouts: 0,
+        messages: 0,
+        streamers: 0,
+    }
+
     /**
      * Gets the current most active channels
      * @returns {[{channel: string, messages: number, bans: number, timeouts: number}]}
@@ -41,6 +48,14 @@ class StatsManager {
             newActivity.push([cur._id, cur.messages, cur.bans, cur.timeouts]);
         }
         return newActivity;
+    }
+
+    /**
+     * Returns general statistics
+     * @returns {{messages: number,bans: number,timeouts: number}}
+     */
+    getGeneralStatistics() {
+        return this.generalStatistics;
     }
 
     /**
@@ -120,10 +135,12 @@ class StatsManager {
             if (intCount % 15 === 0) {
                 this.saveHourlyActivity().catch(console.error);
             }
+
+            if (intCount % 60 === 0) {
+                this.updateGeneralStatistics().catch(console.error);
+            }
             intCount++;
         }, 1000);
-
-        this.loadHourlyActivity().catch(console.error);
     }
 
     /**
@@ -152,7 +169,27 @@ class StatsManager {
      * Loads the hourly activity from the database
      */
     async loadHourlyActivity() {
-        
+        this.hourlyActivity = await global.utils.Schemas.HourlyStat.find({})
+            .sort({posted: -1})
+            .limit(48);
+        this.hourlyActivity.reverse();
+
+        this.hourlyActivity = this.hourlyActivity.filter(x => x._id !== this.#getHourlyDateFormat());
+    }
+
+    /**
+     * Updates general statistics
+     */
+    async updateGeneralStatistics() {
+        this.generalStatistics.messages = await global.utils.Schemas.TwitchChat.estimatedDocumentCount();
+        this.generalStatistics.bans = await global.utils.Schemas.TwitchBan.estimatedDocumentCount();
+        this.generalStatistics.timeouts = await global.utils.Schemas.TwitchTimeout.estimatedDocumentCount();
+
+        const clients = global.client.listen;
+        this.generalStatistics.streamers =
+                clients.member.channels.length +
+                clients.partner.channels.length +
+                clients.affiliate.channels.length;
     }
 
 }
