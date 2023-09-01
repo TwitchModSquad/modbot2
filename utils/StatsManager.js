@@ -141,6 +141,10 @@ class StatsManager {
             }
             intCount++;
         }, 1000);
+
+        setTimeout(() => {
+            this.loadHourlyActivity().catch(console.error);
+        }, 1000);
     }
 
     /**
