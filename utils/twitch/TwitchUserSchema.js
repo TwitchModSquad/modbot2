@@ -59,9 +59,9 @@ const userSchema = new mongoose.Schema({
         default: false,
     },
     blacklisted: Boolean,
+    migrated: Boolean,
     created_at: {
         type: Date,
-        required: true,
     },
     updated_at: {
         type: Date,

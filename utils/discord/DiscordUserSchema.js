@@ -35,7 +35,8 @@ const userSchema = new mongoose.Schema({
     updated_at: {
         type: Date,
         default: Date.now,
-    }
+    },
+    migrated: Boolean,
 });
 
 userSchema.pre("save", function(next) {
