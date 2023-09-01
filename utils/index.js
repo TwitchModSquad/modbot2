@@ -8,6 +8,7 @@ const Discord = require("./discord/");
 const Authentication = require("./authentication/");
 
 const EventManager = require("./EventManager");
+const StatsManager = require("./StatsManager");
 const Flag = require("./flag/Flag");
 
 const Archive = require("./archive/Archive");
@@ -23,6 +24,8 @@ const DiscordToken = require("./discord/DiscordToken");
 
 const Group = require("./group/Group");
 const GroupUser = require("./group/GroupUser");
+
+const HourlyStat = require("./stats/HourlyStat");
 
 const Stream = require("./twitch/TwitchStream");
 const TwitchBan = require("./twitch/TwitchBan");
@@ -63,6 +66,12 @@ class Utils {
      */
     EventManager = new EventManager();
 
+    /**
+     * Global API for stats
+     * @type {StatsManager}
+     */
+    StatsManager = new StatsManager();
+
     Schemas = {
         Flag: Flag,
         Identity: Identity,
@@ -77,6 +86,7 @@ class Utils {
         DiscordToken: DiscordToken,
         Group: Group,
         GroupUser: GroupUser,
+        HourlyStat: HourlyStat,
         TwitchBan: TwitchBan,
         TwitchChat: TwitchChat,
         TwitchGame: Stream.TwitchGame,
