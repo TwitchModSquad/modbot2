@@ -13,6 +13,12 @@ const banSchema = new mongoose.Schema({
         required: true,
         index: true,
     },
+    moderator: {
+        type: String,
+        ref: "TwitchUser",
+        index: true,
+    },
+    reason: String,
     time_start: {
         type: Date,
         default: Date.now,
