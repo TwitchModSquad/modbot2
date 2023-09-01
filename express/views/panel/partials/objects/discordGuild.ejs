@@ -1,0 +1,9 @@
+<<%- locals?.link ? `a href="${link}"` : "div" %> class="community">
+    <img src="<%= guild.iconURL() %>" alt="Icon for <%= guild.name %>">
+    <div class="info">
+        <h3 class="name"><%= guild.name %></h3>
+        <div class="data">
+            <span class="id"><%= guild._id %></span>
+        </div>
+    </div>
+</<%= locals?.link ? "a" : "div" %>>

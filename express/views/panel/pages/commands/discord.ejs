@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Twitch Mod Squad - Discord Commands</title>
+<%- include("../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/panel/panel.css">
+</head>
+<body class="panel">
+<%- include("../../partials/header") %>
+
+    <div class="sidebar-container">
+        <%- include("../../partials/sidebar", {active: "commands-discord"}) %>
+        
+        <main class="container container-md">
+            <% if (locals?.error) { %>
+            <div class="alert alert-danger col-12" onclick="$(this).remove()">
+                <strong>An error occurred!</strong>
+                <%= error %>
+            </div>
+            <% } %>
+            <div class="col-4">
+                <section>
+                    <h2><i class="fa-brands fa-discord"></i> Owned Guilds</h2>
+                    <% guilds.forEach(guild => { %>
+                        <%- include("../../partials/objects/discordGuild", {guild: guild, link: `/panel/commands/discord/${guild._id}`}) %>
+                    <% }) %>
+                    <% if (guilds.length === 0) { %>
+                    <p>You don't own any guilds that <code>MBM</code> has been added to!</p>
+                    <% } %> 
+                </section>
+            </div>
+            <% if (locals?.guild) { %>
+            <form class="col-8" method="post">
+                <section>
+                    <h2><i class="fa-solid fa-command"></i> <code><%= guild.name %></code> Commands</h2>
+                    <% commands.forEach(command => { %>
+                    <label>
+                        <input type="checkbox" name="<%= command.name %>" id="<%= command.name %>"<%= guild?.commands[command.name] ? ` checked="checked"` : "" %>>
+                        <%= command.label %>
+                    </label>
+                    <% }) %>
+                    <input type="submit" value="Update" class="button full">
+                </section>
+            </form>
+            <% } %>
+        </main>
+    </div>
+    
+    <div class="notifications"></div>
+<%- include("../../partials/javascript") %>
+    <script src="/assets/js/panel.js"> </script>
+</body>
+</html>
