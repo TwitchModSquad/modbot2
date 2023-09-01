@@ -17,6 +17,7 @@ const ArchiveLog = require("./archive/ArchiveLog");
 const ArchiveMessage = require("./archive/ArchiveMessage");
 const ArchiveUser = require("./archive/ArchiveUser");
 
+const DiscordBan = require("./discord/DiscordBan");
 const DiscordGuild = require("./discord/DiscordGuild");
 const DiscordUser = require("./discord/DiscordUser");
 const DiscordMessage = require("./discord/DiscordMessage");
@@ -80,6 +81,7 @@ class Utils {
         ArchiveLog: ArchiveLog,
         ArchiveMessage: ArchiveMessage,
         ArchiveUser: ArchiveUser,
+        DiscordBan: DiscordBan,
         DiscordGuild: DiscordGuild,
         DiscordUser: DiscordUser,
         DiscordMessage: DiscordMessage,
