@@ -1,4 +1,4 @@
-const client = global.client.modbot;
+const client = global.client.mbm;
 
 const listener = {
     name: 'updateGuilds',
