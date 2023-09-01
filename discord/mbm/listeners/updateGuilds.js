@@ -23,7 +23,7 @@ const listener = {
                 console.error(e);
             }
         }
-        console.log(`[MBM] Found and updated ${guilds.size} guild(s)`);
+        console.log(`[MBM] Found and updated ${client.guilds.cache.size} guild(s)`);
     }
 };
 
