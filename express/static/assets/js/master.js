@@ -61,4 +61,9 @@ $(function() {
     $(".user img").on("error", function() {
         $(this).attr("src", "/assets/images/blank-profile.webp");
     })
+
+    $("#hide-header").on("click", function() {
+        $("body").addClass("hide-header");
+        return false;
+    });
 });

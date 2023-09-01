@@ -1,0 +1,32 @@
+main {
+    height: calc(100vh - 3.3em);
+}
+
+.hide-header main {
+    height: 100vh;
+}
+
+#bans, #timeouts, #messages, #streamers {
+    font-size: 1.9em;
+    color: #fff;
+    padding: .2em;
+    border-radius: 2px;
+    text-align: center;
+}
+
+#bans {
+    background-color: #db4437;
+}
+
+#timeouts {
+    background-color: #f4b400;
+    color: black;
+}
+
+#messages {
+    background-color: #4285f4;
+}
+
+#streamers {
+    background-color: var(--primary-tms-color);
+}

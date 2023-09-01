@@ -10,6 +10,7 @@ const chatHistory = require("./chatHistory");
 const commands = require("./commands");
 const live = require("./live");
 const manage = require("./manage");
+const overview = require("./overview");
 const status = require("./status");
 const user = require("./user");
 
@@ -49,6 +50,7 @@ router.use("/chat-history", chatHistory);
 router.use("/commands", commands);
 router.use("/live", live);
 router.use("/manage", manage);
+router.use("/overview", overview)
 router.use("/status", status);
 router.use("/user", user);
 

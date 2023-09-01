@@ -1,6 +1,8 @@
 <aside class="sidebar">
     <nav>
         <ul>
+            <li class="separator">Overview</li>
+            <li class="link<%= active === "overview" ? " active" : "" %>"><a href="/panel/overview"><i class="fa-solid fa-users-viewfinder"></i> Overview</a></li>
             <li class="separator">Records</li>
             <li class="link<%= active === "home" ? " active" : "" %>"><a href="/panel/"><i class="fa-solid fa-house"></i> Home</a></li>
             <li class="link<%= active === "status" ? " active" : "" %>"><a href="/panel/status"><i class="fa-solid fa-signal-bars"></i> Status</a></li>
