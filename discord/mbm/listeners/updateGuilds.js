@@ -6,7 +6,7 @@ const listener = {
     eventType: 'once',
     async listener () {
         const guilds = await client.guilds.fetch();
-        for (const [, guild] of guilds) {
+        for (const [, guild] of client.guilds.cache) {
             try {
                 await global.utils.Schemas.DiscordGuild.findOneAndUpdate({
                     _id: guild.id,
