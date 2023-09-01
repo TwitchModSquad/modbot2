@@ -35,6 +35,7 @@ const TwitchToken = require("./twitch/TwitchToken");
 
 const Identity = require("./Identity");
 const Session = require("./Session");
+const { StringSelectMenuBuilder } = require("discord.js");
 
 class Utils {
 
@@ -313,6 +314,26 @@ class Utils {
         if (minute.length === 1) minute = "0" + minute;
         if (second.length === 1) second = "0" + second;
         return `${hour}:${minute}:${second}`;
+    }
+
+    /**
+     * Generates a user select menu
+     * @param {string} type 
+     * @param {[]} users 
+     */
+    userSelect(type, users) {
+        if (type === "discord") {
+            users.forEach(user => {
+                user.display_name = user.displayName;
+            });
+        }
+
+        return new StringSelectMenuBuilder()
+            .setPlaceholder(`View ${type} information`)
+            .setCustomId(`user-${type}`)
+            .setMinValues(1)
+            .setMaxValues(1)
+            .setOptions(users.map(x => {return {label: x.display_name, value: x._id}}));
     }
 
     /**
