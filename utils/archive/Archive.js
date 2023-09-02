@@ -89,7 +89,8 @@ archiveSchema.methods.embed = async function() {
                 value: codeBlock(cleanCodeBlockContent(this.description)),
                 inline: false,
             },
-        ]);
+        ])
+        .setFooter({text: `ID: ${this._id}`, iconURL: config.iconURI});
 
     if (archiveUsers.length > 0) {
         let twitchString = "";
