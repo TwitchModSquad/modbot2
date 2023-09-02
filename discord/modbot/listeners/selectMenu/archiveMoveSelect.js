@@ -58,7 +58,7 @@ const listener = {
                     .setComponents(buttons)
             );
 
-            channel.send({components: components, embeds: [await archive.embed()]}).then(message => {
+            channel.send({components: buttons.length > 0 ? components : null, embeds: [await archive.embed()]}).then(message => {
                 utils.Schemas.ArchiveMessage.create({
                     entry: archive._id,
                     channel: channel.id,
