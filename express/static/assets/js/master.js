@@ -46,9 +46,9 @@ const parse = {
         },
         discord: function(user) {
             return `<div class="user discord">
-            <img src="${user.avatarURL}" alt="Profile picture for ${user.globalName}">
+            <img src="${user.avatarURL}" alt="Profile picture for ${user.displayName}">
             <div class="info">
-                <h3 class="username">${user.globalName}${user.discriminator === "0" ? "" : `<span>${user.discriminator}</span>`}</h3>
+                <h3 class="username">${user.displayName}${user.discriminator === "0" ? "" : `<span>${user.discriminator}</span>`}</h3>
                 <div class="data">
                     <span class="id">${user._id ? user._id : user.id}</span>
                 </div>

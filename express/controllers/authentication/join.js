@@ -101,16 +101,16 @@ router.get("/tms", async (req, res) => {
                         await guild.members.add(user._id, {accessToken: newToken.access_token, roles: resolvedRoles});
                     } catch(e) {
                         console.error(e);
-                        res.json({ok: false, error: `Unable to add user ${user.globalName}!`});
+                        res.json({ok: false, error: `Unable to add user ${user.displayName}!`});
                         return;
                     }
                 } catch(e) {
                     console.error(e);
-                    res.json({ok: false, error: `Unable to refresh access token for Discord user ${user.globalName}!`});
+                    res.json({ok: false, error: `Unable to refresh access token for Discord user ${user.displayName}!`});
                     return;
                 }
             } else {
-                res.json({ok: false, error: `Unable to find token for Discord user ${user.globalName}!`})
+                res.json({ok: false, error: `Unable to find token for Discord user ${user.displayName}!`})
                 return;
             }
         }
@@ -165,16 +165,16 @@ router.get("/tlms", async (req, res) => {
                     await guild.members.add(user._id, {accessToken: newToken.access_token, roles: resolvedRoles});
                 } catch(e) {
                     console.error(e);
-                    res.json({ok: false, error: `Unable to add user ${user.globalName}!`});
+                    res.json({ok: false, error: `Unable to add user ${user.displayName}!`});
                     return;
                 }
             } catch(e) {
                 console.error(e);
-                res.json({ok: false, error: `Unable to refresh access token for Discord user ${user.globalName}!`});
+                res.json({ok: false, error: `Unable to refresh access token for Discord user ${user.displayName}!`});
                 return;
             }
         } else {
-            res.json({ok: false, error: `Unable to find token for Discord user ${user.globalName}!`})
+            res.json({ok: false, error: `Unable to find token for Discord user ${user.displayName}!`})
             return;
         }
     }
@@ -197,16 +197,16 @@ router.get("/cl", async (req, res) => {
                     await guild.members.add(user._id, {accessToken: newToken.access_token});
                 } catch(e) {
                     console.error(e);
-                    res.json({ok: false, error: `Unable to add user ${user.globalName}!`});
+                    res.json({ok: false, error: `Unable to add user ${user.displayName}!`});
                     return;
                 }
             } catch(e) {
                 console.error(e);
-                res.json({ok: false, error: `Unable to refresh access token for Discord user ${user.globalName}!`});
+                res.json({ok: false, error: `Unable to refresh access token for Discord user ${user.displayName}!`});
                 return;
             }
         } else {
-            res.json({ok: false, error: `Unable to find token for Discord user ${user.globalName}!`})
+            res.json({ok: false, error: `Unable to find token for Discord user ${user.displayName}!`})
             return;
         }
     }

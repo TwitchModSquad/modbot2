@@ -40,7 +40,7 @@ const listener = {
                     buttons.push(
                         new ButtonBuilder()
                             .setCustomId(`cb-d-${user._id}`)
-                            .setLabel(`Crossban ${user.globalName}`)
+                            .setLabel(`Crossban ${user.displayName}`)
                             .setStyle(ButtonStyle.Danger)
                     );
                 }

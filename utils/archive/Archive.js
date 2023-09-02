@@ -104,7 +104,7 @@ archiveSchema.methods.embed = async function() {
             if (user.twitchUser) {
                 twitchString += `\n**Twitch:** ${user.twitchUser.display_name} (${user.twitchUser._id})`;
             } else if (user.discordUser) {
-                discordString += `\n**Discord:** ${user.discordUser.globalName} <@${user.discordUser._id}>`;
+                discordString += `\n**Discord:** ${user.discordUser.displayName} <@${user.discordUser._id}>`;
             } else if (user.raw) {
                 discordString += `\n**Raw:** ${user.raw}`;
             }

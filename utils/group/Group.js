@@ -36,7 +36,7 @@ schema.methods.embed = async function() {
     const embed = new EmbedBuilder()
         .setTitle(this?.game?.name ? this.game.name : "Group Information")
         .setColor(0x772ce8)
-        .setAuthor({name: this.posted_by.globalName, iconURL: this.posted_by.avatarURL()})
+        .setAuthor({name: this.posted_by.displayName, iconURL: this.posted_by.avatarURL()})
         .addFields([{
             name: "Posted By",
             value: `<@${this.posted_by._id}>`,
