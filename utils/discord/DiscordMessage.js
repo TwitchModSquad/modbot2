@@ -8,8 +8,8 @@ const messageSchema = new mongoose.Schema({
         ref: "TwitchBan",
     },
     live: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "TwitchBan",
+        type: String,
+        ref: "TwitchLivestream",
     },
     twitchGlobalTimeouts: Boolean,
     twitchGlobalBans: Boolean,

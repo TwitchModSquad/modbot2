@@ -21,6 +21,10 @@ const livestreamSchema = new mongoose.Schema({
         type: String,
         ref: "TwitchUser",
         required: true,
+    },
+    member: {
+        type: Boolean,
+        default: false,
     }
 });
 

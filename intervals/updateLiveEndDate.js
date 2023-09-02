@@ -75,7 +75,7 @@ const interval = {
     interval: 600000,
     onStartup: true,
     run: async () => {
-        const streams = await TwitchLivestream.find({endDate: null})
+        const streams = await TwitchLivestream.find({endDate: null, member: {$ne: true}})
                 .populate("user");
         console.log(streams.length + " live streams");
 
