@@ -169,6 +169,7 @@ const command = {
             interaction.success(`[Create a new Archive entry](${config.express.domain.root}panel/archive/create)`);
         } else if (subcommandGroup) {
             if (subcommandGroup === "set") {
+                //TODO: Make admin only
                 const id = interaction.options.getString("id", true);
                 try {
                     const entry = await utils.Schemas.Archive.findById(new mongoose.Types.ObjectId(id));

@@ -53,7 +53,7 @@ archiveSchema.pre("save", async function() {
         for (let i = 0; i < messages.length; i++) {
             const channel = await global.client.modbot.channels.fetch(messages[i].channel);
             const message = await channel.messages.fetch(messages[i].message);
-            message.edit({embeds: embed}).catch(console.error);
+            message.edit({embeds: [embed]}).catch(console.error);
         }
 
         if (this.isModified("owner")) {
