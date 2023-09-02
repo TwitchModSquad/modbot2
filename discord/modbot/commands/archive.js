@@ -2,6 +2,7 @@ const { ChatInputCommandInteraction, SlashCommandBuilder, EmbedBuilder, codeBloc
 
 const config = require("../../../config.json");
 const utils = require("../../../utils");
+const { default: mongoose } = require("mongoose");
 
 const command = {
     data: new SlashCommandBuilder()
@@ -22,6 +23,26 @@ const command = {
             .setName("create")
             .setDescription("Sends a link to create a new Archive entry")
         )
+        .addSubcommandGroup(x => x
+            .setName("set")
+            .setDescription("Sets an option of an Entry. Admin only")
+            .addSubcommand(y => y
+                .setName("owner")
+                .setDescription("Sets the owner of an entry. Admin only")
+                .addStringOption(z => z
+                    .setName("id")
+                    .setDescription("The archive entry ID")
+                    .setMinLength(24)
+                    .setMaxLength(24)
+                    .setRequired(true)
+                )
+                .addUserOption(y => y
+                    .setName("owner")
+                    .setDescription("The new owner")
+                    .setRequired(true)
+                )
+            )
+        )
         .setDefaultMemberPermissions(0)
         .setDMPermission(false),
     /**
@@ -29,9 +50,10 @@ const command = {
      * @param {ChatInputCommandInteraction} interaction 
      */
     async execute(interaction) {
+        const subcommandGroup = interaction.options.getSubcommandGroup(false);
         const subcommand = interaction.options.getSubcommand(true);
 
-        if (subcommand === "search") {
+        if (!subcommandGroup && subcommand === "search") {
             const query = interaction.options.getString("query", true);
     
             let exactSearch = null;
@@ -143,8 +165,26 @@ const command = {
             }
 
             interaction.reply({embeds: [embed], components: components, ephemeral: interaction.channel.id !== config.discord.modbot.channels.archive_search});
-        } else if (subcommand === "create") {
+        } else if (!subcommandGroup && subcommand === "create") {
             interaction.success(`[Create a new Archive entry](${config.express.domain.root}panel/archive/create)`);
+        } else if (subcommandGroup) {
+            if (subcommandGroup === "set") {
+                const id = interaction.options.getString("id", true);
+                try {
+                    const entry = await utils.Schemas.Archive.findById(new mongoose.Types.ObjectId(id));
+                    if (!entry) return interaction.error("Archive entry not found!");
+
+                    if (subcommand === "owner") {
+                        const owner = interaction.options.getUser("owner", true);
+                        const user = await utils.Discord.getUserById(owner.id, false, true);
+                        entry.owner = await user.createIdentity();
+                        await entry.save();
+                        interaction.success(`Archive entry owner successfully changed to <@${user.id}>!`);
+                    }
+                } catch(err) {
+                    interaction.error("Archive entry not found!");
+                }
+            }
         }
     }
 };
