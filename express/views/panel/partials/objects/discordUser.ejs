@@ -1,7 +1,7 @@
 <<%- locals?.link ? `a href="/panel/user/${account?._id ? account._id : account.id}"` : "div" %> class="user discord">
     <img src="<%= account.avatarURL() %>" alt="Profile picture for <%= account.globalName %>">
     <div class="info">
-        <h3 class="username"><%= account.globalName %><%- account.discriminator === "0" ? "" : `<span>#${account.discriminator}</span>` %></h3>
+        <h3 class="username"><%= account.displayName %><%- account.discriminator === "0" ? "" : `<span>#${account.discriminator}</span>` %></h3>
         <div class="data">
             <span class="id"><%= account?._id ? account._id : account.id %></span>
         </div>
