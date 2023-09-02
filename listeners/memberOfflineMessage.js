@@ -1,3 +1,5 @@
+const { EmbedBuilder } = require("discord.js");
+
 const listener = {
     event: "member_live_offline",
     /**
