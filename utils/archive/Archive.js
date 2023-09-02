@@ -56,6 +56,9 @@ archiveSchema.pre("save", async function() {
             message.edit({embeds: embed}).catch(console.error);
         }
 
+        if (this.isModified("owner")) {
+            await global.utils.Schemas.ArchiveLog.create({entry: this._id, updatedField: "owner"});
+        }
         if (this.isModified("offense")) {
             await global.utils.Schemas.ArchiveLog.create({entry: this._id, updatedField: "offense"});
         }
