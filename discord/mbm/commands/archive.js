@@ -209,7 +209,7 @@ const command = {
                     .setComponents(entrySelect));
             }
 
-            interaction.reply({embeds: [embed], components: components, ephemeral: interaction.channel.id !== config.discord.modbot.channels.archive_search});
+            interaction.reply({embeds: [embed], components: components, ephemeral: !config.discord.modbot.channels.archive_search.includes(interaction.channel.id)});
         } else if (!subcommandGroup && subcommand === "create") {
             interaction.success(`[Create a new Archive entry](${config.express.domain.root}panel/archive/create)`);
         } else if (subcommandGroup) {
