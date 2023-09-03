@@ -1,4 +1,4 @@
-const { ChatInputCommandInteraction, SlashCommandBuilder, EmbedBuilder, codeBlock, ActionRowBuilder } = require("discord.js");
+const { ChatInputCommandInteraction, SlashCommandBuilder, EmbedBuilder, codeBlock, ActionRowBuilder, StringSelectMenuBuilder } = require("discord.js");
 
 const config = require("../../../config.json");
 const utils = require("../../../utils");
@@ -76,7 +76,9 @@ const command = {
 
             if (exactSearch) {
                 archiveEntries = (await utils.Schemas.ArchiveUser.find({$or: [{twitchUser: exactSearch._id}, {discordUser: exactSearch._id}, {raw: exactSearch.display_name}]})
-                        .populate("entry")).map(x => x.entry);
+                        .populate("entry")
+                        .populate("discordUser")
+                        .populate("twitchUser"));
                 if (exactSearch.display_name)
                     bans = await exactSearch.getBans();
             }
@@ -98,7 +100,9 @@ const command = {
                     archiveEntries = [
                         ...archiveEntries,
                         (await utils.Schemas.ArchiveUser.find({$or: [{twitchUser: user._id}, {raw: user.display_name}]})
-                            .populate("entry")).map(x => x.entry)
+                            .populate("entry")
+                            .populate("discordUser")
+                            .populate("twitchUser"))
                     ];
                 }
             }
@@ -116,7 +120,9 @@ const command = {
                 archiveEntries = [
                     ...archiveEntries,
                     (await utils.Schemas.ArchiveUser.find({$or: [{discordUser: user._id}, {raw: user.displayName}]})
-                        .populate("entry")).map(x => x.entry)
+                        .populate("entry")
+                        .populate("discordUser")
+                        .populate("twitchUser"))
                 ];
             }
 
@@ -150,6 +156,29 @@ const command = {
                 });
             }
 
+            archiveEntries = archiveEntries.filter(x => x.entry ? true : false);
+
+            if (archiveEntries.length > 0) {
+                let archiveString = "";
+                for (let i = 0; i < archiveEntries.length; i++) {
+                    if (i > 0) archiveString += "\n";
+                    const entry = archiveEntries[i];
+                    const messages = await entry.entry.getMessages();
+                    let username = (entry.twitchUser ? entry.twitchUser.display_name : "") + (entry.discordUser ? entry.discordUser.displayName : "");
+                    const message = `Entry ${String(entry.entry._id).substring(String(entry.entry._id).length - 6)} on ${username}: ${entry.entry.offense}`;
+                    if (messages.length > 0) {
+                        archiveString += `${i+1}. [${message}](https://discord.com/channels/${config.discord.guilds.modsquad}/${messages[0].channel}/${messages[0].message})`;
+                    } else {
+                        archiveString += `${i+1}. ${message}`;
+                    }
+                }
+                embed.addFields({
+                    name: "Archive Entries",
+                    value: archiveString,
+                    inline: false,
+                });
+            }
+
             const components = [];
 
             if (twitchUsers.length > 0) {
@@ -164,12 +193,34 @@ const command = {
                 );
             }
 
+            if (archiveEntries.length >= 0) {
+                const entrySelect = new StringSelectMenuBuilder()
+                    .setCustomId("entry")
+                    .setPlaceholder("View archive entry information")
+                    .setMinValues(1)
+                    .setMaxValues(1)
+                    .setOptions(
+                        archiveEntries.map(x => {return {
+                            label: (x.twitchUser ? x.twitchUser.display_name : "") + (x.discordUser ? x.discordUser.displayName : "") + ": " + x.entry.offense,
+                            value: String(x.entry._id),
+                        }})
+                    );
+                components.push(new ActionRowBuilder()
+                    .setComponents(entrySelect));
+            }
+
             interaction.reply({embeds: [embed], components: components, ephemeral: interaction.channel.id !== config.discord.modbot.channels.archive_search});
         } else if (!subcommandGroup && subcommand === "create") {
             interaction.success(`[Create a new Archive entry](${config.express.domain.root}panel/archive/create)`);
         } else if (subcommandGroup) {
             if (subcommandGroup === "set") {
-                //TODO: Make admin only
+                if (interaction.guild.id !== config.discord.guilds.modsquad)
+                    return interaction.error("This subcommand must be executed on the main TMS guild!");
+
+                if (!interaction.tms.user?.identity?.admin)
+                    return interaction.error("This subcommand may only be executed by a TMS administrator!");
+
+
                 const id = interaction.options.getString("id", true);
                 try {
                     const entry = await utils.Schemas.Archive.findById(new mongoose.Types.ObjectId(id));
