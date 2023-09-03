@@ -193,7 +193,7 @@ const command = {
                 );
             }
 
-            if (archiveEntries.length >= 0) {
+            if (archiveEntries.length > 0) {
                 const entrySelect = new StringSelectMenuBuilder()
                     .setCustomId("entry")
                     .setPlaceholder("View archive entry information")
