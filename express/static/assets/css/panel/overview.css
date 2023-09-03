@@ -30,3 +30,25 @@ main {
 #streamers {
     background-color: var(--primary-tms-color);
 }
+
+#follows {
+    display: flex;
+}
+
+#follows > div {
+    flex-grow: 1;
+    text-align: center;
+}
+
+#follows img {
+    width: 1.3em;
+    height: 1.3em;
+    vertical-align: middle;
+    border-radius: 50%;
+    margin-right: .1em;
+}
+
+#follows .relative-time {
+    font-size: .8em;
+    color: var(--secondary-text-color);
+}

@@ -57,6 +57,7 @@ router.ws("/chat", (ws, req) => {
 const sendPartialUpdate = ws => {
     ws.sendJson({
         mostActiveChannels: utils.StatsManager.getMostActiveChannels(),
+        recentFollowers: utils.StatsManager.getRecentFollowers(),
     });
 }
 
@@ -65,6 +66,7 @@ const sendFullUpdate = ws => {
         mostActiveChannels: utils.StatsManager.getMostActiveChannels(),
         hourlyActivity: utils.StatsManager.getHourlyActivity(),
         general: utils.StatsManager.getGeneralStatistics(),
+        recentFollowers: utils.StatsManager.getRecentFollowers(),
     });
 }
 

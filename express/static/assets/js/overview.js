@@ -4,6 +4,8 @@ google.charts.setOnLoadCallback(drawChart);
 
 let ws;
 
+let mostRecentFollow = null;
+
 const mostActiveOptions = {
     chartArea: {
         width: '100%',
@@ -114,6 +116,18 @@ function drawChart() {
             $("#bans").text(formatNumberSmall(json.general.bans));
             $("#timeouts").text(formatNumberSmall(json.general.timeouts));
             $("#streamers").text(formatNumberSmall(json.general.streamers));
+        }
+
+        if (json?.recentFollowers && json.recentFollowers.length > 0) {
+            if (json.recentFollowers[0].user.id !== mostRecentFollow?.id) {
+                mostRecentFollow = json.recentFollowers[0].user;
+
+                let htmlOutput = "";
+                json.recentFollowers.forEach(function(f) {
+                    htmlOutput += `<div class="small-user"><div><img src="${f.user.profile_image_url}"> ${f.user.display_name}</div><div class="relative-time" data-timestamp="${new Date(f.date).toString()}"></div></div>`;
+                });
+                $("#follows").html(htmlOutput);
+            }
         }
     }
 }

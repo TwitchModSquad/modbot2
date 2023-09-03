@@ -1,6 +1,9 @@
 function calculateRelativeTime(timestamp) {
     const timeSince = Math.floor((Date.now() - timestamp)/1000);
-    if (timeSince > 86400) {
+    if (timeSince > 2628000) {
+        const time = Math.floor(timeSince / 2628000);
+        return `${time} month${time === 1 ? "" : "s"} ago`;
+    } else if (timeSince > 86400) {
         const time = Math.floor(timeSince / 86400);
         return `${time} day${time === 1 ? "" : "s"} ago`;
     } else if (timeSince > 3600) {
