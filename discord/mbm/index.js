@@ -38,22 +38,37 @@ client.listeners.forEach(listener => {
     client[listener.eventType](listener.eventName, listener.listener);
 });
 
+let page = 1;
 setInterval(() => {
-    let totalChannels = 0;
-
-    totalChannels += global.client.listen.member.channels.length;
-    totalChannels += global.client.listen.partner.channels.length;
-    totalChannels += global.client.listen.affiliate.channels.length;
-
-    client.user.setPresence({
-        activities: [
-            {
-                name: `${totalChannels} Twitch channels`,
-                type: Discord.ActivityType.Watching,
-            }
-        ],
-        status: "online",
-    })
+    if (page === 1) {
+        let totalChannels = 0;
+    
+        totalChannels += global.client.listen.member.channels.length;
+        totalChannels += global.client.listen.partner.channels.length;
+        totalChannels += global.client.listen.affiliate.channels.length;
+    
+        client.user.setPresence({
+            activities: [
+                {
+                    name: `${totalChannels} Twitch channels`,
+                    type: Discord.ActivityType.Watching,
+                }
+            ],
+            status: "online",
+        })
+        page = 2;
+    } else if (page === 2) {
+        client.user.setPresence({
+            activities: [
+                {
+                    name: `${client.guilds.cache.size} Discord guilds`,
+                    type: Discord.ActivityType.Watching,
+                }
+            ],
+            status: "online",
+        })
+        page = 1;
+    }
 }, 30000);
 
 client.login(config.discord.mbm.token);
