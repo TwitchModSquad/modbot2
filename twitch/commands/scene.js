@@ -1,7 +1,5 @@
 const tmi = require("tmi.js");
 
-const { broadcast } = require("../../express/ws/index");
-
 let isLocked = false;
 const command = {
     name: "scene",
@@ -21,11 +19,11 @@ const command = {
 
             const sceneName = args[0].toLowerCase();
             if (sceneName === "tms" || sceneName === "overview") {
-                broadcast("overview", "all", JSON.stringify({
+                global.broadcast("overview", "all", JSON.stringify({
                     changeScene: "TMS Overview",
                 }));
             } else if (sceneName === "wos") {
-                broadcast("overview", "all", JSON.stringify({
+                global.broadcast("overview", "all", JSON.stringify({
                     changeScene: "WOS",
                 }));
             } else if (sceneName === "lock" && tags.mod) {

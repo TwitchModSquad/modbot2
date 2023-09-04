@@ -124,6 +124,8 @@ setInterval(() => {
     intCount++;
 }, 2500);
 
+global.broadcast = broadcast;
+
 module.exports = {
     router: router,
     broadcast: broadcast,
