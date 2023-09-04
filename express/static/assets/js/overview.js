@@ -61,6 +61,8 @@ function formatNumberSmall(num) {
     }
 }
 
+let obs = false;
+
 function drawChart() {
     const mostActiveChart = new google.charts.Bar(document.getElementById('most-active-channels'));
     const hourlyStatsChart = new google.charts.Line(document.getElementById('hourly-stats'));
@@ -129,5 +131,13 @@ function drawChart() {
                 $("#follows").html(htmlOutput);
             }
         }
+
+        if (json?.changeScene && obs) {
+            window.obsstudio.setCurrentScene(json.changeScene);
+        }
     }
 }
+
+$(function() {
+    if (window.obsstudio) obs = true;
+});
