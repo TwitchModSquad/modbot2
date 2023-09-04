@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/assets/css/panel/panel.css">
     <link rel="stylesheet" href="/assets/css/panel/overview.css">
 </head>
-<body class="panel">
+<body class="panel<%= locals?.force ? " hide-header" : "" %>">
 <%- include("../partials/header", {hideOption: true}) %>
 
     <div class="sidebar-container">

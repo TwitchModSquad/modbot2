@@ -5,7 +5,10 @@ const utils = require("../../../utils/");
 const config = require("../../../config.json");
 
 router.get("/", async (req, res) => {
-    res.render("panel/pages/overview", {WS_URI: config.express.domain.root.replace("http://", "ws://").replace("https://", "wss://") + "ws/overview"});
+    res.render("panel/pages/overview", {
+        WS_URI: config.express.domain.root.replace("http://", "ws://").replace("https://", "wss://") + "ws/overview",
+        force: req?.query?.force !== undefined ? true : false,
+    });
 });
 
 module.exports = router;
