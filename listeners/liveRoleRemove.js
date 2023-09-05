@@ -10,7 +10,7 @@ const listener = {
      * @param {Message} message
      */
     func: async (livestream, message) => {
-        const retrievedUser = await utils.Twitch.getUserById(user._id);
+        const retrievedUser = await utils.Twitch.getUserById(livestream.user._id);
         if (retrievedUser?.identity) {
             const discordUsers = await retrievedUser.identity.getDiscordUsers();
             for (let i = 0; i < discordUsers.length; i++) {
