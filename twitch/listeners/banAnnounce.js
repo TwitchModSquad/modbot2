@@ -69,6 +69,8 @@ const listener = {
                 .sort({time_sent: -1})
                 .limit(10);
 
+        chatHistory.reverse();
+
         let chatHistoryString = "";
         chatHistory.forEach(ch => {
             if (chatHistoryString !== "") chatHistoryString += "\n";
