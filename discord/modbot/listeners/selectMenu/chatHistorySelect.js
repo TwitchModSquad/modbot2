@@ -33,17 +33,18 @@ const listener = {
                         }
                     });
 
-            let chatHistoryString = "";
+            let chatHistoryMessages = [];
             let lastTime = Date.now();
             chatHistory.forEach(ch => {
-                if (chatHistoryString !== "") chatHistoryString += "\n";
                 const bansFilter = bans.filter(x => x.time_start < lastTime && x.time_start > ch.time_sent);
                 bansFilter.forEach(ban => {
-                    chatHistoryString += `${global.utils.formatTime(ban.time_start)} [#${streamer.login}] ${chatter.display_name} was banned!\n`;
+                    chatHistoryMessages.push(`${global.utils.formatTime(ban.time_start)} [#${streamer.login}] ${chatter.display_name} was banned!`);
                 });
-                chatHistoryString += `${global.utils.formatTime(ch.time_sent)} [${chatter.display_name}] ${ch.message}`;
+                chatHistoryMessages.push(`${global.utils.formatTime(ch.time_sent)} [${chatter.display_name}] ${ch.message}`);
                 lastTime = ch.time_sent;
             });
+
+            chatHistoryMessages.reverse();
 
             const elapsedTime = Date.now() - startTime;
 
@@ -51,7 +52,7 @@ const listener = {
                     .setTitle(`Chat History in ${streamer.login}`)
                     .setColor(0x03a9fc)
                     .setAuthor({name: chatter.display_name, iconURL: chatter.profile_image_url, url: `https://twitch.tv/${chatter.login}`})
-                    .setDescription(codeBlock(cleanCodeBlockContent(chatHistoryString)))
+                    .setDescription(codeBlock(cleanCodeBlockContent(chatHistoryMessages.join("\n"))))
                     .setFooter({text: `Logs in ${streamer.display_name} • Generated in ${elapsedTime} ms`, iconURL: streamer.profile_image_url});
 
             interaction.reply({embeds: [embed], ephemeral: true});
