@@ -259,7 +259,7 @@
                         <div class="overflow-container">
                             <% if (streamers.length === 0) { %>No moderated channels!<% } %>
                             <% streamers.forEach(role => { %>
-                                <%- include("../partials/objects/twitchUser", {account: role.streamer, comma: comma, link: true}) %>
+                                <%- include("../partials/objects/twitchUser", {account: role.streamer, comma: comma, link: `/panel/user/${role.streamer._id}`}) %>
                             <% }) %>
                         </div>
                     </section>
@@ -268,7 +268,7 @@
                         <div class="overflow-container">
                             <% if (moderators.length === 0) { %>No channel moderators!<% } %>
                             <% moderators.forEach(role => { %>
-                                <%- include("../partials/objects/twitchUser", {account: role.moderator, comma: comma, link: true}) %>
+                                <%- include("../partials/objects/twitchUser", {account: role.moderator, comma: comma, link: `/panel/user/${role.moderator._id}`}) %>
                             <% }) %>
                         </div>
                     </section>

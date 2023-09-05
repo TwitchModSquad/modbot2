@@ -1,4 +1,4 @@
-<<%- locals?.link ? `a href="/panel/user/${account?._id ? account._id : account.id}"` : "div" %> class="user twitch">
+<<%- locals?.link ? `a href="${locals.link}"` : "div" %> class="user twitch">
     <img src="<%= account.profile_image_url %>" alt="Profile picture for <%= account.display_name %>">
     <div class="info">
         <h3 class="username"><%= account.display_name %><%- account.broadcaster_type === "partner" ? ` <img src="/assets/images/badges/twitch/partner.png" alt="Partner badge">` : "" %></h3>

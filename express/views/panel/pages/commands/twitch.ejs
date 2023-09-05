@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Twitch Mod Squad - Twitch Commands</title>
+<%- include("../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/panel/panel.css">
+</head>
+<body class="panel">
+<%- include("../../partials/header") %>
+
+    <div class="sidebar-container">
+        <%- include("../../partials/sidebar", {active: "commands-twitch"}) %>
+        
+        <main class="container container-md">
+            <% if (locals?.error) { %>
+            <div class="alert alert-danger col-12" onclick="$(this).remove()">
+                <strong>An error occurred!</strong>
+                <%= error %>
+            </div>
+            <% } %>
+            <section class="col-4">
+                <h2><i class="fa-brands fa-twitch"></i> Users</h2>
+                <% users.forEach(user => { %>
+                <%- include("../../partials/objects/twitchUser", {account: user, comma: comma, link: `/panel/commands/twitch/${user._id}`}) %>
+                <% }) %>
+            </section>
+            <% if (locals?.user) { %>
+            <form class="col-8" method="post">
+                <section>
+                    <h2><i class="fa-solid fa-command"></i> <code><%= user.display_name %></code> Commands</h2>
+                    <% commands.forEach(command => { %>
+                    <label>
+                        <input type="checkbox" name="<%= command.name %>" id="<%= command.name %>"<%= user?.commands[command.name] ? ` checked="checked"` : "" %>>
+                        <%= command.label %>
+                    </label>
+                    <% }) %>
+                    <input type="submit" value="Update" class="button full">
+                </section>
+            </form>
+            <% } %>
+        </main>
+    </div>
+    
+    <div class="notifications"></div>
+<%- include("../../partials/javascript") %>
+</body>
+</html>

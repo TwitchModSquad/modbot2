@@ -17,7 +17,7 @@
                 <section>
                     <h2><i class="fa-brands fa-twitch"></i> Twitch Users</h2>
                     <% twitchUsers.forEach(user => { %>
-                        <%- include("../partials/objects/twitchUser", {account: user, comma: comma, link: true}) %>
+                        <%- include("../partials/objects/twitchUser", {account: user, comma: comma, link: `/panel/user/${user._id}`}) %>
                     <% }) %>
                 </section>
                 <section>
@@ -31,7 +31,7 @@
                 <section>
                     <h2><i class="fa-solid fa-signal-stream"></i> Streamers</h2>
                     <% streamers.forEach(role => { %>
-                        <%- include("../partials/objects/twitchUser", {account: role.streamer, comma: comma, link: true}) %>
+                        <%- include("../partials/objects/twitchUser", {account: role.streamer, comma: comma, link: `/panel/user/${role.streamer._id}`}) %>
                     <% }) %>
                 </section>
             </div>
