@@ -25,6 +25,7 @@ const archiveSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    tlmsAllowed: Boolean,
 });
 
 archiveSchema.pre("save", async function() {

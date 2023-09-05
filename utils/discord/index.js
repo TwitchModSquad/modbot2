@@ -28,11 +28,12 @@ class Discord {
 
     /**
      * Various Discord channels
-     * @type {{ban:TextChannel,live:TextChannel}}
+     * @type {{ban:TextChannel,live:TextChannel,archiveRequest:TextChannel}}
      */
     channels = {
         ban: null,
         live: null,
+        archiveRequest: null,
     }
 
     /**
@@ -213,6 +214,8 @@ class Discord {
         this.channels.ban = await global.client.modbot.channels.fetch(config.discord.modbot.channels.ban);
         this.channels.live = await global.client.modbot.channels.fetch(config.discord.modbot.channels.live);
 
+        this.channels.archiveRequest = await global.client.mbm.channels.fetch(config.discord.mbm.channels.archive_request);
+
         const globalTimeoutMessage = await DiscordMessage.find({twitchGlobalTimeouts: true})
                 .sort({time_sent: -1})
                 .limit(1);
@@ -246,7 +249,7 @@ class Discord {
 
         console.log(
             `[MB] Using guilds: TMS [${this.guilds.tms.name}] TLMS [${this.guilds.tlms.name}] CL [${this.guilds.cl.name}]\n` +
-            `[MB] Using channel #${this.channels.ban.name} for bans, #${this.channels.live.name} for livestreams\n` +
+            `[MB] Using channel #${this.channels.ban.name} for bans, #${this.channels.live.name} for livestreams, #${this.channels.archiveRequest.name} for archive requests\n` +
             `[MB] Using message ${this.messages.globalTimeout.id} for timeouts, ${this.messages.globalBan.id} for bans`
         );
 
