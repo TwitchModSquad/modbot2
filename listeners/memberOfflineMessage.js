@@ -8,7 +8,6 @@ const listener = {
      */
     func: (livestream, message) => {
         const embed = new EmbedBuilder()
-                .setColor(0x772ce8)
                 .setAuthor({name: `⚫ ${livestream.user.display_name} is now offline!`})
                 .setTitle("Offline")
                 .setURL(`https://twitch.tv/${livestream.user.login}`)
