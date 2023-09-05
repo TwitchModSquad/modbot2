@@ -10,9 +10,9 @@ const utils = require("./utils/");
 const grabFiles = path => fs.readdirSync(path).filter(file => file.endsWith('.js'));
 const intervals = grabFiles('./intervals/');
 
+global.utils = utils;
+
 utils.schema().then(async () => {
-    global.utils = utils;
-    
     for (const file of intervals) {
         const interval = require(`./intervals/${file}`);
         setInterval(interval.run, interval.interval);
