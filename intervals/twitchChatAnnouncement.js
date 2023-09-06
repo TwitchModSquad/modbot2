@@ -10,7 +10,7 @@ const interval = {
     interval: 60000,
     onStartup: true,
     run: async () => {
-        if (!utils.StatsManager.getMemberStreams().find(x => x.user.id !== config.twitch.id))
+        if (!utils.StatsManager.getMemberStreams().find(x => x.user.id === config.twitch.id))
             return;
 
         let message = config.twitch.messages[nextIndex];
@@ -22,7 +22,7 @@ const interval = {
             while (!stream || stream.user.id === config.twitch.id) {
                 stream = randomItem(streams);
             }
-            message = `Visit one of our members ${stream.user.display_name} playing ${stream.game.name} at twitch.tv/${stream.user.login} !`;
+            message = `Visit one of our members - ${stream.user.display_name} playing ${stream.game.name} at twitch.tv/${stream.user.login} !`;
         }
 
         global.client.listen.member.client.say(config.twitch.username, message).catch(console.error);
