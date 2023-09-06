@@ -31,16 +31,19 @@ main {
     background-color: var(--primary-tms-color);
 }
 
-#follows {
+#follows,
+#subscriptions {
     display: flex;
 }
 
-#follows > div {
+#follows > div,
+#subscriptions > div {
     flex-grow: 1;
     text-align: center;
 }
 
-#follows img {
+#follows img,
+#subscriptions > div {
     width: 1.3em;
     height: 1.3em;
     vertical-align: middle;
@@ -48,7 +51,52 @@ main {
     margin-right: .1em;
 }
 
-#follows .relative-time {
+#follows .relative-time,
+#subscriptions .relative-time {
     font-size: .8em;
     color: var(--secondary-text-color);
+}
+
+#subscriptions {
+    color: var(--secondary-text-color);
+    display: block;
+    text-align: center;
+}
+
+#member-streams > div {
+    display: flex;
+    background-color: rgba(255,255,255,0.025);
+    margin: .6em 0;
+    padding: .6em;
+    border: .1em solid rgba(255,255,255,0.05);
+    border-radius: 8px;
+}
+
+#member-streams img {
+    width: 2.5em;
+    height: 2.5em;
+    border-radius: 50%;
+    margin-right: .5em;
+    border: .1em solid #ba3a3a;
+}
+
+#member-streams .content {
+    font-size: .8em;
+    color: var(--tertiary-text-color);
+    flex-grow: 1;
+}
+
+#member-streams .content span {
+    color: var(--secondary-text-color);
+}
+
+#member-streams h3 {
+    color: var(--primary-text-color);
+    width: 12em;
+    font-size: 1rem;
+    font-weight: 300;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    margin: 0;
 }

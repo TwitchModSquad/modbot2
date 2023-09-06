@@ -19,13 +19,13 @@ const command = {
 
             const sceneName = args[0].toLowerCase();
             if (sceneName === "tms" || sceneName === "overview") {
-                global.broadcast("overview", "all", JSON.stringify({
+                global.overviewBroadcast("scene", {
                     changeScene: "TMS Overview",
-                }));
+                });
             } else if (sceneName === "wos") {
-                global.broadcast("overview", "all", JSON.stringify({
+                global.overviewBroadcast("scene", {
                     changeScene: "WOS",
-                }));
+                });
             } else if (sceneName === "lock" && tags.mod) {
                 isLocked = true;
                 return reply("scene changing locked!");

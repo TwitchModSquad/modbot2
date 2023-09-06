@@ -22,39 +22,51 @@
                 </section>
             </div>
             <div class="container container-md">
-                <section class="col-8">
-                    <h2>Hourly Stats</h2>
-                    <div id="hourly-stats" style="width: 100%;height: 200px;"></div>
+                <section class="col-3">
+                    <h2><i class="fa-solid fa-video"></i> Live Members <span id="live-member-count" class="badge">0</span></h2>
+                    <div id="member-streams"></div>
                 </section>
-                <div class="col-4 container container-md">
-                    <section class="col-6">
-                        <h2>Bans</h2>
-                        <div id="bans">0</div>
+                <div class="col-9">
+                    <section>
+                        <h2><i class="fa-solid fa-clock"></i> Hourly Stats</h2>
+                        <div id="hourly-stats" style="width: 100%;height: 250px;"></div>
                     </section>
-                    <section class="col-6">
-                        <h2>Timeouts</h2>
-                        <div id="timeouts">0</div>
+                    <div class="container container-md">
+                        <section class="col-3">
+                            <h2><i class="fa-solid fa-ban"></i> Bans</h2>
+                            <div id="bans">0</div>
+                        </section>
+                        <section class="col-3">
+                            <h2><i class="fa-solid fa-timer"></i> Timeouts</h2>
+                            <div id="timeouts">0</div>
+                        </section>
+                        <section class="col-3">
+                            <h2><i class="fa-solid fa-comment"></i> Messages</h2>
+                            <div id="messages">0</div>
+                        </section>
+                        <section class="col-3">
+                            <h2><i class="fa-solid fa-hashtag"></i> Channels</h2>
+                            <div id="streamers">0</div>
+                        </section>
+                    </div>
+                    <section>
+                        <h2><i class="fa-solid fa-star"></i> Recent Subscriptions</h2>
+                        <div id="subscriptions">
+                            No subscribers until affiliate ☹️<br>
+                            Please follow to help us get there!
+                        </div>
                     </section>
-                    <section class="col-6">
-                        <h2>Messages</h2>
-                        <div id="messages">0</div>
-                    </section>
-                    <section class="col-6">
-                        <h2>Channels</h2>
-                        <div id="streamers">0</div>
+                    <section>
+                        <h2><i class="fa-solid fa-user"></i> Recent Follows</h2>
+                        <div id="follows"></div>
                     </section>
                 </div>
-            </div>
-            <div class="container container-md">
-                <section class="col-12">
-                    <h2>Recent Follows</h2>
-                    <div id="follows"></div>
-                </section>
             </div>
         </main>
     </div>
     
     <div class="notifications"></div>
+    <div class="messages"></div>
 <%- include("../partials/javascript") %>
 <script>
     const WS_URI = "<%= WS_URI %>";

@@ -61,8 +61,6 @@ function formatNumberSmall(num) {
     }
 }
 
-let obs = false;
-
 function drawChart() {
     const mostActiveChart = new google.charts.Bar(document.getElementById('most-active-channels'));
     const hourlyStatsChart = new google.charts.Line(document.getElementById('hourly-stats'));
@@ -76,6 +74,13 @@ function drawChart() {
     ws.onopen = function() {
         setTimeout(() => {
             ws.sendJson({type: "ready"})
+
+            if (window.obsstudio) {
+                ws.send(JSON.stringify({
+                    type: "addScope",
+                    scope: ["scene","chat","follow","subscription"],
+                }));
+            }
         }, 50);
     }
 
@@ -120,6 +125,15 @@ function drawChart() {
             $("#streamers").text(formatNumberSmall(json.general.streamers));
         }
 
+        if (json?.memberStreams) {
+            let htmlOutput = "";
+            json.memberStreams.forEach(function (a) {
+                htmlOutput += `<div class="stream"><img src="${a.user.profile_image_url}"><div class="content"><h3>${a.title}</h3><span>${a.game.name.replace(" ", "&nbsp;")}</span> &bullet; <span>!s&nbsp;${a.user.login}</span> &bullet; <span>${comma(a.viewers)}&nbsp;viewer${a.viewers === 1 ? "" : "s"}</span></div></div>`;
+            });
+            $("#member-streams").html(htmlOutput);
+            $("#live-member-count").text(comma(json.memberStreams.length));
+        }
+
         if (json?.recentFollowers && json.recentFollowers.length > 0) {
             if (json.recentFollowers[0].user.id !== mostRecentFollow?.id) {
                 mostRecentFollow = json.recentFollowers[0].user;
@@ -132,12 +146,14 @@ function drawChart() {
             }
         }
 
-        if (json?.changeScene && obs) {
-            window.obsstudio.setCurrentScene(json.changeScene);
+        if (window.obsstudio) {
+            if (json?.changeScene) {
+                window.obsstudio.setCurrentScene(json.changeScene);
+            }
+
+            if (json?.message) {
+                console.log(json.message);
+            }
         }
     }
 }
-
-$(function() {
-    if (window.obsstudio) obs = true;
-});

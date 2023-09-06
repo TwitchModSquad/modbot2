@@ -56,6 +56,7 @@ const userSchema = new mongoose.Schema({
         continue: Boolean,
         restart: Boolean,
         scene: Boolean,
+        s: Boolean,
     },
     chat_listen: {
         type: Boolean,

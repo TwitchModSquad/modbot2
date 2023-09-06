@@ -17,6 +17,8 @@ class StatsManager {
         streamers: 0,
     };
 
+    memberStreams = [];
+
     recentFollowers = [];
 
     /**
@@ -60,6 +62,14 @@ class StatsManager {
      */
     getGeneralStatistics() {
         return this.generalStatistics;
+    }
+
+    /**
+     * Returns member streams
+     * @returns {{live: any, game: any, user: any, title: string, viewers: number}[]}
+     */
+    getMemberStreams() {
+        return this.memberStreams;
     }
 
     /**
@@ -147,6 +157,7 @@ class StatsManager {
             if (intCount % 15 === 0) {
                 this.saveHourlyActivity().catch(console.error);
                 this.updateRecentFollowers().catch(console.error);
+                this.updateLiveMembers().catch(console.error);
             }
 
             if (intCount % 60 === 0) {
@@ -157,6 +168,7 @@ class StatsManager {
 
         setTimeout(() => {
             this.loadHourlyActivity().catch(console.error);
+            this.updateLiveMembers().catch(console.error);
         }, 1000);
     }
 
@@ -209,6 +221,37 @@ class StatsManager {
                 clients.affiliate.channels.length;
     }
 
+    /**
+     * Updates live members
+     */
+    async updateLiveMembers() {
+        const streams = await global.utils.Schemas.TwitchLivestream.find({endDate: null, member: true})
+            .populate("user");
+
+        let activities = [];
+        for (let i = 0; i < streams.length; i++) {
+            const activity = await global.utils.Schemas.TwitchStreamStatus.find({live: streams[i]._id})
+                .sort({timestamp: -1})
+                .populate("live")
+                .populate("game")
+                .limit(1);
+            if (activity.length > 0) {
+                activities.push({
+                    live: activity[0].live,
+                    game: activity[0].game,
+                    user: streams[i].user.public(),
+                    title: activity[0].title,
+                    viewers: activity[0].viewers,
+                });
+            }
+        }
+        activities.sort((a, b) => a.viewers - b.viewers);
+        this.memberStreams = activities;
+    }
+
+    /**
+     * Updates recent followers
+     */
     async updateRecentFollowers() {
         const data = await global.utils.Twitch.Helix.helix.users.getFollows({followedUser: config.twitch.id});
         let newFollowList = [];

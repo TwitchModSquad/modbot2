@@ -67,9 +67,11 @@ const sendFullUpdate = ws => {
         hourlyActivity: utils.StatsManager.getHourlyActivity(),
         general: utils.StatsManager.getGeneralStatistics(),
         recentFollowers: utils.StatsManager.getRecentFollowers(),
+        memberStreams: utils.StatsManager.getMemberStreams(),
     });
 }
 
+const OVERVIEW_SCOPES = ["scene","chat","follow","subscription"];
 router.ws("/overview", (ws, req) => {
     ws.id = utils.stringGenerator(32);
     ws.identity = req.session.identity;
@@ -79,7 +81,7 @@ router.ws("/overview", (ws, req) => {
     }
 
     ws.type = "overview";
-    ws.scope = "all";
+    ws.scope = [];
 
     websockets.push(ws);
 
@@ -95,6 +97,21 @@ router.ws("/overview", (ws, req) => {
 
         if (json.type === "ready") {
             sendFullUpdate(ws);
+        } else if (json.type === "addScope" && json?.scope) {
+            if (typeof(json.scope) === "object") {
+                for (let i = 0; i < json.scope.length; i++) {
+                    if (!OVERVIEW_SCOPES.includes(json.scope[i]))
+                        return console.error(`Ignoring scope request due to invalid scope ${json.scope[i]}`);
+                }
+                ws.scope = [
+                    ...ws.scope,
+                    ...json.scope,
+                ]
+            } else if (typeof(json.scope) === "string") {
+                if (!OVERVIEW_SCOPES.includes(json.scope))
+                    return console.error(`Ignoring scope request due to invalid scope ${json.scope}`);
+                ws.scope.push(json.scope);
+            }
         }
     });
 
@@ -105,6 +122,18 @@ router.ws("/overview", (ws, req) => {
 
 const broadcast = (type, scope, msg) => {
     const broadcastWs = websockets.filter(x => x.type === type && (x.scope === "all" || x.scope === scope));
+    broadcastWs.forEach(ws => {
+        try {
+            ws.send(msg);
+        } catch(e) {
+            console.error(e);
+        }
+    });
+}
+
+const overviewBroadcast = (scope, msg) => {
+    if (typeof(msg) === "object") msg = JSON.stringify(msg);
+    const broadcastWs = websockets.filter(x => x.type === "overview" && x.scope.includes(scope));
     broadcastWs.forEach(ws => {
         try {
             ws.send(msg);
@@ -125,8 +154,10 @@ setInterval(() => {
 }, 2500);
 
 global.broadcast = broadcast;
+global.overviewBroadcast = overviewBroadcast;
 
 module.exports = {
     router: router,
     broadcast: broadcast,
+    overviewBroadcast: overviewBroadcast,
 };

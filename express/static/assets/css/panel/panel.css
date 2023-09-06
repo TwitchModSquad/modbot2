@@ -6,6 +6,7 @@ header {
     display: flex;
     background-color: var(--primary-tms-color);
     text-shadow: var(--shadow);
+    z-index: 10;
 }
 
 header a {
@@ -107,4 +108,13 @@ main {
 
 .sidebar-collapse main {
     margin-left: 0;
+}
+
+.badge {
+    display: inline-block;
+    background-color: #ba3a3a;
+    color: var(--primary-text-color);
+    padding: .2em .4em;
+    margin: 0 .2em;
+    border-radius: 2em;
 }
