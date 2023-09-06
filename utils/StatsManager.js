@@ -156,7 +156,7 @@ class StatsManager {
             
             if (intCount % 15 === 0) {
                 this.saveHourlyActivity().catch(console.error);
-                this.updateRecentFollowers().catch(console.error);
+                // this.updateRecentFollowers().catch(console.error);
                 this.updateLiveMembers().catch(console.error);
             }
 
