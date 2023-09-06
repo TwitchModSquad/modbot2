@@ -32,7 +32,7 @@ const interval = {
             dbUser.offline_image_url = user.offlinePlaceholderUrl;
             
             try {
-                await dbUser.fetchFollowers();
+                // await dbUser.fetchFollowers();
             } catch(e) {
                 console.error(e);
             }
