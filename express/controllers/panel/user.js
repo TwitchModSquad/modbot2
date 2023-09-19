@@ -189,7 +189,7 @@ router.get("/:query/force", async (req, res) => {
 
         delete dataCache[twitchUser._id];
         await twitchUser.updateData();
-        // await twitchUser.fetchFollowers();
+        await twitchUser.fetchFollowers();
         await twitchUser.save();
         res.redirect("/panel/user/" + twitchUser._id);
     } else {

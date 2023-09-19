@@ -26,7 +26,7 @@ router.use(async (req, res, next) => {
 
     for (let i = 0; i < twitchUsers.length; i++) {
         if (!twitchUsers[i].follower_count) {
-            // await twitchUsers[i].fetchFollowers();
+            await twitchUsers[i].fetchFollowers();
             await twitchUsers[i].save();
         }
     }
@@ -55,7 +55,7 @@ router.get("/:streamer", async (req, res) => {
         const twitchUsers = await req.session.identity.getTwitchUsers();
         const userIds = twitchUsers.map(x => x._id);
         const streamer = await utils.Twitch.getUserByName(req.params.streamer, true);
-        // await streamer.fetchFollowers();
+        await streamer.fetchFollowers();
         await streamer.save();
         const mods = await streamer.fetchMods();
         if (mods.find(x => userIds.includes(x.moderator._id))) {

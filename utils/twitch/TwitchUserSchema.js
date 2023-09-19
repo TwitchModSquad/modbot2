@@ -152,7 +152,7 @@ userSchema.methods.public = function() {
 }
 
 userSchema.methods.fetchFollowers = async function () {
-    const followers = (await global.utils.Twitch.Helix.helix.users.getFollows({followedUser: this._id, limit: 1})).total;
+    const followers = (await global.utils.Authentication.Twitch.getChannelFollowers(this._id)).total;
     this.follower_count = followers;
     return followers;
 }

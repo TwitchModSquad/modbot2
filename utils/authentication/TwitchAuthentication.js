@@ -6,6 +6,8 @@ class TwitchAuthentication {
     TWITCH_URL = `https://id.twitch.tv/oauth2/authorize?response_type=code&client_id=${config.twitch.client_id}&redirect_uri={redirectURI}&scope={scope}`;
     TWITCH_REDIRECT = config.express.domain.root + "auth/twitch";
 
+    followerAccessToken = null;
+
     /**
      * Returns the OAuth2 URI given the scopes & redirect URI
      * @param {string} scope 
@@ -314,6 +316,61 @@ class TwitchAuthentication {
             } catch(err) {
                 reject(err);
                 return;
+            }
+        });
+    }
+
+    /**
+     * Retrieves the follower access token and stores it
+     * @returns {Promise<string>}
+     */
+    #retrieveFollowerAccessToken() {
+        return new Promise(async (resolve, reject) => {
+            this.getAccessToken(config.twitch.follow_refresh).then(token => {
+                this.followerAccessToken = token;
+                resolve(token);
+            }, reject);
+
+        })
+    }
+
+    /**
+     * Gets a channels followers
+     * @param {string} broadcasterId 
+     * @param {number} limit
+     * @returns {Promise<any>}
+     */
+    getChannelFollowers(broadcasterId, limit = 1) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                if (!this.followerAccessToken) await this.#retrieveFollowerAccessToken();
+            } catch(err) {
+                console.error("Unable to retrieve follower access token");
+                console.error(err);
+                return;
+            }
+
+            const oauthResult = await fetch(`https://api.twitch.tv/helix/channels/followers?broadcaster_id=${encodeURIComponent(broadcasterId)}&first=${encodeURIComponent(limit)}`, {
+                method: 'GET',
+                headers: {
+                    ["Client-ID"]: config.twitch.client_id,
+                    Authorization: `Bearer ${this.followerAccessToken}`,
+                },
+            });
+
+            const json = await oauthResult.json();
+            if (oauthResult.status === 200) {
+                resolve(json);
+            } else {
+                try {
+                    if (json?.message) {
+                        reject(json.message);
+                    } else {
+                        reject(oauthResult.statusText);
+                    }
+                } catch(err) {
+                    reject(err);
+                }
             }
         });
     }
