@@ -54,7 +54,10 @@ const command = {
         const subcommand = interaction.options.getSubcommand(true);
 
         if (!subcommandGroup && subcommand === "search") {
-            const query = interaction.options.getString("query", true);
+            const query = utils.escapeRegExp(interaction.options.getString("query", true));
+
+            if (query.length < 3)
+                return interaction.error("Query must contain at least 3 characters!");
     
             let exactSearch = null;
             let twitchUsers = [];
@@ -83,13 +86,16 @@ const command = {
                     bans = await exactSearch.getBans();
             }
             
-            const twitchQuery = await utils.Schemas.TwitchUser.search({
-                query_string: {
-                    query: query,
-                }
-            });
-            for (let i = 0; i < twitchQuery.body.hits.hits.length; i++) {
-                const hit = twitchQuery.body.hits.hits[i];
+            const twitchQuery = await utils.Schemas.TwitchUser.find({
+                    login: {
+                        $regex: new RegExp("^" + query + "*"),
+                        $options: "i",
+                    }
+                })
+                .sort({follower_count: -1})
+                .limit(10);
+            for (let i = 0; i < twitchQuery.length; i++) {
+                const hit = twitchQuery[i];
                 const user = await utils.Schemas.TwitchUser.findById(hit._id);
                 if (user._id !== exactSearch?._id) {
                     twitchUsers.push(user);
@@ -107,13 +113,15 @@ const command = {
                 }
             }
             
-            const discordQuery = await utils.Schemas.DiscordUser.search({
-                query_string: {
-                    query: query,
-                }
-            });
-            for (let i = 0; i < discordQuery.body.hits.hits.length; i++) {
-                const hit = discordQuery.body.hits.hits[i];
+            const discordQuery = await utils.Schemas.DiscordUser.find({
+                    globalName: {
+                        $regex: new RegExp("^" + query + "*"),
+                        $options: "i",
+                    }
+                })
+                .limit(10);
+            for (let i = 0; i < discordQuery.length; i++) {
+                const hit = discordQuery[i];
                 const user = await utils.Schemas.DiscordUser.findById(hit._id);
                 if (user._id !== exactSearch?._id)
                     discordUsers.push(user);

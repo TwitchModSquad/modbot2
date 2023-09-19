@@ -349,6 +349,15 @@ class Utils {
     }
 
     /**
+     * Escapes all RegExp characters
+     * @param {string} str
+     * @returns {string}
+     */
+    escapeRegExp(str) {
+        return str.replace(/[.*+?^${}()|[\]\\]/g, "");
+    }
+
+    /**
      * Initializes schema for all Utils objects
      */
     async schema() {

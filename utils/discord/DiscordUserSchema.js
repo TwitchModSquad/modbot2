@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const mongoosastic = require("mongoosastic");
 
 const config = require("../../config.json");
 const { EmbedBuilder, codeBlock } = require("discord.js");
@@ -13,9 +12,6 @@ const userSchema = new mongoose.Schema({
         minLength: 2,
         maxLength: 32,
         index: true,
-        es_type: "completion",
-        es_search_analyzer: "simple",
-        es_indexed: true,
     },
     displayName: {
         type: String,
@@ -105,7 +101,5 @@ userSchema.methods.embed = async function() {
 
     return embed;
 }
-
-userSchema.plugin(mongoosastic, config.elasticsearch);
 
 module.exports = userSchema;

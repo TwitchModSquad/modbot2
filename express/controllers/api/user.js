@@ -10,25 +10,32 @@ router.get("/search/:query", async (req, res) => {
     let twitchResults = [];
     let discordResults = [];
 
+    const q = utils.escapeRegExp(req.params.query);
+
     if (type === "all" || type === "twitch") {
-        const query = await utils.Schemas.TwitchUser.search({
-            query_string: {
-                query: req.params.query,
-            }
-        });
-        for (let i = 0; i < query.body.hits.hits.length; i++) {
-            const hit = query.body.hits.hits[i];
+        const query = await utils.Schemas.TwitchUser.find({
+                login: {
+                    $regex: new RegExp("^" + q + "*"),
+                    $options: "i",
+                }
+            })
+            .sort({follower_count: -1})
+            .limit(10);
+        for (let i = 0; i < query.length; i++) {
+            const hit = query[i];
             twitchResults.push((await utils.Schemas.TwitchUser.findById(hit._id)).public());
         }
     }
     if (type === "all" || type === "discord") {
-        const query = await utils.Schemas.DiscordUser.search({
-            query_string: {
-                query: req.params.query,
-            }
-        });
-        for (let i = 0; i < query.body.hits.hits.length; i++) {
-            const hit = query.body.hits.hits[i];
+        const query = await utils.Schemas.DiscordUser.find({
+                globalName: {
+                    $regex: new RegExp("^" + q + "*"),
+                    $options: "i",
+                }
+            })
+            .limit(10);
+        for (let i = 0; i < query.length; i++) {
+            const hit = query[i];
             discordResults.push((await utils.Schemas.DiscordUser.findById(hit._id)).public());
         }
     }
