@@ -2,6 +2,7 @@ const config = require("../config.json");
 
 const MOST_ACTIVE_TIME = 15 * 1000; // 15 seconds
 const MOST_ACTIVE_CHANNEL_COUNT = 15;
+const MAX_FOLLOWERS = 10;
 
 class StatsManager {
 
@@ -156,7 +157,7 @@ class StatsManager {
             
             if (intCount % 15 === 0) {
                 this.saveHourlyActivity().catch(console.error);
-                // this.updateRecentFollowers().catch(console.error);
+                this.updateRecentFollowers().catch(console.error);
                 this.updateLiveMembers().catch(console.error);
             }
 
@@ -253,12 +254,12 @@ class StatsManager {
      * Updates recent followers
      */
     async updateRecentFollowers() {
-        const data = await global.utils.Twitch.Helix.helix.users.getFollows({followedUser: config.twitch.id});
+        const data = await global.utils.Authentication.Twitch.getChannelFollowers(config.twitch.id, MAX_FOLLOWERS);
         let newFollowList = [];
-        for (let i = 0; i < Math.min(9, data.data.length); i++) {
+        for (let i = 0; i < Math.min(MAX_FOLLOWERS - 1, data.data.length); i++) {
             newFollowList.push({
-                user: (await global.utils.Twitch.getUserById(data.data[i].userId, false, true)).public(),
-                date: data.data[i].followDate,
+                user: (await global.utils.Twitch.getUserById(data.data[i].user_id, false, true)).public(),
+                date: data.data[i].followed_at,
             });
         }
         this.recentFollowers = newFollowList;
