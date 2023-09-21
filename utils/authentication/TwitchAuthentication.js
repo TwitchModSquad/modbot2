@@ -338,15 +338,17 @@ class TwitchAuthentication {
      * Gets a channels followers
      * @param {string} broadcasterId 
      * @param {number} limit
+     * @param {boolean} retry
      * @returns {Promise<any>}
      */
-    getChannelFollowers(broadcasterId, limit = 1) {
+    getChannelFollowers(broadcasterId, limit = 1, retry = true) {
         return new Promise(async (resolve, reject) => {
             try {
                 if (!this.followerAccessToken) await this.#retrieveFollowerAccessToken();
             } catch(err) {
                 console.error("Unable to retrieve follower access token");
                 console.error(err);
+                reject(err);
                 return;
             }
 
@@ -364,7 +366,15 @@ class TwitchAuthentication {
             } else {
                 try {
                     if (json?.message) {
-                        reject(json.message);
+                        if (json.message.toLowerCase() === "invalid oauth token") {
+                            console.error(`Failed to get followers for ${broadcasterId}: ${err}`);
+                            if (retry) {
+                                this.followerAccessToken = null;
+                                this.getChannelFollowers(broadcasterId, limit, false).then(resolve, reject);
+                            } else {
+                                reject(json.message);
+                            }
+                        }
                     } else {
                         reject(oauthResult.statusText);
                     }
