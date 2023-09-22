@@ -367,7 +367,7 @@ class TwitchAuthentication {
                 try {
                     if (json?.message) {
                         if (json.message.toLowerCase() === "invalid oauth token") {
-                            console.error(`Failed to get followers for ${broadcasterId}: ${err}`);
+                            console.error(`Failed to get followers for ${broadcasterId}: Invalid oauth`);
                             if (retry) {
                                 this.followerAccessToken = null;
                                 this.getChannelFollowers(broadcasterId, limit, false).then(resolve, reject);
