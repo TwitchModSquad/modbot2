@@ -51,7 +51,7 @@ const command = {
                     inline: true,
                 });
 
-            interaction.reply({embeds: [embed]});
+            interaction.reply({embeds: [embed], ephemeral: true});
         } catch (err) {
             interaction.error("An error occurred: " + err);
         }
