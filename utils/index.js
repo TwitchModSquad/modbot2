@@ -31,11 +31,12 @@ const HourlyStat = require("./stats/HourlyStat");
 const Stream = require("./twitch/TwitchStream");
 const TwitchBan = require("./twitch/TwitchBan");
 const TwitchUser = require("./twitch/TwitchUser");
-const TwitchUserFlag = require("./twitch/TwitchUserFlag");
 const TwitchChat = require("./twitch/TwitchChat");
 const TwitchTimeout = require("./twitch/TwitchTimeout");
 const TwitchRole = require("./twitch/TwitchRole");
 const TwitchToken = require("./twitch/TwitchToken");
+
+const UserFlag = require("./flag/UserFlag");
 
 const Identity = require("./Identity");
 const Session = require("./Session");
@@ -97,9 +98,9 @@ class Utils {
         TwitchTag: Stream.TwitchTag,
         TwitchTimeout: TwitchTimeout,
         TwitchUser: TwitchUser,
-        TwitchUserFlag: TwitchUserFlag,
         TwitchRole: TwitchRole,
         TwitchToken: TwitchToken,
+        UserFlag: UserFlag,
         Session: Session,
     }
 
