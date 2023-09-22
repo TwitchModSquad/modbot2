@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Twitch Mod Squad - Manage Streamers</title>
+<%- include("../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/panel/panel.css">
+    <link rel="stylesheet" href="/assets/css/panel/manageStreamers.css">
+</head>
+<body class="panel">
+<%- include("../../partials/header") %>
+
+    <div class="sidebar-container">
+        <%- include("../../partials/sidebar", {active: "manage-streamers"}) %>
+        
+        <main class="container container-md">
+            <div class="col-7">
+                <section>
+                    <h2><i class="fa-brands fa-twitch"></i> Manage Streamers</h2>
+                    <p>
+                        Select a checkbox next to a streamer to <strong>activate</strong> that streamer. This means the TwitchModSquad bot will stay connected to the channel and log bans, timeouts, and messages.
+                    </p>
+                    <form method="post">
+                        <% streamers.forEach(streamer => { %>
+                            <div class="streamer-options">
+                                <input type="hidden" name="streamers[]" value="<%= streamer._id %>">
+                                <input type="checkbox" name="active-<%= streamer._id %>" id="active-<%= streamer._id %>"<%= streamer.chat_listen ? ' checked="checked"' : "" %><%- editNotAllowed.includes(streamer._id) ? ' disabled="disabled" title="This streamer is authenticated with TMS. In order to disable listening, the streamer must login and unauthorize themselves."' : "" %>>
+                                <label for="active-<%= streamer._id %>"><%- include("../../partials/objects/twitchUser", {account: streamer, comma: comma}) %></label>
+                                <a href="/panel/manage/streamers/<%= streamer._id %>/delete" class="button">Remove</a>
+                            </div>
+                        <% }) %>
+                        <input class="button full" type="submit" value="Save">
+                    </form>
+                </section>
+            </div>
+            <div class="col-5">
+                <section>
+                    <h2><i class="fa-solid fa-plus"></i> Add Streamer</h2>
+                    <p>
+                        Visit your <a href="https://twitch.tv/moderator" target="__blank">Twitch moderator page</a> to see the streamers you moderate for.
+                    </p>
+                    <form class="add-user">
+                        <label for="streamer">Streamer Username</label>
+                        <input type="text" name="streamer" id="streamer" class="full" placeholder="Twitch Username">
+                        <input class="button" type="submit" value="Add Streamer">
+                    </form>
+                </section>
+            </div>
+        </main>
+    </div>
+    
+    <div class="notifications"></div>
+<%- include("../../partials/javascript") %>
+    <script src="/assets/js/verify.js"></script>
+</body>
+</html>

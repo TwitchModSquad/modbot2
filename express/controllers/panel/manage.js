@@ -1,8 +1,11 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
 const router = express.Router();
 
 const utils = require("../../../utils/");
+
+const listenClients = require("../../../twitch/");
 
 const FRIENDLY_SCOPES = {
     "moderator:manage:banned_users": "Manage Banned Users",
@@ -11,6 +14,25 @@ const FRIENDLY_SCOPES = {
     "guilds.join": "Join Guilds",
     "identify": "Identify",
 }
+
+router.get("/streamers", async (req, res) => {
+    let streamers = (await req.session.identity.getStreamers()).map(x => x.streamer);
+    const editNotAllowed = [];
+    for (let i = 0; i < streamers.length; i++) {
+        const streamer = streamers[i];
+        if (streamer?.identity) {
+            const identity = await utils.Schemas.Identity.findById(streamer.identity);
+            if (identity?.authenticated) {
+                editNotAllowed.push(streamer._id);
+            }
+        }
+    }
+    streamers = [
+        ...await req.session.identity.getTwitchUsers(),
+        ...streamers,
+    ]
+    res.render("panel/pages/manage/streamers", {streamers: streamers, editNotAllowed: editNotAllowed, comma: utils.comma});
+});
 
 const titleCase = str => {
     str = str.toLowerCase().split(' ');
@@ -80,6 +102,70 @@ router.get("/tokens/:token/delete", async (req, res) => {
         }
     }catch(e) {console.error(e)}
     res.redirect("/panel/manage/tokens");
+});
+
+router.get("/streamers/:streamer/delete", async (req, res) => {
+    try {
+        const twitchUsers = await req.session.identity.getTwitchUsers();
+
+        await utils.Schemas.TwitchRole.deleteMany({
+            streamer: req.params.streamer,
+            moderator: {
+                $in: twitchUsers.map(x => x._id),
+            },
+        });
+        
+        res.redirect("/panel/manage/streamers");
+    } catch(err) {
+        console.error(err);
+        res.send("An error occurred!");
+    }
+});
+
+router.use(bodyParser.urlencoded({extended: true}));
+
+router.post("/streamers", async (req, res) => {
+    let streamers = (await req.session.identity.getStreamers()).map(x => x.streamer);
+    const editNotAllowed = [];
+    for (let i = 0; i < streamers.length; i++) {
+        const streamer = streamers[i];
+        if (streamer?.identity) {
+            const identity = await utils.Schemas.Identity.findById(streamer.identity);
+            if (identity?.authenticated) {
+                editNotAllowed.push(streamer._id);
+            }
+        }
+    }
+    streamers = [
+        ...await req.session.identity.getTwitchUsers(),
+        ...streamers,
+    ];
+    streamers = streamers.filter(x => !editNotAllowed.includes(x._id));
+
+    for (let i = 0; i < req.body.streamers.length; i++) {
+        try {
+            const streamer = await utils.Twitch.getUserById(req.body.streamers[i]);
+            if (streamers.find(x => x._id === streamer._id)) {
+                let newValue = req.body["active-" + streamer._id] ? true : false;
+                if (newValue !== streamer.chat_listen) {
+                    if (newValue) {
+                        listenClients.member.join(streamer.login);
+                        listenClients.partner.part(streamer.login);
+                        listenClients.affiliate.part(streamer.login);
+                    } else {
+                        listenClients.member.part(streamer.login);
+                    }
+
+                    streamer.chat_listen = newValue;
+                    await streamer.save();
+                }
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    res.redirect("/panel/manage/streamers");
 });
 
 module.exports = router;

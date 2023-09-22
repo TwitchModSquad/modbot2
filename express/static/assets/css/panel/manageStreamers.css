@@ -1,0 +1,9 @@
+.streamer-options {
+    display: flex;
+    align-items: center;
+}
+
+.streamer-options label {
+    display: block;
+    flex-grow: 1;
+}
