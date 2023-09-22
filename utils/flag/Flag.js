@@ -13,7 +13,13 @@ const flagSchema = new mongoose.Schema({
     },
     description: {
         type: String,
+        minLength: 1,
+        maxLength: 128,
     },
+    active: {
+        type: Boolean,
+        default: true,
+    }
 });
 
 module.exports = mongoose.model("Flag", flagSchema);
