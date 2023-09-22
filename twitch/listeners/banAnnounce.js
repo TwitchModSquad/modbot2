@@ -201,6 +201,7 @@ const listener = {
             try {
                 await utils.Schemas.DiscordMessage.create({
                     _id: message.id,
+                    channel: message.channel.id,
                     twitchBan: ban._id,
                 });
             } catch(e) {

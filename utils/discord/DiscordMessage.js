@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const messageSchema = new mongoose.Schema({
     _id: String,
+    channel: String,
     content: String,
     twitchBan: {
         type: mongoose.Schema.Types.ObjectId,

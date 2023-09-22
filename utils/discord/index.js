@@ -116,6 +116,7 @@ class Discord {
         const message = await this.channels.ban.send("# Global Timeouts\n" + codeBlock("None to display!"));
         await DiscordMessage.create({
             _id: message.id,
+            channel: message.channel.id,
             twitchGlobalTimeouts: true,
         });
         this.messages.globalTimeout = message;
@@ -137,6 +138,7 @@ class Discord {
         const message = await this.channels.ban.send("# Global Bans\n" + codeBlock("None to display!"));
         await DiscordMessage.create({
             _id: message.id,
+            channel: message.channel.id,
             twitchGlobalBans: true,
         });
         this.messages.globalBan = message;
