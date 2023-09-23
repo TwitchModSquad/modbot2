@@ -350,6 +350,86 @@ class Utils {
     }
 
     /**
+     * Generates a flag select menu
+     * @param {any} user
+     * @returns {Promise<StringSelectMenuBuilder>}
+     */
+    flagSelect(user) {
+        return new Promise(async (resolve, reject) => {
+            let flags = await this.Schemas.Flag.find({});
+
+            const userFlags = (await this.Schemas.UserFlag.find({twitchUser: user._id})).map(x => x.flag);
+            flags = flags.filter(x => !userFlags.includes(x._id));
+
+            resolve(new StringSelectMenuBuilder()
+                .setPlaceholder("Add user flags")
+                .setCustomId(`flag-${user._id}`)
+                .setMinValues(1)
+                .setMaxValues(flags.length)
+                .setOptions(flags.map(x => {return {label: x.name, description: x.description, value: String(x._id), emoji: x.icon ? x.icon : undefined}})));
+        })
+    }
+
+    /**
+     * Updates various user embeds to reflect flag changes
+     * @param {any} twitchUser
+     * @returns {Promise<void>}
+     */
+    updateUserFlags(twitchUser) {
+        return new Promise(async (resolve, reject) => {
+            let channels = {};
+            const bans = await this.Schemas.TwitchBan.find({chatter: twitchUser._id});
+            const flags = await this.Schemas.UserFlag.find({twitchUser: twitchUser._id})
+                .populate("flag");
+            for (let i = 0; i < bans.length; i++) {
+                const messages = await this.Schemas.DiscordMessage.find({twitchBan: bans[i]._id});
+                for (let m = 0; m < messages.length; m++) {
+                    const msg = messages[m];
+
+                    if (!channels.hasOwnProperty(msg.channel)) {
+                        try {
+                            channels[msg.channel] = await global.client.mbm.channels.fetch(msg.channel);
+                        } catch(err) {
+                            console.error(`Unable to find channel ${msg.channel}`);
+                            continue;
+                        }
+                    }
+                    let channel = channels[msg.channel];
+                    try {
+                        const message = await channel.messages.fetch(msg._id);
+                        const embed = message.embeds[0];
+                        const field = embed.fields.find(x => x.name === "Flags");
+
+                        let flagString = flags
+                            .map(x => `\`${x.flag.icon ? x.flag.icon + " " : ""}${x.flag.name}\``)
+                            .join(" ");
+
+                        if (flagString === "")
+                            flagString = "`No flags!`";
+                         
+                        if (field) {
+                            field.value = flagString;
+                        } else {
+                            embed.fields.push({
+                                name: "Flags",
+                                value: flagString,
+                                inline: false,
+                            });
+                        }
+
+                        message.edit({embeds: [embed], components: message.components}).catch(console.error);
+                    } catch(err) {
+                        console.error(err);
+                        console.error(`Unable to find message ${msg._id}`);
+                        continue;
+                    }
+                }
+            }
+            resolve();
+        });
+    }
+
+    /**
      * Escapes all RegExp characters
      * @param {string} str
      * @returns {string}

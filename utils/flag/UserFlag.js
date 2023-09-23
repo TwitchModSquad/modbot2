@@ -10,13 +10,11 @@ const userFlagSchema = new mongoose.Schema({
     twitchUser: {
         type: String,
         ref: "TwitchUser",
-        required: true,
         index: true,
     },
     discordUser: {
         type: String,
         ref: "DiscordUser",
-        required: true,
         index: true,
     },
     addedBy: {

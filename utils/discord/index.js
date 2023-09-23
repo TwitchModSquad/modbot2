@@ -213,7 +213,7 @@ class Discord {
         this.guilds.tlms = await global.client.mbm.guilds.fetch(config.discord.guilds.little_modsquad);
         this.guilds.cl = await global.client.mbm.guilds.fetch(config.discord.guilds.community_lobbies);
 
-        this.channels.ban = await global.client.modbot.channels.fetch(config.discord.modbot.channels.ban);
+        this.channels.ban = await global.client.mbm.channels.fetch(config.discord.modbot.channels.ban);
         this.channels.live = await global.client.modbot.channels.fetch(config.discord.modbot.channels.live);
 
         this.channels.archiveRequest = await global.client.mbm.channels.fetch(config.discord.mbm.channels.archive_request);
