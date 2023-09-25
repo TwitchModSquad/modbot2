@@ -7,7 +7,7 @@ const randomItem = items => {
 
 let nextIndex = 0;
 const interval = {
-    interval: 60000,
+    interval: 200000,
     onStartup: true,
     run: async () => {
         if (!utils.StatsManager.getMemberStreams().find(x => x.user.id === config.twitch.id))
