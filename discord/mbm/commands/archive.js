@@ -88,7 +88,7 @@ const command = {
             
             const twitchQuery = await utils.Schemas.TwitchUser.find({
                     login: {
-                        $regex: new RegExp("^" + query + "*"),
+                        $regex: new RegExp("^" + query),
                         $options: "i",
                     }
                 })
@@ -115,7 +115,7 @@ const command = {
             
             const discordQuery = await utils.Schemas.DiscordUser.find({
                     globalName: {
-                        $regex: new RegExp("^" + query + "*"),
+                        $regex: new RegExp("^" + query),
                         $options: "i",
                     }
                 })
