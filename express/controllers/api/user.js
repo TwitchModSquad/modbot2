@@ -15,7 +15,7 @@ router.get("/search/:query", async (req, res) => {
     if (type === "all" || type === "twitch") {
         const query = await utils.Schemas.TwitchUser.find({
                 login: {
-                    $regex: new RegExp("^" + q + "*"),
+                    $regex: new RegExp("^" + q),
                     $options: "i",
                 }
             })
@@ -29,7 +29,7 @@ router.get("/search/:query", async (req, res) => {
     if (type === "all" || type === "discord") {
         const query = await utils.Schemas.DiscordUser.find({
                 globalName: {
-                    $regex: new RegExp("^" + q + "*"),
+                    $regex: new RegExp("^" + q),
                     $options: "i",
                 }
             })
