@@ -247,6 +247,11 @@
                                         <td><%= entry.fileCount %> file<%= entry.fileCount === 1 ? "" : "s" %></td>
                                     </tr>
                                 <% }) %>
+                                <% if (archive.length === 0) { %>
+                                    <tr>
+                                        <td colspan="4">No archive entries!</td>
+                                    </tr>
+                                <% } %>
                             </tbody>
                         </table>
                     </div>
