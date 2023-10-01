@@ -5,7 +5,7 @@ const { HelixStream } = require("twitch");
 
 const interval = {
     interval: 30000,
-    onStartup: true,
+    onStartup: false,
     run: async () => {
         const users = await utils.Schemas.TwitchUser.find({chat_listen: true});
 
