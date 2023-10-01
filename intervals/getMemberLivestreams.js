@@ -69,12 +69,21 @@ const interval = {
             if (newLivestream) {
                 utils.EventManager.fire("member_live", user, stream, activity);
             } else {
-                const discordMessage = await utils.Schemas.DiscordMessage.findOne({live: livestream._id});
-                if (discordMessage) {
-                    utils.Discord.channels.live.messages.fetch(discordMessage._id).then(message => {
-                        utils.EventManager.fire("member_live_update", user, stream, activity, message);
-                    }, () => {});
+                const discordMessages = await utils.Schemas.DiscordMessage.find({live: livestream._id});
+                const messages = [];
+                for (let m = 0; m < discordMessages.length; m++) {
+                    const discordMessage = discordMessages[m];
+                    let channel = utils.Discord.channels.live;
+                    if (discordMessage.channel && channel.id !== discordMessage.channel) {
+                        channel = await global.client.mbm.channels.fetch(discordMessage.channel);
+                    }
+                    try {
+                        messages.push(await channel.messages.fetch(discordMessage._id));
+                    } catch(err) {
+                        console.error(err);
+                    }
                 }
+                utils.EventManager.fire("member_live_update", user, stream, activity, messages);
             }
             activeStreams = activeStreams.filter(x => x._id !== livestream._id);
         }
@@ -83,12 +92,21 @@ const interval = {
             const livestream = activeStreams[i];
             livestream.endDate = Date.now();
             await livestream.save();
-            const discordMessage = await utils.Schemas.DiscordMessage.findOne({live: livestream._id});
-                if (discordMessage) {
-                    utils.Discord.channels.live.messages.fetch(discordMessage._id).then(message => {
-                        utils.EventManager.fire("member_live_offline", livestream, message);
-                    }, () => {});
+            const discordMessages = await utils.Schemas.DiscordMessage.find({live: livestream._id});
+            const messages = [];
+            for (let m = 0; m < discordMessages.length; m++) {
+                const discordMessage = discordMessages[m];
+                let channel = utils.Discord.channels.live;
+                if (discordMessage.channel && channel.id !== discordMessage.channel) {
+                    channel = await global.client.mbm.channels.fetch(discordMessage.channel);
                 }
+                try {
+                    messages.push(await channel.messages.fetch(discordMessage._id));
+                } catch(err) {
+                    console.error(err);
+                }
+            }
+            utils.EventManager.fire("member_live_offline", livestream, messages);
         }
     },
 };

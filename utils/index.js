@@ -4,6 +4,7 @@ const config = require("../config.json");
 
 const Twitch = require("./twitch/");
 const Discord = require("./discord/");
+const Points = require("./points/");
 
 const Authentication = require("./authentication/");
 
@@ -27,6 +28,8 @@ const Group = require("./group/Group");
 const GroupUser = require("./group/GroupUser");
 
 const HourlyStat = require("./stats/HourlyStat");
+
+const PointLog = require("./points/PointLog");
 
 const Stream = require("./twitch/TwitchStream");
 const TwitchBan = require("./twitch/TwitchBan");
@@ -63,6 +66,12 @@ class Utils {
     Discord = new Discord();
 
     /**
+     * Global API for Points
+     * @type {Points}
+     */
+    Points = new Points();
+
+    /**
      * Global API for events
      * @type {EventManager}
      */
@@ -90,6 +99,7 @@ class Utils {
         Group: Group,
         GroupUser: GroupUser,
         HourlyStat: HourlyStat,
+        PointLog: PointLog,
         TwitchBan: TwitchBan,
         TwitchChat: TwitchChat,
         TwitchGame: Stream.TwitchGame,

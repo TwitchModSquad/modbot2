@@ -4,9 +4,9 @@ const listener = {
     event: "member_live_offline",
     /**
      * @param {*} livestream
-     * @param {Message} message
+     * @param {Message[]} messages
      */
-    func: (livestream, message) => {
+    func: (livestream, messages) => {
         const embed = new EmbedBuilder()
                 .setAuthor({name: `⚫ ${livestream.user.display_name} is now offline!`})
                 .setTitle("Offline")
@@ -14,7 +14,9 @@ const listener = {
                 .setFooter({text: `${livestream.user.display_name} : Offline ⚫`, iconURL: livestream.user.profile_image_url})
                 .setTimestamp(Date.now());
 
-        message.edit({embeds: [embed]}).catch(console.error);
+        messages.forEach(message => {
+            message.edit({embeds: [embed]}).catch(console.error);
+        });
     }
 }
 

@@ -20,6 +20,7 @@ const schema = new mongoose.Schema({
         chatdump: Boolean,
         user: Boolean,
         archive: Boolean,
+        points: Boolean,
     }
 });
 

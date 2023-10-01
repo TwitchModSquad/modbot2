@@ -8,9 +8,9 @@ const listener = {
      * @param {*} user 
      * @param {HelixStream} stream 
      * @param {*} activity
-     * @param {Message} message
+     * @param {Message[]} messages
      */
-    func: (user, stream, activity, message) => {
+    func: (user, stream, activity, messages) => {
         const embed = new EmbedBuilder()
                 .setColor(0x772ce8)
                 .setAuthor({name: `🔴 ${user.display_name} is now live!`})
@@ -30,7 +30,9 @@ const listener = {
                 .setFooter({text: `${user.display_name} : Live 🔴`, iconURL: user.profile_image_url})
                 .setTimestamp(stream.startDate);
 
-        message.edit({embeds: [embed]}).catch(console.error);
+        messages.forEach(message => {
+            message.edit({embeds: [embed]}).catch(console.error);
+        });
     }
 }
 
