@@ -60,6 +60,7 @@ const userSchema = new mongoose.Schema({
         default: false,
     },
     blacklisted: Boolean,
+    featured: Boolean,
     migrated: Boolean,
     created_at: {
         type: Date,

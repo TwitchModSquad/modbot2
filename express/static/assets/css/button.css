@@ -21,6 +21,11 @@ button.twitch,
     background-color: var(--primary-twitch-color);
 }
 
+button.secondary,
+.button.secondary {
+    background-color: var(--tertiary-background-color);
+}
+
 button[disabled="disabled"],
 .button[disabled="disabled"] {
     background-color: var(--primary-background-color);

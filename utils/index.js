@@ -205,6 +205,24 @@ class Utils {
     }
 
     /**
+     * Converts the number into smaller form:
+     * Examples:
+     * 1357283 -> 1.4M
+     * 1357 -> 1.4K
+     * @param {number} num 
+     * @returns {string}
+     */
+    formatNumberSmall(num) {
+        if (num >= 1000000) {
+            return `${(num / 1000000).toFixed(1)}M`;
+        } else if (num >= 1000) {
+            return `${(num / 1000).toFixed(1)}K`;
+        } else {
+            return this.comma(num);
+        }
+    }
+
+    /**
      * Generates a table-like format from tabular rows
      * @param {[...[...string]]} rows 
      * @param {number} padding

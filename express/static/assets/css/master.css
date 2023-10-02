@@ -42,6 +42,7 @@ body:not(.panel) {
     background: url('/assets/images/banners/banner-large.png');
     background-repeat: no-repeat;
     background-size: cover;
+    background-attachment: fixed;
 }
 
 body.narrow-page main {

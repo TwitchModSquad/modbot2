@@ -12,6 +12,8 @@ const public = require("./public/");
 
 router.use("/auth", authentication);
 
+router.use("/", public);
+
 router.use(async (req, res, next) => {
     const {cookies} = req;
 
@@ -34,8 +36,6 @@ router.use(async (req, res, next) => {
 });
 
 router.use("/api", api);
-
-router.use("/", public);
 
 router.use("/panel", panel);
 

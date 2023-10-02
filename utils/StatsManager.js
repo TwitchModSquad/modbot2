@@ -59,7 +59,7 @@ class StatsManager {
 
     /**
      * Returns general statistics
-     * @returns {{messages: number,bans: number,timeouts: number}}
+     * @returns {{messages: number,bans: number,timeouts: number,streamers: number}}
      */
     getGeneralStatistics() {
         return this.generalStatistics;
