@@ -168,6 +168,7 @@ section.heading .statistic h2 {
     font-weight: 700;
     text-transform: uppercase;
     padding: .4em .6em;
+    margin: 0;
 }
 
 section.heading h1 {
