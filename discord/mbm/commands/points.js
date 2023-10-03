@@ -12,6 +12,8 @@ const PRETTY_REASON = {
     ad: "Ad Purchase",
 }
 
+const TOP_LIMIT = 20;
+
 const command = {
     data: new SlashCommandBuilder()
         .setName("points")
@@ -36,6 +38,17 @@ const command = {
         .addSubcommand(x => x
             .setName("ad")
             .setDescription("Posts a livestream ad for a selected linked user or streamer")
+        )
+        .addSubcommand(x => x
+            .setName("top")
+            .setDescription("View TMS members with the top points!")
+            .addIntegerOption(y => y
+                .setName("page")
+                .setDescription("Page number to view")
+                .setMinValue(1)
+                .setMaxValue(10)
+                .setRequired(false)
+            )
         )
         .setDefaultMemberPermissions(0)
         .setDMPermission(false),
@@ -220,6 +233,44 @@ const command = {
                 ],
                 ephemeral: true,
             });
+        } else if (subcommand === "top") {
+            let page = interaction.options.getInteger("page", false);
+
+            if (!page) {
+                page = 1;
+            }
+
+            const top = await utils.Schemas.Identity.find({})
+                .sort({points: -1})
+                .limit(TOP_LIMIT)
+                .skip((page - 1) * TOP_LIMIT);
+
+            let topString = "";
+            const positionOffset = 1 + ((page - 1) * TOP_LIMIT);
+            for (let i = 0; i < top.length; i++) {
+                const identity = top[i];
+                const discordUsers = await identity.getDiscordUsers();
+                let name = "Unknown";
+                if (discordUsers.length > 0) {
+                    name = `<@${discordUsers[0]._id}>`;
+                } else {
+                    const twitchUsers = await identity.getTwitchUsers();
+                    if (twitchUsers.length > 0) {
+                        name = twitchUsers[0].display_name;
+                    }
+                }
+
+                if (i > 0) topString += "\n";
+                topString += `${i + positionOffset}. ${name}: \`${utils.comma(identity.points)} point${identity.points === 1 ? "" : "s"}\``;
+            }
+            if (topString === "") {
+                topString = "No users found on this page!";
+            }
+            const embed = new EmbedBuilder()
+                .setColor(0x772ce8)
+                .setTitle("Points: Top Users")
+                .setDescription(topString);
+            interaction.reply({embeds: [embed], ephemeral: true});
         } else {
             interaction.error(`Unknown subcommand \`${subcommand}\``);
         }
