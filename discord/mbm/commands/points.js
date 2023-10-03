@@ -34,6 +34,11 @@ const command = {
         .addSubcommand(x => x
             .setName("log")
             .setDescription("View your point transaction log")
+            .addUserOption(y => y
+                .setName("user")
+                .setDescription("Mod+ only, views a user's transaction log")
+                .setRequired(false)
+            )
         )
         .addSubcommand(x => x
             .setName("ad")
@@ -103,7 +108,25 @@ const command = {
                 .setDescription(`<@${user.id}>'s points: \`${points} point${points === 1 ? "" : "s"}\``);
             interaction.reply({embeds: [embed], ephemeral: true});
         } else if (subcommand === "log") {
-            const logs = await utils.Schemas.PointLog.find({identity: identity})
+            let targetIdentity = identity;
+            let targetUser = interaction.user;
+
+            if (identity.admin || identity.moderator) {
+                let user = interaction.options.getUser("user", false);
+                if (user) {
+                    try {
+                        const tmsUser = await utils.Discord.getUserById(user.id, false, true);
+                        targetIdentity = await tmsUser.createIdentity();
+                        targetUser = user;
+                    } catch(err) {
+                        console.error(err);
+                        interaction.error("Failed to retrieve the user inputted!");
+                        return;
+                    }
+                }
+            }
+
+            const logs = await utils.Schemas.PointLog.find({identity: targetIdentity})
                 .sort({transferDate: -1})
                 .limit(20);
 
@@ -116,7 +139,7 @@ const command = {
             const embed = new EmbedBuilder()
                 .setColor(0x772ce8)
                 .setTitle("Transaction Log")
-                .setDescription(`<@${interaction.user.id}>'s transaction log${codeBlock(logString)}`);
+                .setDescription(`<@${targetUser.id}>'s transaction log${codeBlock(logString)}`);
 
             interaction.reply({embeds: [embed], ephemeral: true});
         } else if (subcommand === "ad") {
