@@ -298,6 +298,7 @@ a.hamburger {
     }
 
     section .heading-box {
+        display: block;
         margin: 0 auto;
     }
 
