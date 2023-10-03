@@ -304,4 +304,8 @@ a.hamburger {
     .statistics {
         margin: 1em auto;
     }
+
+    .user-container.featured {
+        flex-wrap: wrap;
+    }
 }

@@ -46,7 +46,7 @@
                 <h2>
                     Featured Members
                 </h2>
-                <div class="user-container">
+                <div class="user-container featured">
                 <% featured.forEach(user => { %>
                 <a href="https://twitch.tv/<%= user.login %>" target="__blank" class="user">
                     <img src="<%= user.profile_image_url %>" alt="Profile picture for <%= user.display_name %>">
