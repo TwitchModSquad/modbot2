@@ -200,4 +200,30 @@ router.get("/:query/force", async (req, res) => {
     }
 });
 
+router.get("/:query/migrate", async (req, res) => {
+    let twitchUser;
+    try {
+        twitchUser = await utils.Twitch.getUserById(req.params.query, false, false);
+    } catch(e) {
+    }
+
+    if (twitchUser) {
+        delete dataCache[twitchUser._id];
+        try {
+            await twitchUser.migrateData();
+            res.redirect("/panel/user/" + twitchUser._id);
+        } catch(err) {
+            res.render("panel/pages/userSearch", {
+                comma: utils.comma,
+                error: String(err),
+            });
+        }
+    } else {
+        res.render("panel/pages/userSearch", {
+            comma: utils.comma,
+            error: `No users with the ID ${req.params.query} were found!`,
+        });
+    }
+});
+
 module.exports = router;

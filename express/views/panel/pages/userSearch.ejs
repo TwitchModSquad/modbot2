@@ -83,7 +83,9 @@
                         <small>
                             User information last updated <%= parseDate(user.updated_at) %>
                             <br>
-                            <a href="/panel/user/<%= user._id %>/force">Force update this user</a>
+                            <a href="/panel/user/<%= user._id %>/force">Force&nbsp;update&nbsp;this&nbsp;user</a>
+                            &bullet;
+                            <a href="/panel/user/<%= user._id %>/migrate">Migrate&nbsp;punishments&nbsp;from&nbsp;v1</a>
                         </small>
                     </div>
                 </section>
@@ -101,7 +103,7 @@
                             </thead>
                             <tbody>
                                 <% bans.forEach(ban => { %>
-                                    <tr class="punishment">
+                                    <tr class="punishment"<%- ban.migrate_id ? ` title="Punishment migrated from v1: ${ban.migrate_id}"` : "" %>>
                                         <td>
                                             <img src="<%= ban.streamer.profile_image_url %>" alt="Profile picture for <%= ban.streamer.display_name %>">
                                             <%= ban.streamer.display_name %>
@@ -140,7 +142,7 @@
                             </thead>
                             <tbody>
                                 <% timeouts.forEach(timeout => { %>
-                                    <tr class="punishment">
+                                    <tr class="punishment"<%- timeout.migrate_id ? ` title="Punishment migrated from v1: ${timeout.migrate_id}"` : "" %>>
                                         <td>
                                             <img src="<%= timeout.streamer.profile_image_url %>" alt="Profile picture for <%= timeout.streamer.display_name %>">
                                             <%= timeout.streamer.display_name %>
