@@ -68,8 +68,15 @@ const command = {
 
             await interaction.deferReply({ephemeral: !config.discord.modbot.channels.archive_search.includes(interaction.channel.id)});
 
+            let migrateError = null;
             try {
                 exactSearch = await utils.Twitch.getUserByName(query, true);
+                try {
+                    await exactSearch.migrateData();
+                } catch(err) {
+                    migrateError = String(err);
+                    console.error(err);
+                }
                 twitchUsers = [exactSearch];
             } catch(err) {}
             if (!exactSearch) {
@@ -142,15 +149,6 @@ const command = {
                 .setDescription(`We found \`${twitchUsers.length}\` twitch and \`${discordUsers.length}\` discord users with similar names to \`${query}\``);
 
             if (exactSearch) {
-                let migrateError = null;
-                if (exactSearch.display_name) {
-                    try {
-                        await exactSearch.migrateData();
-                    } catch(err) {
-                        migrateError = String(err);
-                        console.error(err);
-                    }
-                }
                 embed.addFields({
                     name: "Exact Search",
                     value: codeBlock(exactSearch.display_name ? `${exactSearch.display_name} on Twitch - ${migrateError ? "Migration Error: " + migrateError : "Migration Successful"}` : `${exactSearch.displayName} on Discord`),
