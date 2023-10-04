@@ -217,6 +217,26 @@ const command = {
                 );
             }
 
+            if (bans.length > 0) {
+                const banSelect = new StringSelectMenuBuilder()
+                    .setCustomId("ban")
+                    .setPlaceholder("View ban information")
+                    .setMinValues(1)
+                    .setMaxValues(1);
+
+                bans.forEach((ban, i) => {
+                    if (i > 24) return;
+                    banSelect.addOptions({
+                        label: `Ban in #${ban.streamer.login} on ${utils.parseDate(ban.time_start)}${ban.time_end ? " (inactive)" : ""}`,
+                        value: String(ban._id),
+                    });
+                });
+
+                components.push(new ActionRowBuilder()
+                    .setComponents(banSelect)
+                );
+            }
+
             if (archiveEntries.length > 0) {
                 const entrySelect = new StringSelectMenuBuilder()
                     .setCustomId("entry")
