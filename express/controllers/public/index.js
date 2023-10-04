@@ -45,6 +45,7 @@ router.get("/", async (req, res) =>  {
     res.render("public/pages/index", {
         statistics: statistics,
         featured: featured,
+        memberStreams: memberStreams,
         comma: utils.comma,
     });
 });

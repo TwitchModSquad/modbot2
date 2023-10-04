@@ -21,11 +21,7 @@
                 </h2>
                 <div class="user-container wrap">
                     <% members.forEach(user => { %>
-                    <a href="https://twitch.tv/<%= user.login %>" target="__blank" class="user">
-                        <img src="<%= user.profile_image_url %>" alt="Profile picture for <%= user.display_name %>">
-                        <h3><%= user.display_name %><% if (user.broadcaster_type === "partner") { %> <img src="/assets/images/badges/twitch/partner.png" alt="Twitch Partner Badge" /><% } %></h3>
-                        <% if (user.follower_count) { %><span class="followers"><%= comma(user.follower_count) %> follower<%= user.follower_count === 1 ? "" : "s" %></span><% } %>
-                    </a>
+                    <%- include("../partials/user") %>
                     <% }) %>
                 </div>
             </div>
