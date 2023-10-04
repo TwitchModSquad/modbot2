@@ -24,7 +24,8 @@ const chatSchema = new mongoose.Schema({
     time_end: {
         type: Date,
         default: null,
-    }
+    },
+    migrate_id: Number,
 });
 
 module.exports = mongoose.model("TwitchTimeout", chatSchema);

@@ -3,7 +3,11 @@ const mongoose = require("mongoose");
 
 const TwitchRole = require("./TwitchRole");
 
+const TwitchBan = require("./TwitchBan");
+const TwitchTimeout = require("./TwitchTimeout");
+
 const config = require("../../config.json");
+const con = require("../../old-db");
 const { EmbedBuilder, codeBlock, cleanCodeBlockContent } = require('discord.js');
 
 const userSchema = new mongoose.Schema({
@@ -269,6 +273,64 @@ userSchema.methods.fetchMods = async function() {
     } else {
         throw "Json not returned in response";
     }
+}
+
+userSchema.methods.migrateData = function() {
+    return new Promise((resolve, reject) => {
+        con.query("select id, streamer_id, user_id, moderator_id, timebanned, reason, active from twitch__ban where user_id = ?;", [this._id], async (err, bans) => {
+            if (err) return reject(err);
+
+            for (let i = 0; i < bans.length; i++) {
+                const ban = bans[i];
+                const streamer = await global.utils.Twitch.getUserById(ban.streamer_id, false, true);
+                const chatter = await global.utils.Twitch.getUserById(ban.user_id, false, true);
+                const moderator = ban.moderator_id ? await global.utils.Twitch.getUserById(ban.moderator_id, false, true) : null;
+
+                await TwitchBan.findOneAndUpdate({
+                    migrate_id: ban.id,
+                }, {
+                    streamer: streamer,
+                    chatter: chatter,
+                    moderator: moderator,
+                    reason: ban.reason,
+                    time_start: new Date(ban.timebanned),
+                    time_end: ban.active ? null : new Date(ban.timebanned + 1000),
+                    migrate_id: ban.id,
+                }, {
+                    upsert: true,
+                    new: true,
+                });
+            }
+
+            con.query("select id, streamer_id, user_id, timeto, duration from twitch__timeout where user_id = ?;", [this._id], async (err2, tos) => {
+                if (err2) return reject(err2);
+
+                for (let t = 0; t < tos.length; t++) {
+                    const to = tos[t];
+                    const streamer = await global.utils.Twitch.getUserById(to.streamer_id, false, true);
+                    const chatter = await global.utils.Twitch.getUserById(to.user_id, false, true);
+
+                    await TwitchTimeout.findOneAndUpdate({
+                        migrate_id: to.id,
+                    }, {
+                        streamer: streamer,
+                        chatter: chatter,
+                        time_start: new Date(to.timeto),
+                        time_end: new Date(to.timeto + (to.duration * 1000)),
+                        duration: to.duration,
+                    }, {
+                        upsert: true,
+                        new: true,
+                    });
+                }
+
+                this.migrated = true;
+                await this.save();
+
+                resolve();
+            });
+        });
+    });
 }
 
 module.exports = userSchema;
