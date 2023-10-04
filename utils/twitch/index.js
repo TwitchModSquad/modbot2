@@ -179,20 +179,22 @@ class Twitch {
      * Gets a user based on a Twitch name
      * @param {string} login
      * @param {boolean} requestIfUnavailable default false
+     * @param {boolean} bypassCache default false
      * @returns {Promise<TwitchUser>}
      */
-    getUserByName(login, requestIfUnavailable = false) {
+    getUserByName(login, requestIfUnavailable = false, bypassCache = false) {
         login = login.replace("#","").toLowerCase();
         return new Promise(async (resolve, reject) => {
             try {
                 if (this.nameCache.hasOwnProperty(login)) {
                     try {
-                        const user = await this.getUserById(this.nameCache[login], false, false);
+                        const user = await this.getUserById(this.nameCache[login], bypassCache, false);
                         resolve(user);
                         return;
                     } catch(e) {}
                 }
-                const user = await TwitchUser.findOne({login: login});
+                const user = await TwitchUser.findOne({login: login})
+                    .populate("identity");
                 if (user) {
                     this.nameCache[user.login] = user._id;
                     resolve(user);

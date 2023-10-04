@@ -67,7 +67,7 @@ const command = {
         let identity;
 
         try {
-            const discord = await utils.Discord.getUserById(interaction.user.id);
+            const discord = await utils.Discord.getUserById(interaction.user.id, true, true);
             if (!discord?.identity) {
                 return interaction.error("You must be authenticated to use this command! [Make sure you've registered on the website.](https://tms.to/join)");
             }
@@ -92,7 +92,7 @@ const command = {
             let target = identity;
             if (user) {
                 try {
-                    target = (await utils.Discord.getUserById(user.id, true)).identity;
+                    target = (await utils.Discord.getUserById(user.id, true, true)).identity;
                 } catch(err) {}
             } else {
                 user = interaction.user;
@@ -115,7 +115,7 @@ const command = {
                 let user = interaction.options.getUser("user", false);
                 if (user) {
                     try {
-                        const tmsUser = await utils.Discord.getUserById(user.id, false, true);
+                        const tmsUser = await utils.Discord.getUserById(user.id, true, true);
                         targetIdentity = await tmsUser.createIdentity();
                         targetUser = user;
                     } catch(err) {

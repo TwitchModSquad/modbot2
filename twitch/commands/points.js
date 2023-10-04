@@ -19,7 +19,7 @@ const command = {
             if (args[0].toLowerCase() === "add") {
                 if (args.length > 2) {
                     try {
-                        const user = await utils.Twitch.getUserByName(args[1], true);
+                        const user = await utils.Twitch.getUserByName(args[1], true, true);
                         let points = Number(args[2]);
                         if (isNaN(points)) {
                             return reply(`${args[2]} is not a valid number!`);
