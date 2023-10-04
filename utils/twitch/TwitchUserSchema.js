@@ -339,7 +339,7 @@ userSchema.methods.migrateData = function() {
                             return;
                         }
 
-                        console.log(`Received ${chats.length} chat messages from ${this.display_name} at ${Date.now() - start}`);
+                        console.log(`Received ${chats.length} chat messages from ${this.display_name} at ${Date.now() - start} ms`);
                         for (let c = 0; c < chats.length; c++) {
                             const chat = chats[c];
                             try {
