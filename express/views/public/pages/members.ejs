@@ -21,7 +21,7 @@
                 </h2>
                 <div class="user-container wrap">
                     <% members.forEach(user => { %>
-                    <%- include("../partials/user") %>
+                    <%- include("../partials/user", {user: user, comma: comma}) %>
                     <% }) %>
                 </div>
             </div>
