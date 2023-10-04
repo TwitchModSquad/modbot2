@@ -9,6 +9,7 @@ const TwitchTimeout = require("./TwitchTimeout");
 const config = require("../../config.json");
 const con = require("../../old-db");
 const { EmbedBuilder, codeBlock, cleanCodeBlockContent } = require('discord.js');
+const TwitchChat = require('./TwitchChat');
 
 const userSchema = new mongoose.Schema({
     _id: {
@@ -275,8 +276,10 @@ userSchema.methods.fetchMods = async function() {
     }
 }
 
+let migrating = false;
 userSchema.methods.migrateData = function() {
     return new Promise((resolve, reject) => {
+        if (migrating) return reject("A migration is already taking place!");
         con.query("select id, streamer_id, user_id, moderator_id, timebanned, reason, active from twitch__ban where user_id = ?;", [this._id], async (err, bans) => {
             if (err) return reject(err);
 
@@ -318,9 +321,52 @@ userSchema.methods.migrateData = function() {
                         time_start: new Date(to.timeto),
                         time_end: new Date(to.timeto + (to.duration * 1000)),
                         duration: to.duration,
+                        migrate_id: to.id,
                     }, {
                         upsert: true,
                         new: true,
+                    });
+                }
+
+                if (!this.migrated) {
+                    migrating = true;
+                    const start = Date.now();
+                    console.log(`Now migrating chat logs from ${this.display_name}`);
+                    con.query("select id, streamer_id, user_id, message, deleted, color, emotes, badges, timesent from twitch__chat where user_id = ? order by timesent desc limit 25000;", [this._id], async (err3, chats) => {
+                        if (err3) {
+                            migrating = false;
+                            console.error(err3);
+                            return;
+                        }
+
+                        console.log(`Received ${chats.length} chat messages from ${this.display_name} at ${Date.now() - start}`);
+                        for (let c = 0; c < chats.length; c++) {
+                            const chat = chats[c];
+                            try {
+                                const streamer = await global.utils.Twitch.getUserById(chat.streamer_id, false, true);
+                                const chatter = await global.utils.Twitch.getUserById(chat.user_id, false, true);
+                                await TwitchChat.findOneAndUpdate({
+                                    _id: chat.id,
+                                }, {
+                                    _id: chat.id,
+                                    streamer: streamer,
+                                    chatter: chatter,
+                                    color: chat.color,
+                                    badges: chat.badges,
+                                    emotes: chat.emotes,
+                                    message: chat.message,
+                                    deleted: chat.deleted,
+                                    time_sent: new Date(chat.timesent),
+                                }, {
+                                    upsert: true,
+                                    new: true,
+                                });
+                            } catch(e) {
+                                console.error(e);
+                            }
+                        }
+                        console.log(`Completed migration for ${this.display_name} in ${Date.now() - start} ms!`);
+                        migrating = false;
                     });
                 }
 
