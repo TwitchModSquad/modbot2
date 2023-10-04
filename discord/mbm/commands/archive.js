@@ -66,6 +66,8 @@ const command = {
 
             let archiveEntries = [];
 
+            await interaction.deferReply({ephemeral: !config.discord.modbot.channels.archive_search.includes(interaction.channel.id)});
+
             try {
                 exactSearch = await utils.Twitch.getUserByName(query, true);
                 twitchUsers = [exactSearch];
@@ -140,14 +142,31 @@ const command = {
                 .setDescription(`We found \`${twitchUsers.length}\` twitch and \`${discordUsers.length}\` discord users with similar names to \`${query}\``);
 
             if (exactSearch) {
+                let migrateError = null;
+                if (exactSearch.display_name) {
+                    try {
+                        await exactSearch.migrateData();
+                    } catch(err) {
+                        migrateError = String(err);
+                        console.error(err);
+                    }
+                }
                 embed.addFields({
                     name: "Exact Search",
-                    value: codeBlock(exactSearch.display_name ? `${exactSearch.display_name} on Twitch` : `${exactSearch.displayName} on Discord`),
+                    value: codeBlock(exactSearch.display_name ? `${exactSearch.display_name} on Twitch - ${migrateError ? "Migration Error: " + migrateError : "Migration Successful"}` : `${exactSearch.displayName} on Discord`),
                 })
             }
 
             if (bans.length > 0) {
                 let banString = "";
+                const addField = () => {
+                    embed.addFields({
+                        name: "Bans",
+                        value: banString,
+                        inline: false
+                    });
+                    banString = "";
+                }
                 bans.forEach((ban, i) => {
                     if (i > 0) banString += "\n";
                     const message = `${ban.chatter.display_name} banned in #${ban.streamer.login} on ${ban.time_start.toLocaleDateString()}`;
@@ -156,12 +175,11 @@ const command = {
                     } else {
                         banString += `${i+1}. ${message}`;
                     }
+                    if (banString.length > 900) {
+                        addField();
+                    }
                 });
-                embed.addFields({
-                    name: "Bans",
-                    value: banString,
-                    inline: false
-                });
+                addField();
             }
 
             archiveEntries = archiveEntries.filter(x => x.entry ? true : false);
@@ -217,7 +235,7 @@ const command = {
                     .setComponents(entrySelect));
             }
 
-            interaction.reply({embeds: [embed], components: components, ephemeral: !config.discord.modbot.channels.archive_search.includes(interaction.channel.id)});
+            interaction.editReply({embeds: [embed], components: components, ephemeral: !config.discord.modbot.channels.archive_search.includes(interaction.channel.id)});
         } else if (!subcommandGroup && subcommand === "create") {
             interaction.success(`[Create a new Archive entry](${config.express.domain.root}panel/archive/create)`);
         } else if (subcommandGroup) {
