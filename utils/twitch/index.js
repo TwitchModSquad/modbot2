@@ -22,7 +22,7 @@ class Twitch {
      * Cache for Twitch users
      * @type {Cache}
      */
-    userCache = new Cache(0); // No cache limit
+    userCache = new Cache(1 * 60 * 60 * 1000); // 1 hour cache
 
     /**
      * Simple cache of username-ID pairs for quickly retrieving user names
