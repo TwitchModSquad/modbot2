@@ -35,7 +35,7 @@ class Cache {
 
         if (this.expirationTime > 0) {
             setInterval(() => {
-                let curTime = new Date().getTime();
+                let curTime = Date.now();
 
                 let res = {};
                 for (let key in this.objectStore) {
@@ -59,6 +59,9 @@ class Cache {
             return this.objectStore[key];
         } else {
             let item = await new Promise(retrieve);
+            if (this.expirationTime > 0) {
+                item.retrieved = Date.now();
+            }
             this.put(key, item);
             return item;
         }
