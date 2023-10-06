@@ -42,4 +42,8 @@ identitySchema.methods.getStreamers = async function () {
     return streamerRoles;
 }
 
+identitySchema.methods.printPoints = function () {
+    return `${global.utils.comma(this.points)} point${this.points === 1 ? "" : "s"}`;
+}
+
 module.exports = mongoose.model("Identity", identitySchema);
