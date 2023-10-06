@@ -173,7 +173,7 @@ const command = {
                 if (identity.points !== expectedValue) {
                     const twitchUsers = await identity.getTwitchUsers();
 
-                    const difference = expectedValue - identity.points;
+                    const difference = identity.points - expectedValue;
                     discrepancies.push([
                         twitchUsers.length > 0 ? twitchUsers[0].display_name : String(identity._id),
                         String(expectedValue),
