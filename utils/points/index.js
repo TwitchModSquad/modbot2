@@ -3,6 +3,8 @@ const PointLog = require("./PointLog");
 const config = require("../../config.json");
 const { Message } = require("discord.js");
 
+const Identity = require("../Identity");
+
 const HOURS_TO_MILLISECONDS = 3600000;
 const URI_REGEX = /(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?)|(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}(\.[a-zA-Z0-9]{2,})?/g;
 const SPACE_REGEX = / +/g;
@@ -42,6 +44,17 @@ class Points {
     }
 
     /**
+     * Refreshes an identity with the database
+     * @param {any} identity
+     * @param {Promise<any>} identity 
+     */
+    async #refreshIdentity(identity) {
+        global.utils.Discord.userCache.removeIdentity(identity._id);
+        global.utils.Twitch.userCache.removeIdentity(identity._id);
+        return await Identity.findById(identity._id);
+    }
+
+    /**
      * Adds points to the specified identity
      * @param {any} identity 
      * @param {number} amount 
@@ -52,6 +65,7 @@ class Points {
      */
     addPoints(identity, amount, reason, bonus = 0, message = null) {
         return new Promise(async (resolve, reject) => {
+            identity = await this.#refreshIdentity(identity);
             if (!identity.points) {
                 identity.points = amount + bonus;
             } else {
@@ -77,11 +91,12 @@ class Points {
      * Removes points from the identity
      * @param {any} identity 
      * @param {number} amount 
-     * @param {"ad"} reason 
+     * @param {"ad"|"giveaway"} reason 
      * @returns {Promise<PointLog>} Total points on the identity
      */
     removePoints(identity, amount, reason) {
         return new Promise(async (resolve, reject) => {
+            identity = await this.#refreshIdentity(identity);
             if (identity.points < amount) {
                 return reject(`Not enough money! Requires \`${global.utils.comma(amount)} points\`, \`${global.utils.comma(identity.points)} points\` present.`);
             }

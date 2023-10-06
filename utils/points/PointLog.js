@@ -18,7 +18,7 @@ const schema = new mongoose.Schema({
     },
     reason: {
         type: String,
-        enum: ["daily","message","wos","ad"],
+        enum: ["daily","message","wos","ad","giveaway"],
         required: true,
     },
     channel: String,

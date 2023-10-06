@@ -24,6 +24,9 @@ const DiscordUser = require("./discord/DiscordUser");
 const DiscordMessage = require("./discord/DiscordMessage");
 const DiscordToken = require("./discord/DiscordToken");
 
+const Giveaway = require("./giveaway/Giveaway");
+const GiveawayEntry = require("./giveaway/GiveawayEntry");
+
 const Group = require("./group/Group");
 const GroupUser = require("./group/GroupUser");
 
@@ -96,6 +99,8 @@ class Utils {
         DiscordUser: DiscordUser,
         DiscordMessage: DiscordMessage,
         DiscordToken: DiscordToken,
+        Giveaway: Giveaway,
+        GiveawayEntry: GiveawayEntry,
         Group: Group,
         GroupUser: GroupUser,
         HourlyStat: HourlyStat,

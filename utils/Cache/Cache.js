@@ -79,6 +79,16 @@ class Cache {
         } catch (e) {}
     }
 
+    removeIdentity(identityId) {
+        let res = {};
+        for (let key in this.objectStore) {
+            if (this.objectStore[key]?.identity?._id !== identityId) {
+                res[key] = this.objectStore[key];
+            }
+        }
+        this.objectStore = res;
+    }
+
 }
 
 module.exports = Cache;
