@@ -134,6 +134,7 @@ const listener = {
                         sentMessages.push(message);
                         utils.Schemas.DiscordMessage.create({
                             _id: message.id,
+                            guild: message.guild.id,
                             channel: message.channel.id,
                             live: stream,
                         }).catch(console.error);

@@ -33,6 +33,7 @@ const listener = {
         utils.Discord.channels.live.send({embeds: [embed]}).then(message => {
             utils.Schemas.DiscordMessage.create({
                 _id: message.id,
+                guild: message.guild.id,
                 channel: message.channel.id,
                 live: activity.live,
             }).catch(console.error);

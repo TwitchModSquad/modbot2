@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const messageSchema = new mongoose.Schema({
     _id: String,
+    guild: String,
     channel: String,
     content: String,
     twitchBan: {
@@ -11,6 +12,10 @@ const messageSchema = new mongoose.Schema({
     live: {
         type: String,
         ref: "TwitchLivestream",
+    },
+    giveaway: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Giveaway",
     },
     twitchGlobalTimeouts: Boolean,
     twitchGlobalBans: Boolean,
