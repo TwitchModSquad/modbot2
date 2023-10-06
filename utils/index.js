@@ -148,7 +148,23 @@ class Utils {
                 const user = twitchUsers[i];
                 if (user.identity) {
                     await user.populate("identity")
-                    identity = user.identity;
+                    if (!identity) {
+                        identity = user.identity;
+                    } else {
+                        if (user.identity.authenticated) {
+                            identity.authenticated = true;
+                        }
+                        if (user.identity.admin) {
+                            identity.admin = true;
+                        }
+                        if (user.identity.moderator) {
+                            identity.moderator = true;
+                        }
+                        if (user.identity.points) {
+                            if (!identity.points) identity.points = 0;
+                            identity.points += user.identity.points;
+                        }
+                    }
                     await retrieveAdditionalUsers(identity);
                 }
             }
@@ -156,7 +172,23 @@ class Utils {
                 const user = discordUsers[i];
                 if (user.identity) {
                     await user.populate("identity")
-                    identity = user.identity;
+                    if (!identity) {
+                        identity = user.identity;
+                    } else {
+                        if (user.identity.authenticated) {
+                            identity.authenticated = true;
+                        }
+                        if (user.identity.admin) {
+                            identity.admin = true;
+                        }
+                        if (user.identity.moderator) {
+                            identity.moderator = true;
+                        }
+                        if (user.identity.points) {
+                            if (!identity.points) identity.points = 0;
+                            identity.points += user.identity.points;
+                        }
+                    }
                     await retrieveAdditionalUsers(identity);
                 }
             }
@@ -179,6 +211,7 @@ class Utils {
                 await user.save();
             }
 
+            await identity.save();
             resolve(identity);
         });
     }
