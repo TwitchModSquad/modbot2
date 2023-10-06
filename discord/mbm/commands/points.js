@@ -1,4 +1,4 @@
-const { ChatInputCommandInteraction, SlashCommandBuilder, EmbedBuilder, codeBlock, StringSelectMenuBuilder, ActionRowBuilder } = require("discord.js");
+const { ChatInputCommandInteraction, SlashCommandBuilder, EmbedBuilder, codeBlock, StringSelectMenuBuilder, ActionRowBuilder, cleanCodeBlockContent } = require("discord.js");
 
 const utils = require("../../../utils");
 const config = require("../../../config.json");
@@ -39,6 +39,10 @@ const command = {
                 .setDescription("Mod+ only, views a user's transaction log")
                 .setRequired(false)
             )
+        )
+        .addSubcommand(x => x
+            .setName("audit")
+            .setDescription("Admin only. Audits point values for discrepancies.")
         )
         .addSubcommand(x => x
             .setName("ad")
@@ -139,9 +143,56 @@ const command = {
             const embed = new EmbedBuilder()
                 .setColor(0x772ce8)
                 .setTitle("Transaction Log")
-                .setDescription(`<@${targetUser.id}>'s transaction log${codeBlock(logString)}`);
+                .setDescription(`<@${targetUser.id}>'s transaction log: \`${targetIdentity.printPoints()}\`\n${codeBlock(logString)}`);
 
             interaction.reply({embeds: [embed], ephemeral: true});
+        } else if (subcommand === "audit") {
+            if (!identity.admin) {
+                return interaction.error("You must be an admin to use this command!");
+            }
+
+            await interaction.deferReply({ephemeral: true});
+
+            const identities = await utils.Schemas.Identity.find({
+                points: {
+                    $gt: 0,
+                },
+            });
+
+            let discrepancies = [["Name", "Expected", "Actual", "Difference"]];
+            for (let i = 0; i < identities.length; i++) {
+                const identity = identities[i];
+                const logs = await utils.Schemas.PointLog.find({
+                    identity: identity,
+                });
+                let expectedValue = 0;
+                for (let l = 0; l < logs.length; l++) {
+                    const log = logs[l];
+                    expectedValue += log.amount + log.bonus;
+                }
+                if (identity.points !== expectedValue) {
+                    const twitchUsers = await identity.getTwitchUsers();
+
+                    const difference = expectedValue - identity.points;
+                    discrepancies.push([
+                        twitchUsers.length > 0 ? twitchUsers[0].display_name : String(identity._id),
+                        String(expectedValue),
+                        String(identity.points),
+                        (difference > 0 ? "+" : "") + difference,
+                    ]);
+                }
+            }
+
+            const embed = new EmbedBuilder()
+                .setColor(0x772ce8)
+                .setTitle("Audit Results");
+
+            if (discrepancies.length === 1) {
+                embed.setDescription("All identities audited with no discrepancies!");
+            } else {
+                embed.setDescription(codeBlock(cleanCodeBlockContent(utils.stringTable(discrepancies, 3, 6, false))));
+            }
+            interaction.editReply({embeds: [embed]});
         } else if (subcommand === "ad") {
             delete store[interaction.user.id];
 
@@ -284,7 +335,7 @@ const command = {
                 }
 
                 if (i > 0) topString += "\n";
-                topString += `${i + positionOffset}. ${name}: \`${utils.comma(identity.points)} point${identity.points === 1 ? "" : "s"}\``;
+                topString += `${i + positionOffset}. ${name}: \`${identity.printPoints()}\``;
             }
             if (topString === "") {
                 topString = "No users found on this page!";
