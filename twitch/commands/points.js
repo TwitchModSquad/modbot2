@@ -27,7 +27,7 @@ const command = {
                         points = Math.floor(points);
                         const identity = await user.createIdentity();
                         await utils.Points.addPoints(identity, points, "wos");
-                        reply(`user ${user.display_name} was awarded ${points} point${points === 1 ? "" : "s"}! User point balance: ${identity.points} point${identity.points === 1 ? "" : "s"}`);
+                        reply(`user ${user.display_name} was awarded ${points} point${points === 1 ? "" : "s"}! User point balance: ${identity.printPoints()}`);
                     } catch(err) {
                         console.error(err);
                         reply(`user ${args[1]} was not found!`);
