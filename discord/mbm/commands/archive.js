@@ -169,7 +169,7 @@ const command = {
                     if (i > 0) banString += "\n";
                     const message = `${ban.chatter.display_name} banned in #${ban.streamer.login} on ${ban.time_start.toLocaleDateString()}`;
                     if (ban.message) {
-                        banString += `${i+1}. [${message}](https://discord.com/channels/${config.discord.guilds.modsquad}/${config.discord.modbot.channels.ban}/${ban.message._id})`;
+                        banString += `${i+1}. [${message}](https://discord.com/channels/${config.discord.guilds.modsquad}/${config.discord.channels.ban.tms}/${ban.message._id})`;
                     } else {
                         banString += `${i+1}. ${message}`;
                     }

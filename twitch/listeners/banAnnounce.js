@@ -20,18 +20,22 @@ const listener = {
 
         try {
             const message = await ban.message(true, true, bpm);
-    
-            utils.Discord.channels.ban.send(message).then(async message => {
+
+            const logMessage = async message => {
                 try {
                     await utils.Schemas.DiscordMessage.create({
                         _id: message.id,
+                        guild: message.guild.id,
                         channel: message.channel.id,
                         twitchBan: ban._id,
                     });
                 } catch(e) {
                     console.error(e);
                 }
-            }, console.error);
+            }
+    
+            utils.Discord.channels.ban.tms.send(message).then(logMessage, console.error);
+            utils.Discord.channels.ban.tlms.send(message).then(logMessage, console.error);
     
             utils.EventManager.fire("banAnnounce", streamer, chatter, message, bpm);
         } catch(err) {

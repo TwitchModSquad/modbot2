@@ -121,7 +121,7 @@ userSchema.methods.embed = async function() {
             const ban = bans[i];
             if (banString !== "") banString += "\n";
             if (ban.message) {
-                banString += `[${ban.streamer.display_name} on ${ban.time_start.toLocaleDateString()}](https://discord.com/channels/${config.discord.guilds.modsquad}/${config.discord.modbot.channels.ban}/${ban.message._id})`
+                banString += `[${ban.streamer.display_name} on ${ban.time_start.toLocaleDateString()}](https://discord.com/channels/${config.discord.guilds.modsquad}/${config.discord.channels.ban.tms}/${ban.message._id})`
             } else {
                 banString += `${ban.streamer.display_name} on ${ban.time_start.toLocaleDateString()}`;
             }
