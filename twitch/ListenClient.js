@@ -162,6 +162,25 @@ class ListenClient {
             }
         }, 1000);
 
+        if (this.type === "member") {
+            let lastJoinTime = Date.now();
+            this.client.on("join", (channel, username, self) => {
+                if (self && channel.replace("#","").toLowerCase() === config.twitch.username) {
+                    console.log("Bot has joined its own channel!");
+                }
+                if (self && lastJoinTime !== null) {
+                    lastJoinTime = Date.now();
+                }
+            });
+            const interval = setInterval(() => {
+                if (Date.now() - lastJoinTime > 20000) {
+                    console.log("Bot has joined all channels!");
+                    clearInterval(interval);
+                    lastJoinTime = null;
+                }
+            }, 5000);
+        }
+
         this.client.on("message", this.listenerWrappers.message);
         this.client.on("timeout", this.listenerWrappers.timeout);
         this.client.on("ban", this.listenerWrappers.ban);
