@@ -165,6 +165,7 @@ const command = {
                 const identity = identities[i];
                 const logs = await utils.Schemas.PointLog.find({
                     identity: identity,
+                    cancelDate: null,
                 });
                 let expectedValue = 0;
                 for (let l = 0; l < logs.length; l++) {

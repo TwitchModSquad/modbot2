@@ -22,7 +22,7 @@ const listener = {
 
         let identity;
         try {
-            const discord = await utils.Discord.getUserById(message.member.id);
+            const discord = await utils.Discord.getUserById(message.member.id, true);
             if (!discord?.identity) return;
             identity = discord.identity;
         } catch(err) {
