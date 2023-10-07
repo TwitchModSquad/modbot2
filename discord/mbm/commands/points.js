@@ -10,6 +10,7 @@ const PRETTY_REASON = {
     message: "Message Reward",
     wos: "WOS Reward",
     ad: "Ad Purchase",
+    giveaway: "Giveaway Entry",
 }
 
 const TOP_LIMIT = 20;
@@ -83,9 +84,9 @@ const command = {
 
         if (subcommand === "daily") {
             try {
-                const addedPoints = await utils.Points.collectDaily(identity);
+                const log = await utils.Points.collectDaily(identity);
                 interaction.success(
-                    `Collected \`${addedPoints} points\` from daily rewards!\n` +
+                    `Collected \`${log.amount}${log.bonus > 0 ? `+${log.bonus}` : ""} points\` from daily rewards!\n` +
                     `You currently have \`${identity.points} points\``
                 );
             } catch(err) {

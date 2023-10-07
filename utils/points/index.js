@@ -51,7 +51,8 @@ class Points {
     async #refreshIdentity(identity) {
         global.utils.Discord.userCache.removeIdentity(identity._id);
         global.utils.Twitch.userCache.removeIdentity(identity._id);
-        return await Identity.findById(identity._id);
+        // return await Identity.findById(identity._id);
+        return identity;
     }
 
     /**
@@ -61,29 +62,43 @@ class Points {
      * @param {"daily"|"message"|"wos"} reason
      * @param {number} bonus
      * @param {Message} message
+     * @param {boolean} supporterBonusEnabled
      * @returns {Promise<number>} The total points of the identity
      */
-    addPoints(identity, amount, reason, bonus = 0, message = null) {
+    addPoints(identity, amount, reason, bonus = 0, message = null, supporterBonusEnabled = true) {
         return new Promise(async (resolve, reject) => {
             identity = await this.#refreshIdentity(identity);
+
+            if (supporterBonusEnabled &&
+                identity.supporter &&
+                identity.supporter > 0 &&
+                config.points.supporter.length >= identity.supporter) {
+                const multiplier = config.points.supporter[identity.supporter - 1];
+                if (multiplier) {
+                    bonus += Math.floor((amount + bonus) * multiplier);
+                }
+            }
+
             if (!identity.points) {
                 identity.points = amount + bonus;
             } else {
                 identity.points += amount + bonus;
             }
+
             await identity.save();
+
             const data = {
                 identity: identity,
                 reason: reason,
                 amount: amount,
                 bonus: bonus,
             };
+            
             if (message) {
                 data.message = message.id;
                 data.channel = message.channel.id;
             }
-            await PointLog.create(data);
-            resolve(identity.points);
+            resolve(await PointLog.create(data));
         });
     }
 
@@ -133,8 +148,8 @@ class Points {
             }
 
             const bonusAmount = await this.#calculateBonus(identity);
-            await this.addPoints(identity, config.points.daily.base, "daily", bonusAmount);
-            resolve(bonusAmount + config.points.daily.base);
+            const log = await this.addPoints(identity, config.points.daily.base, "daily", bonusAmount);
+            resolve(log);
         });
     }
 

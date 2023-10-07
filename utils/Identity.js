@@ -16,7 +16,9 @@ const identitySchema = new mongoose.Schema({
     points: {
         type: Number,
         default: 0,
-    }
+    },
+    supporter: Number,
+    // 1 = twitch subscriber, 2 = Patreon supporter, 3 = Patreon enabler, 4 = Patreon premium
 });
 
 identitySchema.methods.getTwitchUsers = async function () {
