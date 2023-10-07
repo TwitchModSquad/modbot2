@@ -33,7 +33,7 @@ const command = {
         if (twitchUser) {
             user = await utils.Twitch.getUserByName(twitchUser, true);
         } else if (discordUser) {
-            user = await utils.Discord.getUserById(discordUser.id);
+            user = await utils.Discord.getUserById(discordUser.id, true);
         } else {
             return interaction.error("A Discord user or a Twitch user must be specified!");
         }
