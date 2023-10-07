@@ -204,7 +204,14 @@ const command = {
                         interaction.channel.send({embeds: [giveaway.embed()], components: [
                             new ActionRowBuilder()
                                 .setComponents(enterButton)
-                        ]});
+                        ]}).then(message => {
+                            utils.Schemas.DiscordMessage.create({
+                                _id: message.id,
+                                guild: message.guild.id,
+                                channel: message.channel.id,
+                                giveaway: giveaway,
+                            }).catch(console.error);
+                        }, console.error);
                         interaction.success(`Giveaway embed for \`${giveaway.name}\` resent!`);
                         return;
                     }
