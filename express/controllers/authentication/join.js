@@ -12,6 +12,10 @@ router.get("/", async (req, res) => {
         return;
     }
 
+    if (!req?.session?.identity) {
+        return res.redirect("/auth/login");
+    }
+
     const twitchUsers = await req.session.identity.getTwitchUsers();
     const discordUsers = await req.session.identity.getDiscordUsers();
 
