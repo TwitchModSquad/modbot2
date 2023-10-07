@@ -22,6 +22,7 @@ const schema = new mongoose.Schema({
         archive: Boolean,
         points: Boolean,
         giveaway: Boolean,
+        mention: Boolean,
     }
 });
 
