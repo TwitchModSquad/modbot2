@@ -67,11 +67,11 @@ schema.methods.embed = function() {
         }, {
             name: "Start Time",
             value: `${this.discordStartTime("f")}\n${this.discordStartTime("R")}`,
-            inline: true,
+            inline: false,
         }, {
             name: "End Time",
             value: `${this.discordEndTime("f")}\n${this.discordEndTime("R")}`,
-            inline: true,
+            inline: false,
         })
         .setFooter({iconURL: config.iconURI, text: "The Mod Squad"});
 }
