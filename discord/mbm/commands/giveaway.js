@@ -196,7 +196,15 @@ const command = {
                 try {
                     const giveaway = await utils.Schemas.Giveaway.findById(new mongoose.Types.ObjectId(id));
                     if (giveaway) {
-                        interaction.channel.send({embeds: [giveaway.embed()]});
+                        const enterButton = new ButtonBuilder()
+                            .setCustomId("giveaway-enter")
+                            .setLabel("Enter")
+                            .setEmoji('📥')
+                            .setStyle(ButtonStyle.Primary);
+                        interaction.channel.send({embeds: [giveaway.embed()], components: [
+                            new ActionRowBuilder()
+                                .setComponents(enterButton)
+                        ]});
                         interaction.success(`Giveaway embed for \`${giveaway.name}\` resent!`);
                         return;
                     }
