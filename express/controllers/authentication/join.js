@@ -13,7 +13,8 @@ router.get("/", async (req, res) => {
     }
 
     if (!req?.session?.identity) {
-        return res.redirect("/auth/login");
+        res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users"));
+        return;
     }
 
     const twitchUsers = await req.session.identity.getTwitchUsers();
