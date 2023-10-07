@@ -103,14 +103,14 @@ schema.methods.enter = function(identity) {
             return reject(`Maximum entries have been reached for this user! (${this.entry.maximum})`);
         }
 
-        global.utils.Points.removePoints(identity, this.entry.price, "giveaway").then(log => {
+        global.utils.Points.removePoints(identity, this.entry.price, "giveaway").then(async log => {
             resolve(entries.length + 1);
-        }, reject);
 
-        await GiveawayEntry.create({
-            giveaway: this,
-            identity: identity,
-        });
+            await GiveawayEntry.create({
+                giveaway: this,
+                identity: identity,
+            });
+        }, reject);
     });
 }
 
