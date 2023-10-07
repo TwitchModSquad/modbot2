@@ -79,6 +79,16 @@ const command = {
                     .setAutocomplete(true)
                 )
             )
+            .addSubcommand(y => y
+                .setName("resend")
+                .setDescription("Resend a message for a giveaway")
+                .addStringOption(z => z
+                    .setName("giveaway")
+                    .setDescription("The giveaway to resend")
+                    .setRequired(true)
+                    .setAutocomplete(true)
+                )
+            )
         )
         .addSubcommand(x => x
             .setName("enter")
@@ -181,6 +191,19 @@ const command = {
                     console.error(err);
                     interaction.error(String(err));
                 });
+            } else if (subcommand === "resend") {
+                const id = interaction.options.getString("giveaway", true);
+                try {
+                    const giveaway = await utils.Schemas.Giveaway.findById(new mongoose.Types.ObjectId(id));
+                    if (giveaway) {
+                        interaction.channel.send({embeds: [giveaway.embed()]});
+                        interaction.success(`Giveaway embed for \`${giveaway.name}\` resent!`);
+                        return;
+                    }
+                } catch(err) {
+                    console.error(err);
+                }
+                interaction.error(`Unable to find giveaway with ID ${id}!`);
             } else {
                 interaction.error("Unknown subcommand!");
             }
