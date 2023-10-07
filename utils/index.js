@@ -150,7 +150,7 @@ class Utils {
                     await user.populate("identity")
                     if (!identity) {
                         identity = user.identity;
-                    } else {
+                    } else if (identity._id !== user.identity._id) {
                         if (user.identity.authenticated) {
                             identity.authenticated = true;
                         }
@@ -174,7 +174,7 @@ class Utils {
                     await user.populate("identity")
                     if (!identity) {
                         identity = user.identity;
-                    } else {
+                    } else if (identity._id !== user.identity._id) {
                         if (user.identity.authenticated) {
                             identity.authenticated = true;
                         }
