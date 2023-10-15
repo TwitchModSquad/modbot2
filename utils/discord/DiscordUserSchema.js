@@ -102,4 +102,11 @@ userSchema.methods.embed = async function() {
     return embed;
 }
 
+userSchema.methods.message = async function(ephemeral = true) {
+    return {
+        embeds: [await this.embed()],
+        ephemeral: ephemeral,
+    };
+}
+
 module.exports = userSchema;

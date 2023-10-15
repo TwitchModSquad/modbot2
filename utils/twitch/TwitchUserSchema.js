@@ -8,8 +8,9 @@ const TwitchTimeout = require("./TwitchTimeout");
 
 const config = require("../../config.json");
 const con = require("../../old-db");
-const { EmbedBuilder, codeBlock, cleanCodeBlockContent } = require('discord.js');
+const { EmbedBuilder, codeBlock, cleanCodeBlockContent, StringSelectMenuBuilder, ActionRowBuilder } = require('discord.js');
 const TwitchChat = require('./TwitchChat');
+const UserFlag = require('../flag/UserFlag');
 
 const userSchema = new mongoose.Schema({
     _id: {
@@ -81,11 +82,13 @@ userSchema.pre("save", function(next) {
     next();
 });
 
-userSchema.methods.embed = async function() {
+userSchema.methods.embed = async function(bans = null, communities = null) {
     const mods = await this.getMods();
     const streamers = await this.getStreamers();
+    const flags = await this.getFlags();
 
-    const bans = await this.getBans();
+    if (!bans) bans = await this.getBans();
+    if (!communities) communities = await this.getActiveCommunities();
 
     const embed = new EmbedBuilder()
             .setAuthor({name: this.display_name, iconURL: this.profile_image_url, url: `https://twitch.tv/${this.login}`})
@@ -98,6 +101,16 @@ userSchema.methods.embed = async function() {
                 `[Profile](https://twitch.tv/${this.login}) | [TMS User Log](${config.express.domain.root}panel/user/${this._id})` +
                 (this.description !== "" ? `\n**Description**${codeBlock(cleanCodeBlockContent(this.description))}` : "")
             );
+
+    if (communities.length > 0) {
+        embed.addFields({
+            name: "Active Communities",
+            value: codeBlock(cleanCodeBlockContent(
+                await this.generateCommunityTable(communities)
+            )),
+            inline: false,
+        });
+    }
 
     if (mods.length > 0) {
         embed.addFields({
@@ -113,6 +126,14 @@ userSchema.methods.embed = async function() {
             value: streamers.map(x => x.streamer.display_name).join(", "),
             inline: true,
         })
+    }
+
+    if (flags.length > 0) {
+        embed.addFields({
+            name: "User Flags",
+            value: flags.map(x => `\`${x.flag.icon ? `${x.flag.icon} ` : ""}${x.flag.name}\``).join(" "),
+            inline: true,
+        });
     }
 
     if (bans.length > 0) {
@@ -134,6 +155,61 @@ userSchema.methods.embed = async function() {
     }
     
     return embed;
+}
+
+userSchema.methods.message = async function(ephemeral = true) {
+    const bans = await this.getBans();
+    const communities = await this.getActiveCommunities();
+
+    const components = [];
+    
+    if (bans.length > 0) {
+        const banSelectMenu = new StringSelectMenuBuilder()
+            .setCustomId("ban")
+            .setPlaceholder("View ban information")
+            .setMinValues(1)
+            .setMaxValues(1);
+
+        bans.forEach((ban, i) => {
+            if (i > 24) return;
+            banSelectMenu.addOptions({
+                label: `Ban in #${ban.streamer.login} on ${utils.parseDate(ban.time_start)}${ban.time_end ? " (inactive)" : ""}`,
+                value: String(ban._id),
+            });
+        });
+
+        components.push(
+            new ActionRowBuilder()
+                .setComponents(banSelectMenu)
+        );
+    }
+
+    if (communities.length > 0) {
+        const chatHistorySelectMenu = new StringSelectMenuBuilder()
+            .setCustomId("chathistory")
+            .setPlaceholder("View chat history")
+            .setMinValues(1)
+            .setMaxValues(1);
+
+        communities.forEach((com, i) => {
+            if (i > 24) return;
+            chatHistorySelectMenu.addOptions({
+                label: com.streamer.display_name,
+                value: `${com.streamer._id}:${com.chatter}`,
+            });
+        });
+
+        components.push(
+            new ActionRowBuilder()
+                .setComponents(chatHistorySelectMenu)
+        );
+    }
+
+    return {
+        embeds: [await this.embed(bans, communities)],
+        components: components,
+        ephemeral: ephemeral,
+    };
 }
 
 userSchema.methods.public = function() {
@@ -222,11 +298,74 @@ userSchema.methods.getTokens = async function(requiredScopes = []) {
 userSchema.methods.getBans = async function() {
     const bans = await global.utils.Schemas.TwitchBan.find({chatter: this._id})
             .populate("streamer")
-            .populate("chatter");
+            .populate("chatter")
+            .sort({time_start: -1});
     for (let i = 0; i < bans.length; i++) {
         bans[i].message = await global.utils.Schemas.DiscordMessage.findOne({twitchBan: bans[i]._id});
     }
     return bans;
+}
+
+userSchema.methods.getFlags = async function() {
+    return await UserFlag.find({twitchUser: this._id})
+        .populate("flag");
+}
+
+userSchema.methods.getActiveCommunities = async function() {
+    const channelHistoryDistinct = await utils.Schemas.TwitchChat
+            .distinct("streamer", {chatter: this._id});
+
+    let channelHistory = [];
+    for (let i = 0; i < channelHistoryDistinct.length; i++) {
+        const channelId = channelHistoryDistinct[i];
+
+        let lastMessage = await utils.Schemas.TwitchChat
+                .find({streamer: channelId, chatter: this._id})
+                .sort({time_sent: -1})
+                .limit(1)
+                .populate("streamer");
+        
+        if (lastMessage && lastMessage?.length > 0) {
+            lastMessage = lastMessage[0];
+            lastMessage.bannedIn = await utils.Schemas.TwitchBan
+                    .exists({streamer: channelId, chatter: this._id, time_end: null});
+            lastMessage.timedOutIn = await utils.Schemas.TwitchTimeout
+                    .exists({streamer: channelId, chatter: this._id, time_end: {$gt: Date.now()}});
+
+            channelHistory.push(lastMessage);
+        }
+    }
+    channelHistory.sort((a, b) => b.time_sent - a.time_sent);
+    return channelHistory;
+}
+
+userSchema.methods.generateCommunityTable = async function(allChannelHistory = null) {
+    if (!allChannelHistory) allChannelHistory = await this.getActiveCommunities();
+
+    let memberChannelHistory = allChannelHistory.filter(x => x.streamer.chat_listen);
+    let channelHistory = allChannelHistory.filter(x => !x.streamer.chat_listen);
+
+    let channelHistoryTable = [["Channel", "Last Active", ""]];
+
+    if (memberChannelHistory.length > 0)
+        channelHistoryTable.push(["", "Member Channels", ""]);
+
+    for (let i = 0; i < Math.min(memberChannelHistory.length, 15); i++) {
+        let lastMessage = memberChannelHistory[i];
+        channelHistoryTable.push([lastMessage.streamer.display_name, global.utils.parseDate(lastMessage.time_sent), (lastMessage.bannedIn ? "[❌banned]" : "") + (lastMessage.timedOutIn ? "[⏲️t/o]" : "")])
+    }
+
+    const otherChannelCount = Math.min(channelHistory.length, 15) - memberChannelHistory.length;
+
+    if (otherChannelCount > 0)
+        channelHistoryTable.push(["", "Other Channels", ""]);
+
+    for (let i = 0; i < otherChannelCount; i++) {
+        let lastMessage = channelHistory[i];
+        channelHistoryTable.push([lastMessage.streamer.display_name, global.utils.parseDate(lastMessage.time_sent), (lastMessage.bannedIn ? "[❌banned]" : "") + (lastMessage.timedOutIn ? "[⏲️t/o]" : "")])
+    }
+
+    return global.utils.stringTable(channelHistoryTable, 2);
 }
 
 userSchema.methods.fetchMods = async function() {

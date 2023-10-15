@@ -30,15 +30,20 @@ const command = {
         const discordUser = interaction.options.getUser("discord");
 
         let user;
-        if (twitchUser) {
-            user = await utils.Twitch.getUserByName(twitchUser, true);
-        } else if (discordUser) {
-            user = await utils.Discord.getUserById(discordUser.id, false, true);
-        } else {
-            return interaction.error("A Discord user or a Twitch user must be specified!");
+        try {
+            if (twitchUser) {
+                user = await utils.Twitch.getUserByName(twitchUser, true);
+            } else if (discordUser) {
+                user = await utils.Discord.getUserById(discordUser.id, false, true);
+            } else {
+                return interaction.error("A Discord user or a Twitch user must be specified!");
+            }
+        } catch(err) {
+            interaction.error(String(err));
+            return;
         }
 
-        interaction.reply({embeds: [await user.embed()], ephemeral: true});
+        interaction.reply(await user.message());
     }
 };
 
