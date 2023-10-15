@@ -19,14 +19,14 @@ const listener = {
         const [, type] = interaction.component.customId.split("-");
         const id = interaction.values[0];
 
-        let embed;
+        let message;
         if (type === "twitch") {
-            embed = await (await utils.Twitch.getUserById(id)).embed();
+            message = await (await utils.Twitch.getUserById(id)).message();
         } else if (type === "discord") {
-            embed = await (await utils.Discord.getUserById(id)).embed();
+            message = await (await utils.Discord.getUserById(id)).message();
         }
 
-        interaction.reply({embeds: [embed], ephemeral: true});
+        interaction.reply(message);
     }
 };
 
