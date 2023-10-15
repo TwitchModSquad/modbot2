@@ -43,7 +43,8 @@ const command = {
             return;
         }
 
-        interaction.reply(await user.message());
+        interaction.deferReply({ephemeral: true});
+        interaction.editReply(await user.message());
     }
 };
 
