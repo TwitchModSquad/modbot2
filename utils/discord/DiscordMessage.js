@@ -25,4 +25,15 @@ const messageSchema = new mongoose.Schema({
     },
 });
 
+messageSchema.methods.getMessage = function(client = global.client.mbm) {
+    return new Promise((resolve, reject) => {
+        if (!this.channel) {
+            return reject("Channel was not stored with message!");
+        }
+        client.channels.fetch(this.channel).then(channel => {
+            channel.messages.fetch(this._id).then(resolve, reject);
+        }, reject);
+    })
+}
+
 module.exports = mongoose.model("DiscordMessage", messageSchema);

@@ -28,12 +28,13 @@ class Discord {
 
     /**
      * Various Discord channels
-     * @type {{ban:{tms:TextChannel,tlms:TextChannel},live:TextChannel,archiveRequest:TextChannel}}
+     * @type {{ban:{tms:TextChannel,tlms:TextChannel,hide:TextChannel},live:TextChannel,archiveRequest:TextChannel}}
      */
     channels = {
         ban: {
             tms: null,
             tlms: null,
+            hide: null,
         },
         live: null,
         archiveRequest: null,
@@ -120,13 +121,14 @@ class Discord {
 
         this.channels.ban.tms = await global.client.mbm.channels.fetch(config.discord.channels.ban.tms);
         this.channels.ban.tlms = await global.client.mbm.channels.fetch(config.discord.channels.ban.tlms);
+        this.channels.ban.hide = await global.client.mbm.channels.fetch(config.discord.channels.ban.hide);
         this.channels.live = await global.client.modbot.channels.fetch(config.discord.modbot.channels.live);
 
         this.channels.archiveRequest = await global.client.mbm.channels.fetch(config.discord.mbm.channels.archive_request);
 
         console.log(
             `[MB] Using guilds: TMS [${this.guilds.tms.name}] TLMS [${this.guilds.tlms.name}] CL [${this.guilds.cl.name}]\n` +
-            `[MB] Using channel #${this.channels.ban.tms.name} & #${this.channels.ban.tlms.name} for bans, #${this.channels.live.name} for livestreams, #${this.channels.archiveRequest.name} for archive requests\n` +
+            `[MB] Using channel #${this.channels.ban.tms.name} & #${this.channels.ban.tlms.name} for bans, #${this.channels.ban.hide.name} for hidden bans, #${this.channels.live.name} for livestreams, #${this.channels.archiveRequest.name} for archive requests\n` +
             `[MB] Using message (no messages loaded)`
         );
     }

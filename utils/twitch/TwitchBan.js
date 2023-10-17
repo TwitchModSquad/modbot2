@@ -44,6 +44,9 @@ banSchema.methods.public = function() {
 }
 
 banSchema.methods.message = async function(showButtons = false, getData = false, bpm = null) {
+    await this.populate("chatter");
+    await this.populate("streamer");
+
     const startTime = Date.now();
 
     let banData = null;
