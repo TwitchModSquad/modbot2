@@ -58,6 +58,7 @@ const sendPartialUpdate = ws => {
     ws.sendJson({
         mostActiveChannels: utils.StatsManager.getMostActiveChannels(),
         recentFollowers: utils.StatsManager.getRecentFollowers(),
+        recentSubscriptions: utils.StatsManager.getRecentSubscriptions(),
     });
 }
 

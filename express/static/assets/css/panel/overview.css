@@ -43,7 +43,7 @@ main {
 }
 
 #follows img,
-#subscriptions > div {
+#subscriptions img {
     width: 1.3em;
     height: 1.3em;
     vertical-align: middle;
@@ -52,15 +52,9 @@ main {
 }
 
 #follows .relative-time,
-#subscriptions .relative-time {
+#subscriptions .tier {
     font-size: .8em;
     color: var(--secondary-text-color);
-}
-
-#subscriptions {
-    color: var(--secondary-text-color);
-    display: block;
-    text-align: center;
 }
 
 #member-streams > div {

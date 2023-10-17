@@ -385,6 +385,57 @@ class TwitchAuthentication {
         });
     }
 
+    /**
+     * Gets a channels subscriptions
+     * @param {string} broadcasterId 
+     * @param {number} limit
+     * @param {boolean} retry
+     * @returns {Promise<any>}
+     */
+    getChannelSubscriptions(broadcasterId, limit = 20, retry = true) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                if (!this.followerAccessToken) await this.#retrieveFollowerAccessToken();
+            } catch(err) {
+                console.error("Unable to retrieve follower access token");
+                console.error(err);
+                reject(err);
+                return;
+            }
+
+            const oauthResult = await fetch(`https://api.twitch.tv/helix/subscriptions?broadcaster_id=${encodeURIComponent(broadcasterId)}&first=${encodeURIComponent(limit)}`, {
+                method: 'GET',
+                headers: {
+                    ["Client-ID"]: config.twitch.client_id,
+                    Authorization: `Bearer ${this.followerAccessToken}`,
+                },
+            });
+
+            const json = await oauthResult.json();
+            if (oauthResult.status === 200) {
+                resolve(json);
+            } else {
+                try {
+                    if (json?.message) {
+                        if (json.message.toLowerCase() === "invalid oauth token") {
+                            console.error(`Failed to get subscribers for ${broadcasterId}: Invalid oauth`);
+                            if (retry) {
+                                this.followerAccessToken = null;
+                                this.getChannelSubscriptions(broadcasterId, limit, false).then(resolve, reject);
+                            } else {
+                                reject(json.message);
+                            }
+                        }
+                    } else {
+                        reject(oauthResult.statusText);
+                    }
+                } catch(err) {
+                    reject(err);
+                }
+            }
+        });
+    }
+
 }
 
 module.exports = TwitchAuthentication;

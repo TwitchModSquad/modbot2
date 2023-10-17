@@ -146,6 +146,14 @@ function drawChart() {
             }
         }
 
+        if (json?.recentSubscriptions && json.recentSubscriptions.length > 0) {
+            let htmlOutput = "";
+            json.recentSubscriptions.forEach(function (s) {
+                htmlOutput += `<div class="small-user"><div><img src="${s.user.profile_image_url}"> ${s.user.display_name}</div><div class="tier">Tier ${s.tier}</div></div>`;
+            });
+            $("#subscriptions").html(htmlOutput);
+        }
+
         if (window.obsstudio) {
             if (json?.changeScene) {
                 window.obsstudio.setCurrentScene(json.changeScene);

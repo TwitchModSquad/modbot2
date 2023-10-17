@@ -3,6 +3,7 @@ const config = require("../config.json");
 const MOST_ACTIVE_TIME = 15 * 1000; // 15 seconds
 const MOST_ACTIVE_CHANNEL_COUNT = 15;
 const MAX_FOLLOWERS = 10;
+const MAX_SUBSCRIBERS = 10;
 
 class StatsManager {
 
@@ -21,6 +22,7 @@ class StatsManager {
     memberStreams = [];
 
     recentFollowers = [];
+    recentSubscriptions = [];
 
     /**
      * Gets the current most active channels
@@ -79,6 +81,14 @@ class StatsManager {
      */
     getRecentFollowers() {
         return this.recentFollowers;
+    }
+
+    /**
+     * Returns recent subscriptions
+     * @returns {any[]}
+     */
+    getRecentSubscriptions() {
+        return this.recentSubscriptions;
     }
 
     /**
@@ -158,6 +168,7 @@ class StatsManager {
             if (intCount % 15 === 0) {
                 this.saveHourlyActivity().catch(console.error);
                 this.updateRecentFollowers().catch(console.error);
+                this.updateRecentSubscribers().catch(console.error);
                 this.updateLiveMembers().catch(console.error);
             }
 
@@ -263,6 +274,24 @@ class StatsManager {
             });
         }
         this.recentFollowers = newFollowList;
+    }
+
+    /**
+     * Updates recent subscribers
+     */
+    async updateRecentSubscribers() {
+        const data = await global.utils.Authentication.Twitch.getChannelSubscriptions(config.twitch.id, MAX_SUBSCRIBERS);
+        let newSubList = [];
+        for (let i = 0; i < Math.min(MAX_SUBSCRIBERS - 1, data.data.length); i++) {
+            const d = data.data[i];
+            newSubList.push({
+                user: (await global.utils.Twitch.getUserById(d.user_id, false, true)).public(),
+                gifter: (d.is_gift ? 
+                    (await global.utils.Twitch.getUserById(d.gifter_id, false, true)).public() : null),
+                tier: Number(d.tier) / 1000,
+            });
+        }
+        this.recentSubscriptions = newSubList;
     }
 
 }
