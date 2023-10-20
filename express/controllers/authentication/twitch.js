@@ -48,15 +48,18 @@ router.get("/", async (req, res) => {
 
             if (session.identity) {
                 discordUsers = await session.identity.getDiscordUsers();
-                await utils.consolidateIdentites([
-                    ...await session.identity.getTwitchUsers(),
-                    twitchUser,
-                ], [
-                    ...discordUsers,
-                ]);
+                if (twitchUser.identity._id !== session.identity._id) {
+                    await utils.consolidateIdentites([
+                        ...await session.identity.getTwitchUsers(),
+                        twitchUser,
+                    ], [
+                        ...discordUsers,
+                    ]);
+                }
             } else {
                 const identity = await twitchUser.createIdentity();
                 session.identity = identity;
+                discordUsers = await session.identity.getDiscordUsers();
                 await session.save();
             }
 
