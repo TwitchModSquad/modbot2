@@ -61,6 +61,39 @@ function formatNumberSmall(num) {
     }
 }
 
+function startGame(data) {
+    $("body").addClass("game-active");
+    $(`.game`).addClass("game-fade");
+    setTimeout(function() {
+        $(".game-fade").hide();
+        $(".game-fade").removeClass("game-fade");
+    }, 200);
+    game = data.startGame;
+    if (data.gameType === "wos") {
+        $(".game-wos").show();
+        $(".game-wos").removeClass("game-fade");
+    } else if (data.gameType === "sudoku") {
+        startSudoku();
+        $(".game-sudoku").show().removeClass("game-fade");
+    }
+}
+
+function resumeGame(newGame) {
+    if (game) return;
+    game = newGame;
+
+    if (game.gameType === "wos") {
+        $(".game-wos").addClass("game-fade");
+        $(".game-wos").show();
+        $(".game-wos").removeClass("game-fade");
+    } else if (game.gameType === "sudoku") {
+        drawSudoku();
+        $(".game-sudoku").addClass("game-fade");
+        $(".game-sudoku").show();
+        $(".game-sudoku").removeClass("game-fade");
+    }
+}
+
 function drawChart() {
     const mostActiveChart = new google.charts.Bar(document.getElementById('most-active-channels'));
     const hourlyStatsChart = new google.charts.Line(document.getElementById('hourly-stats'));
@@ -75,13 +108,19 @@ function drawChart() {
         setTimeout(() => {
             ws.sendJson({type: "ready"})
 
-            if (window.obsstudio) {
+            if (games) {
                 ws.send(JSON.stringify({
                     type: "addScope",
-                    scope: ["scene","chat","follow","subscription"],
+                    scope: ["game"],
                 }));
             }
-        }, 50);
+        }, 100);
+    }
+
+    ws.onclose = function() {
+        setTimeout(() => {
+            drawChart();
+        }, 1000);
     }
 
     ws.onmessage = function(e) {
@@ -154,13 +193,47 @@ function drawChart() {
             $("#subscriptions").html(htmlOutput);
         }
 
-        if (window.obsstudio) {
-            if (json?.changeScene) {
-                window.obsstudio.setCurrentScene(json.changeScene);
-            }
+        if (json?.startGame) {
+            startGame(json.startGame);
+        }
 
-            if (json?.message) {
-                console.log(json.message);
+        if (json?.resumeGame) {
+            resumeGame(json.resumeGame);
+        }
+
+        if (json?.endGame) {
+            $(".game").addClass("game-fade")
+            setTimeout(() => {
+                $(".game").hide();
+                $(".game").removeClass("game-fade");
+            }, 200);
+        }
+
+        if (json?.sudokuAnswer) {
+            processGuessSudoku(json.sudokuAnswer);
+        }
+
+        if (json?.remainingSudoku) {
+            let remainingHtml = "";
+            json.remainingSudoku.forEach((r, i) => {
+                remainingHtml += `<div${r === 0 ? ` style="opacity: 0;"` : ""}><div class="number">${i+1}</div><div class="remaining">${r}</div></div>`
+            });
+            $(".remaining-sudoku").html(remainingHtml);
+        }
+
+        if (json?.leaderboardUpdate) {
+            let leaderboardString = "";
+            json.leaderboardUpdate.forEach(rec => {
+                leaderboardString += `<tr><td><div class="small-user"><img src="${rec.user.profile_image_url}" /> ${rec.user.display_name}</div></td><td>${rec.score}</td></tr>`;
+            });
+            $(".leaderboard tbody").html(leaderboardString);
+        }
+
+        if (json.hasOwnProperty("botListening")) {
+            if (json.botListening) {
+                $(".bot-not-listening").fadeOut(200);
+            } else {
+                $(".bot-not-listening").fadeIn(200);
             }
         }
     }

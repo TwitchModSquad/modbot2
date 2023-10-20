@@ -6,6 +6,7 @@
 
     <link rel="stylesheet" href="/assets/css/panel/panel.css">
     <link rel="stylesheet" href="/assets/css/panel/overview.css">
+    <% if (locals.wos) { %><link rel="stylesheet" href="/assets/css/panel/overviewGames.css"><% } %>
 </head>
 <body class="panel<%= locals?.force ? " hide-header" : "" %>">
 <%- include("../partials/header", {hideOption: true}) %>
@@ -65,6 +66,68 @@
             </div>
         </main>
     </div>
+
+<script>let games = false;</script>
+<% if (locals.wos) {
+    const letters = ["A","B","C","D","E","F","G","H","I"];
+    let boxNum = 0;
+%>
+    <iframe src="<%= locals.wos %>" frameborder="0" class="game game-wos" style="display: none;"></iframe>
+    <div class="game game-sudoku" style="display: none;">
+        <h1>Sudoku</h1>
+        <div class="flex">
+            <div></div>
+            <table class="board">
+                <tbody>
+                    <tr>
+                        <th></th>
+                        <% letters.forEach(letter => { %>
+                        <th><%= letter %></th>
+                        <% }) %>
+                    </tr>
+                    <% for (let y = 1; y < 10; y++) { %>
+                    <tr>
+                        <th><%= y %></th>
+                    <% for (let x = 1; x < 10; x++) {
+                        let classes = [];
+                        if (y === 1) classes.push("t");
+                        if (y === 3 || y === 6 || y === 9) classes.push("b");
+                        if (x === 1) classes.push("l");
+                        if (x === 3 || x === 6 || x === 9) classes.push("r");
+                    %>
+                        <td id="s-<%= boxNum %>"<%- (classes.length > 0 ? ` class="${classes.join(" ")}"` : "") %>><span class="unsolved"><%= letters[x - 1] %><%= y %></span></td>
+                    <% boxNum++;} %>
+                    </tr>
+                    <% } %>
+                </tbody>
+            </table>
+            <div>
+                <table class="leaderboard">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="2">
+                                No users on the leaderboard!
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="remaining-sudoku"></div>
+    </div>
+    <div class="game game-crossmath" style="display: none;"></div>
+    <script src="/assets/js/games.js"> </script>
+
+    <div class="bot-not-listening"<%- botListening ? ` style="display: none;"` : "" %>>
+        The Mod Squad bot recently restarted and is currently not listening to channels! Please wait to use commands.
+    </div>
+<% } %>
     
     <div class="notifications"></div>
     <div class="messages"></div>

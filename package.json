@@ -26,6 +26,7 @@
     "mongoose": "^7.4.2",
     "multer": "^1.4.5-lts.1",
     "mysql": "^2.18.1",
+    "sudoku": "^0.0.3",
     "tmi.js": "^1.8.5",
     "twitch": "^4.6.7",
     "twitch-auth": "^4.6.7"

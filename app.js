@@ -1,6 +1,8 @@
 global.startTime = Date.now();
 global.rootDir = __dirname;
 
+global.botListening = false;
+
 const fs = require('fs');
 
 global.client = {};

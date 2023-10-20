@@ -3,6 +3,8 @@ const router = express.Router();
 
 const utils = require("../../utils/");
 
+const gameCommand = require("../../twitch/commands/game");
+
 router.use(async (req, res, next) => {
     const {cookies} = req;
 
@@ -72,7 +74,7 @@ const sendFullUpdate = ws => {
     });
 }
 
-const OVERVIEW_SCOPES = ["scene","chat","follow","subscription"];
+const OVERVIEW_SCOPES = ["game"];
 router.ws("/overview", (ws, req) => {
     ws.id = utils.stringGenerator(32);
     ws.identity = req.session.identity;
@@ -86,7 +88,7 @@ router.ws("/overview", (ws, req) => {
 
     websockets.push(ws);
 
-    ws.on("message", msg => {
+    ws.on("message", async msg => {
         let json;
         try {
             json = JSON.parse(msg);
@@ -112,6 +114,15 @@ router.ws("/overview", (ws, req) => {
                 if (!OVERVIEW_SCOPES.includes(json.scope))
                     return console.error(`Ignoring scope request due to invalid scope ${json.scope}`);
                 ws.scope.push(json.scope);
+            }
+
+            if (ws.scope.includes("game") && gameCommand.game) {
+                ws.sendJson({
+                    resumeGame: gameCommand.game,
+                    leaderboardUpdate: await gameCommand.game.getLeaderboard(),
+                    remainingSudoku: gameCommand.game.getRemainingSudoku(),
+                    botListening: global.botListening,
+                });
             }
         }
     });

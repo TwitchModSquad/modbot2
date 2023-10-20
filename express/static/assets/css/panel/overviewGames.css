@@ -1,0 +1,190 @@
+.bot-not-listening {
+    position: fixed;
+    bottom: 1em;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--primary-background-color);
+    box-shadow: var(--shadow);
+    border-radius: 4px;
+    padding: .8em 1em;
+    z-index: 200;
+    text-align: center;
+}
+
+body.game-active {
+    overflow: hidden;
+}
+
+.game {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transition: 800ms;
+    opacity: 1;
+    overflow-y: auto;
+}
+
+.game.game-fade {
+    width: calc(100% - 6em);
+    height: calc(100% - 6em);
+    top: 3em;
+    left: 3em;
+    opacity: 0;
+}
+
+.leaderboard {
+    width: auto;
+    margin: 1em auto;
+}
+
+.flex {
+    display: flex;
+}
+
+.flex > div {
+    flex-grow: 1;
+}
+
+.leaderboard img {
+    width: 1.1em;
+    height: 1.1em;
+    border-radius: 50%;
+}
+
+/* SUDOKU */
+
+.game-sudoku {
+    background-color: var(--primary-background-color);
+}
+
+.game-sudoku h1 {
+    text-align: center;
+    font-family: "Noto Sans Mono", monospace;
+    margin: 1em;
+}
+
+.game-sudoku table.board {
+    width: auto;
+    margin: 1em auto;
+}
+
+.game-sudoku table.board tr {
+    border: none;
+}
+
+.game-sudoku table.board th {
+    font-weight: 300;
+    opacity: .8;
+    font-size: .9em;
+}
+
+.game-sudoku table.board th,
+.game-sudoku table.board td {
+    width: 3em;
+    height: 3em;
+    padding: 0;
+}
+
+.game-sudoku table.board td {
+    position: relative;
+    background-color: var(--tertiary-background-color);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.game-sudoku table.board td.t {
+    border-top: 1px solid rgba(255, 255, 255, 0.4);
+}
+.game-sudoku table.board td.b {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+}
+.game-sudoku table.board td.l {
+    border-left: 1px solid rgba(255, 255, 255, 0.4);
+}
+.game-sudoku table.board td.r {
+    border-right: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.game-sudoku table.board span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.game-sudoku table.board .solved {
+    font-size: 1.8em;
+    color: white;
+}
+.game-sudoku table.board .unsolved {
+    font-size: .9em;
+    opacity: .6;
+}
+
+.game-sudoku table.board .guess {
+    position: absolute;
+    padding: 0;
+    margin: 0;
+    width: 3rem;
+    height: 3rem;
+    border: .2rem solid var(--primary-tms-color);
+    z-index: 20;
+    border-radius: 3px;
+    font-size: 1.8rem;
+    color: white;
+    transition: 400ms;
+}
+
+.game-sudoku table.board .guess .user {
+    background-color: var(--primary-tms-color);
+    color: var(--primary-text-color);
+    padding: .1rem .2rem;
+    margin: 0;
+    position: absolute;
+    font-size: .6rem;
+    top: 0;
+    left: -.2rem;
+    font-weight: 600;
+    transform: translateY(-100%);
+    text-transform: uppercase;
+    border-radius: 3px;
+    z-index: 30;
+    transition: 400ms background-color;
+}
+
+.game-sudoku table.board .guess.wrong {
+    border-color: #c93434;
+    color: #c93434;
+}
+.game-sudoku table.board .guess.wrong .user {
+    background-color: #c93434;
+}
+
+.game-sudoku table.board .guess.right {
+    border-color: #6aea47;
+    color: #6aea47;
+}
+.game-sudoku table.board .guess.right .user {
+    background-color: #6aea47;
+}
+
+.remaining-sudoku {
+    display: flex;
+    justify-content: center;
+}
+
+.remaining-sudoku > div {
+    width: 2em;
+    text-align: center;
+}
+
+.remaining-sudoku .number {
+    font-weight: 300;
+    font-size: 2.2em;
+}
+
+.remaining-sudoku .remaining {
+    font-size: 1.4em;
+    color: var(--secondary-text-color);
+}

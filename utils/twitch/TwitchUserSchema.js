@@ -57,7 +57,7 @@ const userSchema = new mongoose.Schema({
         group: Boolean,
         continue: Boolean,
         restart: Boolean,
-        scene: Boolean,
+        game: Boolean,
         s: Boolean,
         points: Boolean,
     },

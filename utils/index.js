@@ -24,6 +24,8 @@ const DiscordUser = require("./discord/DiscordUser");
 const DiscordMessage = require("./discord/DiscordMessage");
 const DiscordToken = require("./discord/DiscordToken");
 
+const TwitchChatGame = require("./game/TwitchChatGame");
+
 const Giveaway = require("./giveaway/Giveaway");
 const GiveawayEntry = require("./giveaway/GiveawayEntry");
 
@@ -99,6 +101,7 @@ class Utils {
         DiscordUser: DiscordUser,
         DiscordMessage: DiscordMessage,
         DiscordToken: DiscordToken,
+        TwitchChatGame: TwitchChatGame,
         Giveaway: Giveaway,
         GiveawayEntry: GiveawayEntry,
         Group: Group,

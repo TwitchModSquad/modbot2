@@ -167,6 +167,8 @@ class ListenClient {
             this.client.on("join", (channel, username, self) => {
                 if (self && channel.replace("#","").toLowerCase() === config.twitch.username) {
                     console.log("Bot has joined its own channel!");
+                    global.botListening = true;
+                    global.overviewBroadcast("game", {botListening: true});
                 }
                 if (self && lastJoinTime !== null) {
                     lastJoinTime = Date.now();
