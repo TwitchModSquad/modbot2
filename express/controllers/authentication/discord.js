@@ -40,7 +40,7 @@ router.get("/", async (req, res) => {
 
             if (session.identity) {
                 twitchUsers = await session.identity.getTwitchUsers();
-                if (discordUser.identity._id !== session.identity._id) {
+                if (discordUser?.identity?._id !== session?.identity?._id) {
                     await utils.consolidateIdentites([
                         ...twitchUsers,
                     ], [
