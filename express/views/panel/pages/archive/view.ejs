@@ -55,9 +55,9 @@
                         <tr>
                             <td><%= file.label %></td>
                             <% if (file?.image?.data) { %>
-                                <td><a href="/panel/archive/image/<%= file._id %>" target="__blank"><img src="/panel/archive/image/<%= file._id %>" alt="<%= file.label %>" style="max-height:10em;"></a></td>
+                                <td><a href="/panel/archive/image/<%= file._id %>" target="_blank"><img src="/panel/archive/image/<%= file._id %>" alt="<%= file.label %>" style="max-height:10em;"></a></td>
                             <% } else if (file.remote) { %>
-                                <td><a href="<%= file.remote %>" target="__blank"><%= file.remote %></a></td>
+                                <td><a href="<%= file.remote %>" target="_blank"><%= file.remote %></a></td>
                             <% } %>
                         </tr>
                     <% }) %>
