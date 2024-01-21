@@ -436,6 +436,44 @@ class TwitchAuthentication {
         });
     }
 
+    /**
+     * Retrieves the moderated channels for a user
+     * @param {string} accessToken
+     * @param {string} userId
+     * @returns {Promise<any>}
+     */
+    getModeratedChannels(accessToken, userId, cursor = null) {
+        return new Promise(async (resolve, reject) => {
+            const result = await fetch(`https://api.twitch.tv/helix/moderation/channels?user_id=${userId}&first=100${cursor ? `&after=${encodeURIComponent(cursor)}` : ""}`, {
+                method: 'GET',
+                headers: {
+                    ["Client-ID"]: config.twitch.client_id,
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            });
+    
+            let json;
+            try {
+                json = await result.json();
+            } catch (err) {
+                throw new Error(err);
+            }
+    
+            if (result.status === 200) {
+                let result = json.data;
+                if (json?.pagination?.cursor) {
+                    result = [
+                        ...result,
+                        ...await this.getModeratedChannels(accessToken, userId, json.pagination.cursor),
+                    ];
+                }
+                resolve(result);
+            } else {
+                reject(result.statusText);
+            }
+        });
+    }
+
 }
 
 module.exports = TwitchAuthentication;

@@ -8,7 +8,7 @@ const listenClients = require("../../../twitch/");
 
 router.use(async (req, res, next) => {
     if (!req?.session?.identity) {
-        res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users"));
+        res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users user:read:moderated_channels"));
         return;
     }
 
@@ -16,7 +16,7 @@ router.use(async (req, res, next) => {
     const discordUsers = await req.session.identity.getDiscordUsers();
 
     if (twitchUsers.length === 0) {
-        res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users"));
+        res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users user:read:moderated_channels"));
         return;
     }
     if (discordUsers.length === 0) {
@@ -143,10 +143,11 @@ router.post("/", async (req, res) => {
             await req.session.identity.save();
         }
 
-        if (warnings === "") {
-            res.redirect("/auth/join");
+        const discordUsers = await req.session.identity.getDiscordUsers();
+        if (discordUsers.length === 0) {
+            res.redirect(utils.Authentication.Discord.getURL());
         } else {
-            res.redirect(`/auth/join?warnings=${encodeURIComponent(warnings)}`);
+            res.redirect("/auth/login");
         }
     } else {
         error("Expected parameter 'users' of type Object!");

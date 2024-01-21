@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Twitch Mod Squad - Verify</title>
+<%- include("../../partials/head") %>
+</head>
+<body class="narrow-page">
+    <main>
+        <h1><img src="/assets/images/logo.webp" alt="Twitch Mod Squad Logo"> TwitchModSquad <span>streamer update</span></h1>
+        <% if (locals?.error) { %>
+        <div class="alert alert-danger" onclick="$(this).remove()">
+            <strong>An error occurred!</strong>
+            <%= error %>
+        </div>
+        <% } %>
+        <p>
+            We've noticed a change in your moderated channels!
+        </p>
+        <p>
+            Click the checkbox next to each streamer to enable listening on that channel.
+        </p>
+        <form action="/auth/verify" method="post" class="verify">
+            <div class="streamers">
+                <% twitchUsers.forEach(user => { %>
+                    <label class="user-selector">
+                        <input type="hidden" name="users[]" value="<%= user._id %>">
+                        <input type="checkbox" name="listen-<%= user._id %>"<%- user.chat_listen ? ` checked="checked"` : "" %>>
+                        <%- include("../../partials/objects/twitchUser", {account: user, comma: comma}) %>
+                    </label>
+                <% }) %>
+                <h2>Added Channels</h2>
+                <% addedStreamers.forEach(user => { %>
+                    <label class="user-selector">
+                        <input type="hidden" name="users[]" value="<%= user._id %>">
+                        <input type="checkbox" name="listen-<%= user._id %>"<%- user.chat_listen ? ` checked="checked"` : "" %>>
+                        <%- include("../../partials/objects/twitchUser", {account: user, comma: comma}) %>
+                    </label>
+                <% }) %>
+                <% if (addedStreamers.length === 0) { %>
+                <small>No channels added!</small>
+                <% } %>
+                <h2>Existing Channels</h2>
+                <% existingStreamers.forEach(user => { %>
+                    <label class="user-selector">
+                        <input type="hidden" name="users[]" value="<%= user._id %>">
+                        <input type="checkbox" name="listen-<%= user._id %>"<%- user.chat_listen ? ` checked="checked"` : "" %>>
+                        <%- include("../../partials/objects/twitchUser", {account: user, comma: comma}) %>
+                    </label>
+                <% }) %>
+                <% if (existingStreamers.length === 0) { %>
+                <small>No channels!</small>
+                <% } %>
+                <h2>Removed Channels</h2>
+                <% removedStreamers.forEach(user => { %>
+                    <%- include("../../partials/objects/twitchUser", {account: user, comma: comma}) %>
+                <% }) %>
+                <% if (removedStreamers.length === 0) { %>
+                <small>No channels removed!</small>
+                <% } %>
+            </div>
+            <button class="button full next" type="submit">Next</button>
+        </form>
+    </main>
+    
+    <div class="notifications"></div>
+<%- include("../../partials/javascript") %>
+<script src="/assets/js/verify.js"> </script>
+</body>
+</html>

@@ -75,6 +75,7 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    updated_modded_channels: Date,
 });
 
 userSchema.pre("save", function(next) {
@@ -413,6 +414,35 @@ userSchema.methods.fetchMods = async function() {
     } else {
         throw "Json not returned in response";
     }
+}
+
+userSchema.methods.fetchModdedChannels = async function(accessToken) {
+    const channels = await global.utils.Authentication.Twitch.getModeratedChannels(accessToken, this._id);
+    await TwitchRole.updateMany({
+        moderator: this,
+        time_end: null,
+    }, {
+        time_end: Date.now(),
+    })
+    for (let i = 0; i < channels.length; i++) {
+        const channel = channels[i];
+        try {
+            const streamer = await global.utils.Twitch.getUserById(channel.broadcaster_id, false, true);
+            await TwitchRole.findOneAndUpdate({
+                streamer, moderator: this,
+            }, {
+                time_end: null,
+                source: "helix",
+            }, {
+                upsert: true,
+                new: true,
+            });
+        } catch(err) {
+            console.error(err);
+        }
+    }
+    return await TwitchRole.find({moderator: this, time_end: null})
+        .populate(["streamer","moderator"]);
 }
 
 let migrating = false;

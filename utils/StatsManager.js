@@ -203,7 +203,9 @@ class StatsManager {
      * Saves the current hourly activity to the database
      */
     async saveHourlyActivity() {
-        if (this.currentHourlyActivity) await this.currentHourlyActivity.save();
+        if (this.currentHourlyActivity) {
+            await global.utils.Schemas.HourlyStat.findByIdAndUpdate(this.currentHourlyActivity._id, this.currentHourlyActivity);
+        }
     }
 
     /**
