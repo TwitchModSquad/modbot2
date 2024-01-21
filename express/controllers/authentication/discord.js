@@ -58,7 +58,7 @@ router.get("/", async (req, res) => {
             if (twitchUsers.length === 0) {
                 res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users user:read:moderated_channels"));
             } else {
-                res.redirect("/auth/login");
+                res.redirect("/auth/join");
             }
         }, err => {
             console.error(err);
