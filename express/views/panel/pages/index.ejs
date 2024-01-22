@@ -26,6 +26,47 @@
                         <%- include("../partials/objects/discordUser", {account: user, link: true}) %>
                     <% }) %>
                 </section>
+                <% if (discordUsers.length > 0) { %>
+                <section>
+                    <h2>TMS Guilds</h2>
+                    <div class="community">
+                        <img src="/assets/images/logos/logo-green.png" alt="Twitch Mod Squad Logo">
+                        <div class="info">
+                            <h3>
+                                Twitch Mod Squad
+                            </h3>
+                            Main Mod Squad community for streamers which have over 5,000 followers or Twitch partnership and their moderators!
+                        </div>
+                        <div>
+                            <% if (!joinedGuilds.inTMS) { %><button class="join tms" type="button">Join!</button><% } else { %><button class="join" type="button" disabled="disabled">Joined</button><% } %>
+                        </div>
+                    </div>
+                    <div class="community">
+                        <img src="/assets/images/logos/logo-blue.png" alt="The Little Mod Squad Logo">
+                        <div class="info">
+                            <h3>
+                                The Little Mod Squad
+                            </h3>
+                            Sister community to The Mod Squad providing all streamers and their moderators a place to call home!
+                        </div>
+                        <div>
+                            <% if (!joinedGuilds.inTLMS) { %><button class="join tlms" type="button">Join!</button><% } else { %><button class="join" type="button" disabled="disabled">Joined</button><% } %>
+                        </div>
+                    </div>
+                    <div class="community">
+                        <img src="/assets/images/logos/logo.png" alt="Community Lobbies Logo">
+                        <div class="info">
+                            <h3>
+                                Community Lobbies
+                            </h3>
+                            Join or host lobbies within The Mod Squad and participating communities!
+                        </div>
+                        <div>
+                            <% if (!joinedGuilds.inCL) { %><button class="join cl" type="button">Join!</button><% } else { %><button class="join" type="button" disabled="disabled">Joined</button><% } %>
+                        </div>
+                    </div>
+                </section>
+                <% } %>
             </div>
             <div class="col-4">
                 <section>
@@ -61,5 +102,6 @@
     
     <div class="notifications"></div>
 <%- include("../partials/javascript") %>
+<script src="/assets/js/join.js"> </script>
 </body>
 </html>

@@ -28,10 +28,17 @@ router.get("/", async (req, res) => {
     const cachedTwitchUsers = utils.comma(Object.keys(utils.Twitch.userCache.objectStore).length);
     const cachedDiscordUsers = utils.comma(Object.keys(utils.Discord.userCache.objectStore).length);
 
+    let joinedGuilds = {};
+
+    if (discordUsers.length > 0) {
+        joinedGuilds = await discordUsers[0].getJoinedGuilds();
+    }
+
     res.render("panel/pages/index", {
-        twitchUsers: twitchUsers,
-        discordUsers: discordUsers,
-        streamers: streamers,
+        twitchUsers,
+        discordUsers,
+        joinedGuilds,
+        streamers,
         comma: utils.comma,
         stats: [
             ["Uptime", utils.formatElapsed(Math.floor((Date.now() - global.startTime) / 1000))],
