@@ -97,8 +97,7 @@ const command = {
             
             const twitchQuery = await utils.Schemas.TwitchUser.find({
                     login: {
-                        $regex: new RegExp("^" + query),
-                        $options: "i",
+                        $regex: new RegExp("^" + query.toLowerCase()),
                     }
                 })
                 .sort({follower_count: -1})
@@ -124,8 +123,7 @@ const command = {
             
             const discordQuery = await utils.Schemas.DiscordUser.find({
                     globalName: {
-                        $regex: new RegExp("^" + query),
-                        $options: "i",
+                        $regex: new RegExp("^" + query.toLowerCase()),
                     }
                 })
                 .limit(10);
