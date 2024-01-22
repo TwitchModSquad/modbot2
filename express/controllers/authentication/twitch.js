@@ -109,7 +109,12 @@ router.get("/", async (req, res) => {
             if (discordUsers.length === 0) {
                 res.redirect(utils.Authentication.Discord.getURL());
             } else {
-                res.redirect("/auth/login");
+                const joinedGuilds = await discordUsers[0].getJoinedGuilds();
+                if (joinedGuilds.inAny) {
+                    res.redirect("/auth/login");
+                } else {
+                    res.redirect("/auth/join");
+                }
             }
         }, err => {
             console.error(err);
