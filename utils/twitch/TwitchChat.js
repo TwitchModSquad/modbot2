@@ -6,13 +6,11 @@ const chatSchema = new mongoose.Schema({
         type: String,
         ref: "TwitchUser",
         required: true,
-        index: true,
     },
     chatter: {
         type: String,
         ref: "TwitchUser",
         required: true,
-        index: true,
     },
     color: String,
     badges: String,
@@ -27,16 +25,13 @@ const chatSchema = new mongoose.Schema({
     time_sent: {
         type: Date,
         default: Date.now,
-        index: true,
     },
     percent: {
         caps: {
             type: Number,
-            index: true,
         },
         emotes: {
             type: Number,
-            index: true,
         },
     }
 });
