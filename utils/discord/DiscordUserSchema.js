@@ -110,9 +110,22 @@ userSchema.methods.message = async function(ephemeral = true) {
 }
 
 userSchema.methods.getJoinedGuilds = async function() {
-    const inTMS = Boolean(await global.utils.Discord.guilds.tms.members.fetch(this._id));
-    const inTLMS = Boolean(await global.utils.Discord.guilds.tlms.members.fetch(this._id));
-    const inCL = Boolean(await global.utils.Discord.guilds.cl.members.fetch(this._id));
+    let inTMS = false;
+    let inTLMS = false;
+    let inCL = false;
+
+    try {
+        await global.utils.Discord.guilds.tms.members.fetch(this._id)
+        inTMS = true;
+    } catch(err) {}
+    try {
+        await global.utils.Discord.guilds.tlms.members.fetch(this._id)
+        inTLMS = true;
+    } catch(err) {}
+    try {
+        await global.utils.Discord.guilds.cl.members.fetch(this._id)
+        inCL = true;
+    } catch(err) {}
 
     return {
         inTMS, inTLMS, inCL,
