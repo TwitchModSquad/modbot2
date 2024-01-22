@@ -52,6 +52,7 @@ const streamStatusSchema = new mongoose.Schema({
         type: String,
         ref: "TwitchLivestream",
         required: true,
+        index: true,
     },
     game: {
         type: String,
@@ -60,14 +61,17 @@ const streamStatusSchema = new mongoose.Schema({
     tags: [{
         type: String,
         ref: "TwitchTag",
-        required: true,
     }],
     title: String,
-    viewers: Number,
+    viewers: {
+        type: Number,
+        index: true,
+    },
     timestamp: {
         type: Date,
         default: Date.now,
-    }
+        index: true,
+    },
 });
 
 const TwitchStreamStatus = mongoose.model("TwitchStreamStatus", streamStatusSchema);
