@@ -10,6 +10,15 @@ const TwitchUser = require("../utils/twitch/TwitchUser");
 
 const twitchListeners = grabFiles('./twitch/listeners');
 
+const io = require("@pm2/io");
+
+const joinedChannels = io.metric({
+    id: "app/realtime/joinedChannels",
+    name: "Joined Channels",
+});
+
+joinedChannels.set("Joining...");
+
 class ListenClient {
 
     /**
@@ -166,7 +175,7 @@ class ListenClient {
             let lastJoinTime = Date.now();
             this.client.on("join", (channel, username, self) => {
                 if (self && channel.replace("#","").toLowerCase() === config.twitch.username) {
-                    console.log("Bot has joined its own channel!");
+                    joinedChannels.set("Bot");
                 }
                 if (self && lastJoinTime !== null) {
                     lastJoinTime = Date.now();
@@ -174,7 +183,7 @@ class ListenClient {
             });
             const interval = setInterval(() => {
                 if (Date.now() - lastJoinTime > 20000) {
-                    console.log("Bot has joined all channels!");
+                    joinedChannels.set("All");
                     clearInterval(interval);
                     lastJoinTime = null;
                 }
