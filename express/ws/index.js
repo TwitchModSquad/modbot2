@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const io = require("@pm2/io");
 
 const utils = require("../../utils/");
 
@@ -25,6 +26,15 @@ router.use(async (req, res, next) => {
 });
 
 let websockets = [];
+
+const websocketsMetric = io.metric({
+    id: "app/realtime/websockets",
+    name: "Active Websockets",
+})
+
+setInterval(() => {
+    websocketsMetric.set(websockets.length);
+}, 1000);
 
 router.ws("/ban", (ws, req) => {
     ws.id = utils.stringGenerator(32);
