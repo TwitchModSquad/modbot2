@@ -10,6 +10,20 @@ const authentication = require("./authentication/");
 const panel = require("./panel/");
 const public = require("./public/");
 
+const io = require("@pm2/io");
+
+const requests = io.counter({
+    id: "app/realtime/requests/all",
+    name: "All Requests",
+})
+
+router.use((r,r_,next) => {
+    requests.inc();
+    next();
+});
+
+router.use("/api", api);
+
 router.use("/auth", authentication);
 
 router.use("/", public);
@@ -34,8 +48,6 @@ router.use(async (req, res, next) => {
         redirect();
     }
 });
-
-router.use("/api", api);
 
 router.use("/panel", panel);
 
