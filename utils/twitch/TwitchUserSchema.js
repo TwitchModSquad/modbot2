@@ -195,8 +195,8 @@ userSchema.methods.message = async function(ephemeral = true) {
         communities.forEach((com, i) => {
             if (i > 24) return;
             chatHistorySelectMenu.addOptions({
-                label: com.streamer.display_name,
-                value: `${com.streamer._id}:${com.chatter}`,
+                label: `${com.streamer.display_name} (${com.messages} message${com.messages === 1 ? "" : "s"})`,
+                value: `${com.streamer._id}:${com.chatter._id}`,
             });
         });
 
@@ -313,30 +313,9 @@ userSchema.methods.getFlags = async function() {
 }
 
 userSchema.methods.getActiveCommunities = async function() {
-    const channelHistoryDistinct = await utils.Schemas.TwitchChat
-            .distinct("streamer", {chatter: this._id});
-
-    let channelHistory = [];
-    for (let i = 0; i < channelHistoryDistinct.length; i++) {
-        const channelId = channelHistoryDistinct[i];
-
-        let lastMessage = await utils.Schemas.TwitchChat
-                .find({streamer: channelId, chatter: this._id})
-                .sort({time_sent: -1})
-                .limit(1)
-                .populate("streamer");
-        
-        if (lastMessage && lastMessage?.length > 0) {
-            lastMessage = lastMessage[0];
-            lastMessage.bannedIn = await utils.Schemas.TwitchBan
-                    .exists({streamer: channelId, chatter: this._id, time_end: null});
-            lastMessage.timedOutIn = await utils.Schemas.TwitchTimeout
-                    .exists({streamer: channelId, chatter: this._id, time_end: {$gt: Date.now()}});
-
-            channelHistory.push(lastMessage);
-        }
-    }
-    channelHistory.sort((a, b) => b.time_sent - a.time_sent);
+    const channelHistory = await utils.Schemas.TwitchUserChat.find({chatter: this})
+        .populate(["streamer","chatter"])
+        .sort({last_message: -1});
     return channelHistory;
 }
 
@@ -346,24 +325,24 @@ userSchema.methods.generateCommunityTable = async function(allChannelHistory = n
     let memberChannelHistory = allChannelHistory.filter(x => x.streamer.chat_listen);
     let channelHistory = allChannelHistory.filter(x => !x.streamer.chat_listen);
 
-    let channelHistoryTable = [["Channel", "Last Active", ""]];
+    let channelHistoryTable = [["Channel", "Last Active"]];
 
     if (memberChannelHistory.length > 0)
-        channelHistoryTable.push(["", "Member Channels", ""]);
+        channelHistoryTable.push(["", "Member Channels"]);
 
     for (let i = 0; i < Math.min(memberChannelHistory.length, 15); i++) {
-        let lastMessage = memberChannelHistory[i];
-        channelHistoryTable.push([lastMessage.streamer.display_name, global.utils.parseDate(lastMessage.time_sent), (lastMessage.bannedIn ? "[❌banned]" : "") + (lastMessage.timedOutIn ? "[⏲️t/o]" : "")])
+        let history = memberChannelHistory[i];
+        channelHistoryTable.push([history.streamer.display_name, global.utils.parseDate(history.last_message)])
     }
 
     const otherChannelCount = Math.min(channelHistory.length, 15) - memberChannelHistory.length;
 
     if (otherChannelCount > 0)
-        channelHistoryTable.push(["", "Other Channels", ""]);
+        channelHistoryTable.push(["", "Other Channels"]);
 
     for (let i = 0; i < otherChannelCount; i++) {
-        let lastMessage = channelHistory[i];
-        channelHistoryTable.push([lastMessage.streamer.display_name, global.utils.parseDate(lastMessage.time_sent), (lastMessage.bannedIn ? "[❌banned]" : "") + (lastMessage.timedOutIn ? "[⏲️t/o]" : "")])
+        let history = channelHistory[i];
+        channelHistoryTable.push([history.streamer.display_name, global.utils.parseDate(history.last_message)])
     }
 
     return global.utils.stringTable(channelHistoryTable, 2);

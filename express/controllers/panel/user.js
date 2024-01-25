@@ -92,38 +92,11 @@ router.get("/:query", async (req, res) => {
                     .sort({time_sent: -1});
             }
 
-            const channelHistoryDistinct = await utils.Schemas.TwitchChat
-                    .distinct("streamer", {chatter: twitchUser._id});
-            
-            let memberChannelHistory = [];
-            let channelHistory = [];
-            for (let i = 0; i < channelHistoryDistinct.length; i++) {
-                const channelId = channelHistoryDistinct[i];
-
-                let lastMessage = await utils.Schemas.TwitchChat
-                        .find({streamer: channelId, chatter: twitchUser._id})
-                        .sort({time_sent: -1})
-                        .limit(1)
-                        .populate("streamer");
-                
-                if (lastMessage && lastMessage?.length > 0) {
-                    lastMessage = lastMessage[0];
-                    lastMessage.bannedIn = await utils.Schemas.TwitchBan
-                            .exists({streamer: channelId, chatter: twitchUser._id, time_end: null});
-                    lastMessage.timedOutIn = await utils.Schemas.TwitchTimeout
-                            .exists({streamer: channelId, chatter: twitchUser._id, time_end: {$gt: Date.now()}});
-
-                    if (lastMessage.streamer.chat_listen) {
-                        memberChannelHistory.push(lastMessage);
-                    } else {
-                        channelHistory.push(lastMessage);
-                    }
-                }
-            }
+            const allChannelHistory = await twitchUser.getActiveCommunities();
 
             data.channelHistory = {
-                member: memberChannelHistory,
-                other: channelHistory,
+                member: allChannelHistory.filter(x => x.streamer.chat_listen),
+                other: allChannelHistory.filter(x => !x.streamer.chat_listen),
             }
 
             const userSearchQuery = {};

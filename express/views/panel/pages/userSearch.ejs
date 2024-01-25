@@ -193,7 +193,7 @@
                                         <%= channel.streamer.display_name %>
                                     </td>
                                     <td>
-                                        <%= parseDate(channel.time_sent) %>
+                                        <%= parseDate(channel.last_message) %>
                                     </td>
                                     <td>
                                         <a href="#" class="history-popup" data-streamer="<%= channel.streamer._id %>" data-chatter="<%= user._id %>" data-before="all" data-after="all">View Logs</a>
@@ -212,7 +212,7 @@
                                         <%= channel.streamer.display_name %>
                                     </td>
                                     <td>
-                                        <%= parseDate(channel.time_sent) %>
+                                        <%= parseDate(channel.last_message) %>
                                     </td>
                                     <td>
                                         <a href="#" class="history-popup" data-streamer="<%= channel.streamer._id %>" data-chatter="<%= user._id %>" data-before="all" data-after="all">View Logs</a>
