@@ -4,15 +4,21 @@ const config = require('../config.json');
 let botRoot = config.discord.modbot;
 const rest = new REST().setToken(botRoot.token);
 
-const guildId = "934991691402866689";
+const guilds = [
+	config.discord.guilds.community_lobbies,
+	config.discord.guilds.little_modsquad,
+	config.discord.guilds.modsquad,
+];
 
 const io = require("@pm2/io");
 
 io.action("discord/delete-commands", cb => {
 	// for guild-based commands
-	rest.put(Routes.applicationGuildCommands(botRoot.id, guildId), { body: [] })
-		.then(() => console.log('Successfully deleted all guild commands.'))
-		.catch(console.error);
+	for (let i = 0; i < guilds.length; i++) {
+		rest.put(Routes.applicationGuildCommands(botRoot.id, guilds[i]), { body: [] })
+			.then(() => console.log(`Successfully deleted guild commands for ${guilds[i]}.`))
+			.catch(console.error);
+	}
 	
 	// for global commands
 	rest.put(Routes.applicationCommands(botRoot.id), { body: [] })
