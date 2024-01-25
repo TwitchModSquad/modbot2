@@ -11,16 +11,19 @@ router.use(async (req, res, next) => {
         res.json({ok: false, error: "Unauthenticated"});
     }
 
-    if (cookies?.session) {
-        const session = await utils.Schemas.Session.findById(cookies.session)
-                .populate("identity");
-        if (session && session.identity.authenticated) {
+    if (!cookies?.session) {
+        return fail();
+    }
+
+    try {
+        const session = await utils.SessionStore.getSessionById(cookies.session);
+        if (session.identity.authenticated) {
             req.session = session;
             next();
         } else {
             fail();
         }
-    } else {
+    } catch(err) {
         fail();
     }
 });

@@ -35,16 +35,18 @@ router.use(async (req, res, next) => {
         res.redirect("/auth/login");
     }
 
-    if (cookies?.session) {
-        const session = await utils.Schemas.Session.findById(cookies.session)
-                .populate("identity");
-        if (session?.identity?.authenticated) {
-            req.session = session;
-            next();
-        } else {
-            redirect();
+    if (!cookies?.session) {
+        return redirect();
+    }
+
+    try {
+        const session = await utils.SessionStore.getSessionById(cookies.session);
+        if (!session.identity.authenticated) {
+            return redirect();
         }
-    } else {
+        req.session = session;
+        next();
+    } catch(err)  {
         redirect();
     }
 });

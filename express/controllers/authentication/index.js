@@ -21,16 +21,15 @@ router.use(async (req, res, next) => {
         next();
     }
 
-    if (cookies?.session) {
-        const session = await utils.Schemas.Session.findById(cookies.session)
-                .populate("identity");
-        if (session) {
-            req.session = session;
-            next();
-        } else {
-            createNewSession();
-        }
-    } else {
+    if (!cookies?.session) {
+        return createNewSession();
+    }
+
+    try {
+        const session = await utils.SessionStore.getSessionById(cookies.session);
+        req.session = session;
+        next();
+    } catch(err) {
         createNewSession();
     }
 });

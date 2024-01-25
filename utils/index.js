@@ -49,6 +49,8 @@ const Identity = require("./Identity");
 const Session = require("./Session");
 const { StringSelectMenuBuilder } = require("discord.js");
 
+const SessionStore = require("./SessionStore");
+
 class Utils {
 
     /**
@@ -86,6 +88,12 @@ class Utils {
      * @type {StatsManager}
      */
     StatsManager = new StatsManager();
+
+    /**
+     * Session store
+     * @type {SessionStore}
+     */
+    SessionStore = new SessionStore();
 
     Schemas = {
         Flag: Flag,
