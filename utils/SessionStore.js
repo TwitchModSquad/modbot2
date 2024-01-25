@@ -14,7 +14,6 @@ class SessionStore {
      */
     getSessionById(id, overrideCache = false) {
         return this.cache.get(id, async (resolve, reject) => {
-            console.log("getting session");
             const session = await Session.findById(id)
                 .populate("identity");
             if (session) {
