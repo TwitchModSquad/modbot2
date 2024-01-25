@@ -37,6 +37,7 @@ const PointLog = require("./points/PointLog");
 const Stream = require("./twitch/TwitchStream");
 const TwitchBan = require("./twitch/TwitchBan");
 const TwitchUser = require("./twitch/TwitchUser");
+const TwitchUserChat = require("./twitch/TwitchUserChat");
 const TwitchChat = require("./twitch/TwitchChat");
 const TwitchTimeout = require("./twitch/TwitchTimeout");
 const TwitchRole = require("./twitch/TwitchRole");
@@ -107,6 +108,7 @@ class Utils {
         PointLog: PointLog,
         TwitchBan: TwitchBan,
         TwitchChat: TwitchChat,
+        TwitchUserChat: TwitchUserChat,
         TwitchGame: Stream.TwitchGame,
         TwitchLivestream: Stream.TwitchLivestream,
         TwitchStreamStatus: Stream.TwitchStreamStatus,
