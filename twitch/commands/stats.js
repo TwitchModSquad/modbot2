@@ -80,33 +80,16 @@ const updateStats = async () => {
     let allowedUsers = await utils.Schemas.TwitchUser.find({chat_listen: true})
             .select("_id");
     allowedUsers = allowedUsers.map(x => x._id);
-    const chats = await utils.Schemas.TwitchChat.aggregate([
-        {
-            $match: {
-                streamer: {
-                    $in: allowedUsers,
-                },
-            },
-        },
+    const chats = await utils.Schemas.TwitchUserChat.aggregate([
         {
             $group: {
-                _id: {
-                    chatter: "$chatter",
-                    streamer: "$streamer"
-                },
-                total: { $sum: "$total" },
-                sum: { $sum: 1 },
-            }
-        },
-        {
-            $group: {
-                _id: "$_id.chatter",
+                _id: "$chatter",
                 streamers: {
-                    $push:{
-                        streamer: "$_id.streamer",
-                        total: "$sum",
-                    }
-                }
+                    $push: {
+                        streamer: "$streamer",
+                        total: "$messages",
+                    },
+                },
             },
         },
     ]);
