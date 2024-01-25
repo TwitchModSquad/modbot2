@@ -135,7 +135,7 @@ banSchema.methods.message = async function(showButtons = false, getData = false,
             const lastMessage = memberChannelHistory[i];
             selectMenu.addOptions({
                 label: lastMessage.streamer.display_name,
-                value: `${lastMessage.streamer._id}:${lastMessage.chatter}`,
+                value: `${lastMessage.streamer._id}:${lastMessage.chatter._id}`,
             })
         }
 
@@ -143,7 +143,7 @@ banSchema.methods.message = async function(showButtons = false, getData = false,
             const lastMessage = channelHistory[i];
             selectMenu.addOptions({
                 label: lastMessage.streamer.display_name,
-                value: `${lastMessage.streamer._id}:${lastMessage.chatter}`,
+                value: `${lastMessage.streamer._id}:${lastMessage.chatter._id}`,
             })
         }
 
