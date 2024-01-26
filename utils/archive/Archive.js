@@ -159,6 +159,7 @@ archiveSchema.methods.message = async function() {
 
     for (let i = 0; i < users.length; i++) {
         if (users[i].twitchUser) {
+            if (ids.includes(`cb-t-${user._id}`)) continue;
             const user = users[i].twitchUser;
             buttons.push(
                 new ButtonBuilder()
@@ -168,6 +169,7 @@ archiveSchema.methods.message = async function() {
             );
             ids.push(`cb-t-${user._id}`);
         } else if (users[i].discordUser) {
+            if (ids.includes(`cb-d-${user._id}`)) continue;
             const user = users[i].discordUser;
             buttons.push(
                 new ButtonBuilder()
@@ -175,6 +177,7 @@ archiveSchema.methods.message = async function() {
                     .setLabel(`Crossban ${user.displayName}`)
                     .setStyle(ButtonStyle.Danger)
             );
+            ids.push(`cb-d-${user._id}`);
         }
         if (buttons.length >= 5) {
             components.push(
