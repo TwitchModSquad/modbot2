@@ -159,8 +159,8 @@ archiveSchema.methods.message = async function() {
 
     for (let i = 0; i < users.length; i++) {
         if (users[i].twitchUser) {
-            if (ids.includes(`cb-t-${user._id}`)) continue;
             const user = users[i].twitchUser;
+            if (ids.includes(`cb-t-${user._id}`)) continue;
             buttons.push(
                 new ButtonBuilder()
                     .setCustomId(`cb-t-${user._id}`)
@@ -169,8 +169,8 @@ archiveSchema.methods.message = async function() {
             );
             ids.push(`cb-t-${user._id}`);
         } else if (users[i].discordUser) {
-            if (ids.includes(`cb-d-${user._id}`)) continue;
             const user = users[i].discordUser;
+            if (ids.includes(`cb-d-${user._id}`)) continue;
             buttons.push(
                 new ButtonBuilder()
                     .setCustomId(`cb-d-${user._id}`)
