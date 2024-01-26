@@ -68,6 +68,7 @@ const userSchema = new mongoose.Schema({
     blacklisted: Boolean,
     featured: Boolean,
     migrated: Boolean,
+    safe: Boolean,
     created_at: {
         type: Date,
     },

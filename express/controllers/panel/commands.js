@@ -8,6 +8,7 @@ const config = require("../../../config.json");
 const client = require("../../../discord/mbm/");
 
 const discordCommands = [
+    {label: "Ban Scan", name: "banscan"},
     {label: "Chatdump", name: "chatdump"},
     {label: "User", name: "user"},
 ];

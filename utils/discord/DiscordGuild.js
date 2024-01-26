@@ -17,12 +17,13 @@ const schema = new mongoose.Schema({
     icon: String,
     banner: String,
     commands: {
-        chatdump: Boolean,
-        user: Boolean,
         archive: Boolean,
-        points: Boolean,
+        banscan: Boolean,
+        chatdump: Boolean,
         giveaway: Boolean,
         mention: Boolean,
+        points: Boolean,
+        user: Boolean,
     }
 });
 
