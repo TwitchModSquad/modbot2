@@ -148,6 +148,59 @@ archiveSchema.methods.embed = async function() {
     return embed;
 }
 
+archiveSchema.methods.message = async function() {
+    const embed = await this.embed();
+    const users = await this.getUsers();
+
+    const components = [];
+    let buttons = [];
+
+    let ids = [];
+
+    for (let i = 0; i < users.length; i++) {
+        if (users[i].twitchUser) {
+            const user = users[i].twitchUser;
+            buttons.push(
+                new ButtonBuilder()
+                    .setCustomId(`cb-t-${user._id}`)
+                    .setLabel(`Crossban ${user.display_name}`)
+                    .setStyle(ButtonStyle.Danger)
+            );
+            ids.push(`cb-t-${user._id}`);
+        } else if (users[i].discordUser) {
+            const user = users[i].discordUser;
+            buttons.push(
+                new ButtonBuilder()
+                    .setCustomId(`cb-d-${user._id}`)
+                    .setLabel(`Crossban ${user.displayName}`)
+                    .setStyle(ButtonStyle.Danger)
+            );
+        }
+        if (buttons.length >= 5) {
+            components.push(
+                new ActionRowBuilder()
+                    .setComponents(buttons)
+            );
+            buttons = [];
+        }
+    }
+
+    if (buttons.length > 0) {
+        components.push(
+            new ActionRowBuilder()
+                .setComponents(buttons)
+        )
+    }
+
+    const data = {embeds: [embed]};
+    
+    if (components.length > 0) {
+        data.components = components;
+    }
+
+    return data;
+}
+
 archiveSchema.methods.getUsers = async function() {
     return await global.utils.Schemas.ArchiveUser.find({entry: this._id})
             .populate("twitchUser")

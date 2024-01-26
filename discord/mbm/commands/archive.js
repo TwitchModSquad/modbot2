@@ -305,7 +305,7 @@ const command = {
                                 console.error(err);
                             }
                         }
-                        channel.send({embeds: [await entry.embed()]}).then(msg => {
+                        channel.send(await entry.message()).then(msg => {
                             utils.Schemas.ArchiveMessage.create({
                                 entry,
                                 message: msg.id,

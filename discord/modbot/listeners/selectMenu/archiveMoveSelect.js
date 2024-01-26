@@ -20,45 +20,9 @@ const listener = {
                 .populate("entry");
         if (archiveMessage) {
             const archive = archiveMessage.entry;
-            const users = await archive.getUsers();
             const channel = await global.client.modbot.channels.fetch(interaction.values[0]);
 
-            const components = [];
-            let buttons = [];
-
-            for (let i = 0; i < users.length; i++) {
-                if (users[i].twitchUser) {
-                    const user = users[i].twitchUser;
-                    buttons.push(
-                        new ButtonBuilder()
-                            .setCustomId(`cb-t-${user._id}`)
-                            .setLabel(`Crossban ${user.display_name}`)
-                            .setStyle(ButtonStyle.Danger)
-                    );
-                } else if (users[i].discordUser) {
-                    const user = users[i].discordUser;
-                    buttons.push(
-                        new ButtonBuilder()
-                            .setCustomId(`cb-d-${user._id}`)
-                            .setLabel(`Crossban ${user.displayName}`)
-                            .setStyle(ButtonStyle.Danger)
-                    );
-                }
-                if (buttons.length >= 5) {
-                    components.push(
-                        new ActionRowBuilder()
-                            .setComponents(buttons)
-                    );
-                    buttons = [];
-                }
-            }
-
-            components.push(
-                new ActionRowBuilder()
-                    .setComponents(buttons)
-            );
-
-            channel.send({components: buttons.length > 0 ? components : null, embeds: [await archive.embed()]}).then(message => {
+            channel.send(await archive.message()).then(message => {
                 utils.Schemas.ArchiveMessage.create({
                     entry: archive._id,
                     channel: channel.id,
