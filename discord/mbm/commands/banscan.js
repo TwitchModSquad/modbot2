@@ -17,12 +17,12 @@ const command = {
         results.forEach((result, i) => {
             const str = `${i+1}. [${result.chatter.display_name}](${config.express.domain.root}panel/user/${result.chatter._id}) banned in ${result.channels.map(x => x.display_name).join(", ")}`;
             if (resultString.length + str.length > 1020) {
-                resultString = "";
                 embed.addFields({
                     name: "Bans",
                     value: resultString,
                     inline: false,
                 });
+                resultString = "";
             }
             if (resultString !== "") resultString += "\n";
             resultString += str;
