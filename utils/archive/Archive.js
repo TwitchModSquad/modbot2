@@ -78,8 +78,11 @@ archiveSchema.methods.embed = async function() {
     const archiveFiles = await this.getFiles();
     const archiveUsers = await this.getUsers();
 
+    const url = `${config.express.domain.root}panel/archive/${String(this._id)}`;
+
     const embed = new EmbedBuilder()
         .setTitle("Archive Entry")
+        .setURL(url)
         .setDescription(`**Submitted by ${twitchUsers.length > 0 ? twitchUsers[0].display_name : ""}${discordUsers.length > 0 ? ` <@${discordUsers[0]._id}>` : ""}**`)
         .setColor(0x772ce8)
         .addFields([
@@ -90,7 +93,7 @@ archiveSchema.methods.embed = async function() {
             },
             {
                 name: "Description",
-                value: codeBlock(cleanCodeBlockContent(this.description)),
+                value: codeBlock(cleanCodeBlockContent(this.description.length > 900 ? this.description.substr(0,900) + `...` : this.description)) + (this.description.length > 900 ? `[View the full description](${url})` : ""),
                 inline: false,
             },
         ])
