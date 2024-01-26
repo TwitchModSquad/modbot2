@@ -261,7 +261,7 @@ class TwitchAuthentication {
                     for (let i = 0; i < json.data.length; i++) {
                         result = [
                             ...result,
-                            await global.api.Twitch.getUserById(json.data[i].user_id, false, true)
+                            await global.utils.Twitch.getUserById(json.data[i].user_id, false, true)
                         ]
                     }
 
