@@ -2,7 +2,7 @@ const { ChatInputCommandInteraction, SlashCommandBuilder, EmbedBuilder, codeBloc
 
 const config = require("../../../config.json");
 const utils = require("../../../utils");
-const { default: mongoose } = require("mongoose");
+const mongoose = require("mongoose");
 
 const command = {
     data: new SlashCommandBuilder()
@@ -40,6 +40,23 @@ const command = {
                     .setName("owner")
                     .setDescription("The new owner")
                     .setRequired(true)
+                )
+            )
+            .addSubcommand(x => x
+                .setName("channel")
+                .setDescription("Sets the channel of an entry. Admin only")
+                .addStringOption(z => z
+                    .setName("id")
+                    .setDescription("The archive entry ID")
+                    .setMinLength(24)
+                    .setMaxLength(24)
+                    .setRequired(true)
+                )
+                .addStringOption(y => y
+                    .setName("channel")
+                    .setDescription("The channel to move it to")
+                    .setRequired(true)
+                    .setChoices(...config.discord.modbot.channels.archive_sort_targets.map(x => {return {name: x.label, value: x.value}}))
                 )
             )
         )
@@ -274,9 +291,35 @@ const command = {
                         entry.owner = await user.createIdentity();
                         await entry.save();
                         interaction.success(`Archive entry owner successfully changed to <@${user.id}>!`);
+                    } else if (subcommand === "channel") {
+                        const channelId = interaction.options.getString("channel", true);
+                        const channel = await global.client.modbot.channels.fetch(channelId);
+                        const messages = await entry.getMessages();
+                        for (let i = 0; i < messages.length; i++) {
+                            try {
+                                const channel = await global.client.modbot.channels.fetch(messages[i].channel);
+                                const message = await channel.messages.fetch(messages[i].message);
+                                await message.delete();
+                                await messages[i].remove();
+                            } catch(err) {
+                                console.error(err);
+                            }
+                        }
+                        channel.send({embeds: [await entry.embed()]}).then(msg => {
+                            utils.Schemas.ArchiveMessage.create({
+                                entry,
+                                message: msg.id,
+                                channel: msg.channelId,
+                            }).catch(console.error);
+                            interaction.success(`Successfully moved! View the message: ${msg.url}`);
+                        }, err => {
+                            console.error(err)
+                            interaction.error("Failed to send message!");
+                        });
                     }
                 } catch(err) {
-                    interaction.error("Archive entry not found!");
+                    console.error(err);
+                    interaction.error("An unknown error occurred!");
                 }
             }
         }
