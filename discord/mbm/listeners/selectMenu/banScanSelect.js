@@ -30,7 +30,7 @@ const listener = {
             for (let i = 0; i < interaction.values.length; i++) {
                 try {
                     const user = await utils.Twitch.getUserById(interaction.values[i]);
-                    utils.safe = true;
+                    user.safe = true;
                     await user.save();
                 } catch(err) {
                     console.error(err);
