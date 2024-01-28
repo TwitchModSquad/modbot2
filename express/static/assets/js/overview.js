@@ -2,6 +2,22 @@ google.charts.load('current', {'packages':['corechart', 'bar', 'line']});
 
 google.charts.setOnLoadCallback(drawChart);
 
+function getCookie(cname) {
+    const name = cname + "=";
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const ca = decodedCookie.split(';');
+    for(let i = 0; i <ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
 let ws;
 
 let mostRecentFollow = null;
@@ -73,13 +89,14 @@ function drawChart() {
 
     ws.onopen = function() {
         setTimeout(() => {
-            ws.sendJson({type: "ready"})
+            ws.sendJson({type: "authenticate", session: getCookie("session")});
+            ws.sendJson({type: "ready"});
 
             if (window.obsstudio) {
-                ws.send(JSON.stringify({
+                ws.sendJson({
                     type: "addScope",
                     scope: ["scene","chat","follow","subscription"],
-                }));
+                });
             }
         }, 50);
     }

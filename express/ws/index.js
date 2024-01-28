@@ -4,29 +4,15 @@ const io = require("@pm2/io");
 
 const utils = require("../../utils/");
 
-router.use(async (req, res, next) => {
-    const {cookies} = req;
-
-    const fail = () => {
-        res.json({ok: false, error: "Unauthenticated"});
-    }
-
-    if (!cookies?.session) {
-        return fail();
-    }
-
+const authenticate = async sessionId => {
     try {
-        const session = await utils.SessionStore.getSessionById(cookies.session);
+        const session = await utils.SessionStore.getSessionById(sessionId);
         if (session.identity.authenticated) {
-            req.session = session;
-            next();
-        } else {
-            fail();
+            return session;
         }
-    } catch(err) {
-        fail();
-    }
-});
+    } catch(err) {}
+    return null;
+};
 
 let websockets = [];
 
@@ -46,7 +32,47 @@ router.ws("/ban", (ws, req) => {
     ws.type = "ban";
     ws.scope = "all";
 
-    websockets.push(ws);
+    const expireTimeout = setTimeout(() => {
+        ws.close();
+    }, 10000);
+
+    ws.on("message", async msg => {
+        let json;
+        try {
+            json = JSON.parse(msg);
+        } catch(err) {
+            return;
+        }
+
+        if (!json?.type) return;
+
+        if (json.type === "authenticate" && json?.session) {
+            const session = await authenticate(json.session);
+            if (session) {
+                clearTimeout(expireTimeout);
+                websockets.push(ws);
+                ws.session = session;
+                ws.send(JSON.stringify({
+                    type: "authenticate",
+                    ok: true,
+                    identity: {
+                        id: session.identity._id,
+                        authenticated: session.identity.authenticated,
+                        twitchUsers: (await session.identity.getTwitchUsers()).map(x => x.public()),
+                        discordUsers: (await session.identity.getDiscordUsers()).map(x => x.public()),
+                    },
+                }));
+            } else {
+                ws.send(JSON.stringify({
+                    type: "authenticate",
+                    ok: false,
+                    identity: null,
+                }));
+            }
+        }
+        
+        if (!ws.session) return;
+    });
 
     ws.on("close", () => {
         websockets = websockets.filter(x => x.id !== ws.id);
@@ -60,7 +86,47 @@ router.ws("/chat", (ws, req) => {
     ws.type = "chat";
     ws.scope = "all";
 
-    websockets.push(ws);
+    const expireTimeout = setTimeout(() => {
+        ws.close();
+    }, 10000);
+
+    ws.on("message", async msg => {
+        let json;
+        try {
+            json = JSON.parse(msg);
+        } catch(err) {
+            return;
+        }
+
+        if (!json?.type) return;
+
+        if (json.type === "authenticate" && json?.session) {
+            const session = await authenticate(json.session);
+            if (session) {
+                clearTimeout(expireTimeout);
+                websockets.push(ws);
+                ws.session = session;
+                ws.send(JSON.stringify({
+                    type: "authenticate",
+                    ok: true,
+                    identity: {
+                        id: session.identity._id,
+                        authenticated: session.identity.authenticated,
+                        twitchUsers: (await session.identity.getTwitchUsers()).map(x => x.public()),
+                        discordUsers: (await session.identity.getDiscordUsers()).map(x => x.public()),
+                    },
+                }));
+            } else {
+                ws.send(JSON.stringify({
+                    type: "authenticate",
+                    ok: false,
+                    identity: null,
+                }));
+            }
+        }
+
+        if (!ws.session) return;
+    });
 
     ws.on("close", () => {
         websockets = websockets.filter(x => x.id !== ws.id);
@@ -97,9 +163,11 @@ router.ws("/overview", (ws, req) => {
     ws.type = "overview";
     ws.scope = [];
 
-    websockets.push(ws);
+    const expireTimeout = setTimeout(() => {
+        ws.close();
+    }, 10000);
 
-    ws.on("message", msg => {
+    ws.on("message", async msg => {
         let json;
         try {
             json = JSON.parse(msg);
@@ -108,6 +176,33 @@ router.ws("/overview", (ws, req) => {
         }
 
         if (!json?.type) return;
+
+        if (json.type === "authenticate" && json?.session) {
+            const session = await authenticate(json.session);
+            if (session) {
+                clearTimeout(expireTimeout);
+                websockets.push(ws);
+                ws.session = session;
+                ws.send(JSON.stringify({
+                    type: "authenticate",
+                    ok: true,
+                    identity: {
+                        id: session.identity._id,
+                        authenticated: session.identity.authenticated,
+                        twitchUsers: (await session.identity.getTwitchUsers()).map(x => x.public()),
+                        discordUsers: (await session.identity.getDiscordUsers()).map(x => x.public()),
+                    },
+                }));
+            } else {
+                ws.send(JSON.stringify({
+                    type: "authenticate",
+                    ok: false,
+                    identity: null,
+                }));
+            }
+        }
+
+        if (!ws.session) return;
 
         if (json.type === "ready") {
             sendFullUpdate(ws);
@@ -135,6 +230,7 @@ router.ws("/overview", (ws, req) => {
 });
 
 const broadcast = (type, scope, msg) => {
+    if (typeof(msg) === "object") msg = JSON.stringify(msg);
     const broadcastWs = websockets.filter(x => x.type === type && (x.scope === "all" || x.scope === scope));
     broadcastWs.forEach(ws => {
         try {
