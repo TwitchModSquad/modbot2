@@ -90,7 +90,6 @@ function drawChart() {
     ws.onopen = function() {
         setTimeout(() => {
             ws.sendJson({type: "authenticate", session: getCookie("session")});
-            ws.sendJson({type: "ready"});
 
             if (window.obsstudio) {
                 ws.sendJson({
@@ -110,6 +109,14 @@ function drawChart() {
         }
 
         if (!json) return;
+
+        if (json?.type === "authenticate") {
+            if (json.ok) {
+                ws.sendJson({type: "ready"});
+            } else {
+                alert("Failed to authenticate WS");
+            }
+        }
 
         if (json?.mostActiveChannels) {
             const data = google.visualization.arrayToDataTable(
