@@ -19,7 +19,7 @@ const listener = {
     listener: async (client, streamer, chatter, tags, message, self) => {
         if (streamer._id !== config.twitch.id) return;
 
-        global.overviewBroadcast("message", {
+        global.broadcast("chat", streamer._id, {
             id: tags.id,
             chatter: chatter.public(),
             badges: tags["badges-raw"],
