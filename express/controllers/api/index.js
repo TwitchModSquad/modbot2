@@ -27,10 +27,9 @@ router.use(async (req, res, next) => {
 
     res.header("Vary","Origin")
     if (req.headers.origin && req.headers.origin.replace("https://","").replace("www.","") === "twitch.tv") {
-        console.log("setting twitch origin header");
-        res.header("Access-Control-Allow-Origin","twitch.tv")
+        res.header("Access-Control-Allow-Origin","https://www.twitch.tv")
     } else {
-        res.header("Access-Control-Allow-Origin","tms.to")
+        res.header("Access-Control-Allow-Origin","https://tms.to")
     }
 
     if (!session) {
