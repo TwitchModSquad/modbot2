@@ -34,6 +34,10 @@ router.use(async (req, res, next) => {
         res.header("Access-Control-Allow-Origin","https://tms.to")
     }
 
+    if (req.method === "OPTIONS") {
+        return res.send("");
+    }
+
     if (!session) {
         res.status(401);
         return res.json({ok: false, error: "Unauthorized"})
