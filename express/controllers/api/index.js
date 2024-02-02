@@ -30,9 +30,15 @@ router.use(async (req, res, next) => {
         return res.json({ok: false, error: "Unauthorized"})
     }
 
+    res.header("Vary","Origin")
+    if (req.headers.origin && req.headers.origin.replace("https://","").replace("www.","") === "twitch.tv") {
+        res.header("Access-Control-Allow-Origin","https://www.twitch.tv")
+    } else {
+        res.header("Access-Control-Allow-Origin","tms.to")
+    }
+
     try {
         req.session = await utils.SessionStore.getSessionById(session);
-        res.header("Access-Control-Allow-Origin: tms.to")
         next();
     } catch(err) {
         res.status(401);
