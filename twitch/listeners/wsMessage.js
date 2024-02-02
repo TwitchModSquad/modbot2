@@ -1,10 +1,7 @@
 const tmi = require("tmi.js");
 
-const utils = require("../../utils/");
-const config = require("../../config.json");
-
 const listener = {
-    name: "overviewMessage",
+    name: "wsMessage",
     eventName: "message",
     /**
      * 
@@ -17,8 +14,6 @@ const listener = {
      * @returns 
      */
     listener: async (client, streamer, chatter, tags, message, self) => {
-        if (streamer._id !== config.twitch.id) return;
-
         global.broadcast("chat", streamer._id, {
             id: tags.id,
             chatter: chatter.public(),

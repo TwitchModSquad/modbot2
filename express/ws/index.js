@@ -70,7 +70,7 @@ router.ws("/ban", (ws, req) => {
                 }));
             }
         }
-        
+
         if (!ws.session) return;
     });
 
@@ -245,6 +245,7 @@ const overviewBroadcast = (scope, msg) => {
     if (typeof(msg) === "object") msg = JSON.stringify(msg);
     const broadcastWs = websockets.filter(x => x.type === "overview" && x.scope.includes(scope));
     broadcastWs.forEach(ws => {
+        console.log(msg)
         try {
             ws.send(msg);
         } catch(e) {
