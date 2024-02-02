@@ -25,17 +25,17 @@ router.use(async (req, res, next) => {
         session = req.cookies?.session;
     }
 
-    if (!session) {
-        res.status(401);
-        return res.json({ok: false, error: "Unauthorized"})
-    }
-
     res.header("Vary","Origin")
     if (req.headers.origin && req.headers.origin.replace("https://","").replace("www.","") === "twitch.tv") {
         console.log("setting twitch origin header");
         res.header("Access-Control-Allow-Origin","twitch.tv")
     } else {
         res.header("Access-Control-Allow-Origin","tms.to")
+    }
+
+    if (!session) {
+        res.status(401);
+        return res.json({ok: false, error: "Unauthorized"})
     }
 
     try {
