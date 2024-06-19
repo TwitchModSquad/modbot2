@@ -162,21 +162,24 @@ class StatsManager {
 
     constructor() {
         let intCount = 0;
-        setInterval(async () => {
-            this.purgeMostActiveChannels();
-            
-            if (intCount % 15 === 0) {
-                this.saveHourlyActivity().catch(console.error);
-                this.updateRecentFollowers().catch(console.error);
-                this.updateRecentSubscribers().catch(console.error);
-                this.updateLiveMembers().catch(console.error);
-            }
 
-            if (intCount % 60 === 0) {
-                this.updateGeneralStatistics().catch(console.error);
-            }
-            intCount++;
-        }, 1000);
+        setTimeout(() => {
+            setInterval(async () => {
+                this.purgeMostActiveChannels();
+                
+                if (intCount % 15 === 0) {
+                    this.saveHourlyActivity().catch(console.error);
+                    this.updateRecentFollowers().catch(console.error);
+                    this.updateRecentSubscribers().catch(console.error);
+                    this.updateLiveMembers().catch(console.error);
+                }
+    
+                if (intCount % 60 === 0) {
+                    this.updateGeneralStatistics().catch(console.error);
+                }
+                intCount++;
+            }, 1000);
+        }, 10000);
 
         setTimeout(() => {
             this.loadHourlyActivity().catch(console.error);
@@ -267,12 +270,12 @@ class StatsManager {
      * Updates recent followers
      */
     async updateRecentFollowers() {
-        const data = await global.utils.Authentication.Twitch.getChannelFollowers(config.twitch.id, MAX_FOLLOWERS);
+        const data = await global.utils.Twitch.Helix.channels.getChannelFollowers(config.twitch.id, null, {limit: MAX_FOLLOWERS});
         let newFollowList = [];
         for (let i = 0; i < Math.min(MAX_FOLLOWERS - 1, data.data.length); i++) {
             newFollowList.push({
-                user: (await global.utils.Twitch.getUserById(data.data[i].user_id, false, true)).public(),
-                date: data.data[i].followed_at,
+                user: (await global.utils.Twitch.getUserById(data.data[i].userId, false, true)).public(),
+                date: data.data[i].followDate,
             });
         }
         this.recentFollowers = newFollowList;
@@ -282,14 +285,14 @@ class StatsManager {
      * Updates recent subscribers
      */
     async updateRecentSubscribers() {
-        const data = await global.utils.Authentication.Twitch.getChannelSubscriptions(config.twitch.id, MAX_SUBSCRIBERS);
+        const data = await global.utils.Twitch.Helix.subscriptions.getSubscriptions(config.twitch.id, {limit: MAX_SUBSCRIBERS});
         let newSubList = [];
         for (let i = 0; i < Math.min(MAX_SUBSCRIBERS - 1, data.data.length); i++) {
             const d = data.data[i];
             newSubList.push({
-                user: (await global.utils.Twitch.getUserById(d.user_id, false, true)).public(),
-                gifter: (d.is_gift ? 
-                    (await global.utils.Twitch.getUserById(d.gifter_id, false, true)).public() : null),
+                user: (await global.utils.Twitch.getUserById(d.userId, false, true)).public(),
+                gifter: (d.isGift ? 
+                    (await global.utils.Twitch.getUserById(d.gifterId, false, true)).public() : null),
                 tier: Number(d.tier) / 1000,
             });
         }

@@ -1,16 +1,53 @@
+const { RefreshingAuthProvider } = require("@twurple/auth");
+const { ApiClient } = require("@twurple/api");
+
 const config = require("../../config.json");
 
 const Cache = require("../Cache/Cache");
 
 const TwitchUser = require("./TwitchUser");
+const TwitchToken = require("./TwitchToken");
 
-const {ApiClient} = require("twitch");
-const {ClientCredentialsAuthProvider} = require("twitch-auth");
+const authProvider = new RefreshingAuthProvider({
+    clientId: config.twitch.client_id,
+    clientSecret: config.twitch.client_secret,
+    redirectUri: config.express.domain.root + "auth/twitch",
+});
 
-const authProvider = new ClientCredentialsAuthProvider(config.twitch.client_id, config.twitch.client_secret);
-const api = new ApiClient({ authProvider });
+const api = new ApiClient({
+    authProvider,
+});
+
+(async function() {
+    const tokens = await TwitchToken.find({});
+
+    let foundTMSUser = false;
+
+    tokens.forEach(token => {
+        let intents = [];
+
+        if (token.user === config.twitch.id) {
+            intents.push("tms:chat");
+            foundTMSUser = true;
+        }
+
+        authProvider.addUser(token.user, token.tokenData, intents);
+    });
+
+    if (!foundTMSUser) {
+        console.error("TwitchModSquad is not authenticated! We may not join channels or fetch data.")
+    }
+
+    console.log(`Added ${tokens.length} pre-existing tokens to AuthProvider`)
+})();
 
 class Twitch {
+
+    /**
+     * The Twitch auth provider
+     * @type {RefreshingAuthProvider}
+     */
+    authProvider = authProvider;
 
     /**
      * Twitch Helix API
@@ -30,30 +67,16 @@ class Twitch {
     nameCache = {};
 
     /**
-     * Caches forced queries to avoid multiple requests.
-     * @type {{id:string,resolve:Promise,reject:Promise}[]}
+     * Requests a user directly from the Twitch Helix API
+     * This method should NEVER be used externally as it can take a substantial amount of time to request and WILL overwrite other data.
+     * @param {string} id 
+     * @returns {Promise<TwitchUser>}
      */
-    forceCache = [];
-
-    /**
-     * Tick to retrieve all users in the cache. This is ran once every 500ms
-     */
-    async getUserByIdTick() {
-        if (this.forceCache.length === 0) return;
-
-        let ids = [];
-        for (let i = 0; i < this.forceCache.length; i++) {
-            const id = this.forceCache[i].id;
-            if (!ids.includes(id)) ids.push(id);
-            if (ids.length >= 100) break;
-        }
-
-        const users = await api.helix.users.getUsersByIds(ids);
-        for (let i = 0; i < users.length; i++) {
-            const user = users[i];
-            let forces = this.forceCache.filter(x => x.id === user.id);
-
+    getUserByIdByForce(id) {
+        return new Promise(async (resolve, reject) => {
             try {
+                const user = await api.users.getUserByIdBatched(id);
+    
                 const dbUser = await TwitchUser.findOneAndUpdate(
                     {
                         _id: user.id
@@ -72,40 +95,12 @@ class Twitch {
                         new: true,
                     }
                 );
-    
-                forces.forEach(force => {
-                    force.resolve(dbUser);
-                });
-    
-                this.forceCache = this.forceCache.filter(x => x.id !== user.id);
-            } catch(e) {
-                console.error(e);
+
+                resolve(dbUser);
+            } catch(err) {
+                console.error(err);
+                reject("User not found!"); // TODO: Better error management
             }
-        }
-        
-        for (let i = 0; i < ids.length; i++) {
-            let forces = this.forceCache.filter(x => x.id === ids[i]);
-            forces.forEach(force => {
-                force.reject("User not found!");
-            });
-        }
-
-        this.forceCache = this.forceCache.filter(x => !ids.includes(x.id));
-    }
-
-    /**
-     * Requests a user directly from the Twitch Helix API
-     * This method should NEVER be used externally as it can take a substantial amount of time to request and WILL overwrite other data.
-     * @param {string} id 
-     * @returns {Promise<TwitchUser>}
-     */
-    getUserByIdByForce(id) {
-        return new Promise(async (resolve, reject) => {
-            this.forceCache.push({
-                id: id,
-                resolve: resolve,
-                reject: reject,
-            });
         });
     }
 
@@ -119,6 +114,11 @@ class Twitch {
      */
     getUserById(id, bypassCache = false, requestIfUnavailable = false) {
         return this.userCache.get(id, async (resolve, reject) => {
+            if (!id) {
+                console.error("No user ID was given for Twitch#getUserById");
+                return reject("No user ID was given");
+            }
+
             const user = await TwitchUser.findById(id)
                     .populate("identity");
             if (user) {
@@ -209,16 +209,6 @@ class Twitch {
                 reject(e);
             }
         });
-    }
-
-    constructor() {
-        setInterval(async () => {
-            try {
-                await this.getUserByIdTick()
-            } catch(e) {
-                console.error(e);
-            }
-        }, 500);
     }
 
 }

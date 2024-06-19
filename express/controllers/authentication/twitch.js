@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const utils = require("../../../utils/");
+const config = require("../../../config.json");
 
 const UPDATE_MODDED_LIMIT = 7 * 24 * 60 * 60 * 1000;
 
@@ -15,39 +16,32 @@ router.get("/", async (req, res) => {
     }
 
     if (code) {
-        const oauthData = await utils.Authentication.Twitch.getToken(code);
-
-        if (oauthData.hasOwnProperty("status") && oauthData.status === 400) {
-            res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users user:read:moderated_channels"));
-            return;
-        }
-
-        let user;
         try {
-            user = await utils.Authentication.Twitch.getUser(oauthData.access_token);
-        } catch(err) {
-            console.error(err);
-            res.send("Unable to retrieve user from access token! Try again!");
-            return;
-        }
+            const userId = await utils.Twitch.authProvider.addUserForCode(code);
+            const twitchUser = await utils.Twitch.getUserById(userId, false, true);
+            
+            const accessToken = await utils.Twitch.authProvider.getAccessTokenForUser(twitchUser._id);
 
-        utils.Twitch.getUserById(user.id, true, true).then(async twitchUser => {
+            if (twitchUser._id === config.twitch.id) {
+                if (accessToken.scope.includes("channel:read:subscriptions")) {
+                    utils.Twitch.authProvider.addIntentsToUser(twitchUser._id, ["tms:chat"]);
+                } else {
+                    return res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users user:read:moderated_channels chat:read chat:edit channel:moderate moderator:read:followers channel:read:subscriptions"));
+                }
+            }
+
             await utils.Schemas.TwitchToken.findOneAndUpdate({
-                user: twitchUser,
-                scope: oauthData.scope.join(" "),
+                user: twitchUser._id,
             }, {
-                user: twitchUser,
-                refresh_token: oauthData.refresh_token,
-                scope: oauthData.scope.join(" "),
-                created_at: Date.now(),
-                last_used: Date.now(),
+                user: twitchUser._id,
+                tokenData: accessToken,
             }, {
                 upsert: true,
                 new: true,
             });
-
+    
             let discordUsers = [];
-
+    
             if (session.identity) {
                 discordUsers = await session.identity.getDiscordUsers();
                 if (twitchUser?.identity?._id !== session?.identity?._id) {
@@ -64,17 +58,17 @@ router.get("/", async (req, res) => {
                 discordUsers = await session.identity.getDiscordUsers();
                 await session.save();
             }
-
+    
             if (!twitchUser.updated_modded_channels || Date.now() - twitchUser.updated_modded_channels >= UPDATE_MODDED_LIMIT) {
                 try {
                     const oldStreamers = (await twitchUser.getStreamers(false)).map(x => x.streamer);
-                    const newStreamers = (await twitchUser.fetchModdedChannels(oauthData.access_token)).map(x => x.streamer);
+                    const newStreamers = (await twitchUser.fetchModdedChannels()).map(x => x.streamer);
                     let removedStreamers = [];
                     let addedStreamers = [];
                     let existingStreamers = [];
                     for (let i = 0; i < newStreamers.length; i++) {
                         const streamer = newStreamers[i];
-                        await streamer.fetchFollowers
+                        await streamer.fetchFollowers();
                         if (oldStreamers.find(x => x._id === streamer._id)) {
                             existingStreamers.push(streamer);
                         } else {
@@ -105,7 +99,7 @@ router.get("/", async (req, res) => {
                     console.error(err);
                 }
             }
-
+    
             if (discordUsers.length === 0) {
                 res.redirect(utils.Authentication.Discord.getURL());
             } else {
@@ -116,13 +110,18 @@ router.get("/", async (req, res) => {
                     res.redirect("/auth/join");
                 }
             }
-        }, err => {
+        } catch(err) {
+            console.error("Error while logging in:");
             console.error(err);
-            res.send("Unable to retrieve user!");
-        });
+            res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users user:read:moderated_channels"));
+        }
     } else {
         res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users user:read:moderated_channels"));
     }
+});
+
+router.get("/bot", (req, res) => {
+    res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users user:read:moderated_channels chat:read chat:edit channel:moderate moderator:read:followers channel:read:subscriptions"));
 });
 
 module.exports = router;

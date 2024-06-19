@@ -1,11 +1,22 @@
-const utils = require("../../utils");
+const utils = require("../../utils/");
+const ListenClient = require('../ListenClient');
+const { ChatMessage } = require('@twurple/chat');
 
 const punishmentStore = require("../PunishmentStore");
 
 const listener = {
     name: "punishmentDeactivator",
     eventName: "message",
-    listener: async (client, streamer, chatter, timebanned, userstate, bpm) => {
+    /**
+     * Listener for a message
+     * @param {ListenClient} client 
+     * @param {utils.Schemas.TwitchUser} streamer 
+     * @param {utils.Schemas.TwitchUser} chatter 
+     * @param {ChatMessage} msg 
+     * @param {string} message 
+     * @param {boolean} self
+     */
+    listener: async (client, streamer, chatter, msg, message, self) => {
         if (punishmentStore.isBanned(streamer._id, chatter._id)) {
             const bans = await utils.Schemas.TwitchBan.find({streamer: streamer._id, chatter: chatter._id, time_end: null});
             bans.forEach(async ban => {

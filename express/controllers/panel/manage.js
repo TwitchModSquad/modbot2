@@ -44,7 +44,11 @@ const titleCase = str => {
 
 const friendly = token => {
     token.friendlyScopes = "";
-    token.scope.split(" ").forEach(scope => {
+    let scopes = token.scope;
+    if (typeof(scopes) === "string") {
+        scopes = scopes.split(" ");
+    }
+    scopes.forEach(scope => {
         if (token.friendlyScopes !== "")
             token.friendlyScopes += ", ";
         if (FRIENDLY_SCOPES.hasOwnProperty(scope)) {
@@ -64,7 +68,7 @@ router.get("/tokens", async (req, res) => {
         const user = twitchUsers[i];
         twitchTokens = [
             ...twitchTokens,
-            ...await user.getTokens(),
+            ...(await user.getTokens()).map(x => { return {_id: x._id, created_at: x.created_at, scope: x.tokenData.scope} }),
         ]
     }
 

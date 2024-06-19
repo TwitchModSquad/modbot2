@@ -1,4 +1,4 @@
-const tmi = require('tmi.js');
+const { ChatClient, ChatMessage, ClearChat } = require("@twurple/chat")
 const fs = require('fs');
 
 const utils = require("../utils/");
@@ -28,8 +28,8 @@ class ListenClient {
     type;
 
     /**
-     * Represents the TMI client
-     * @type {tmi.Client}
+     * Represents the twurple chat client
+     * @type {ChatClient}
      */
     client;
 
@@ -57,17 +57,23 @@ class ListenClient {
      * Wraps listener parameters to be more TMS friendly than TMI functions
      */
     listenerWrappers = {
-        message: async (channel, tags, message, self) => {
+        /**
+         * @param {string} channel 
+         * @param {string} user 
+         * @param {string} message 
+         * @param {ChatMessage} msg 
+         * @returns 
+         */
+        message: async (channel, user, message, msg) => {
             try {
-                if (tags.hasOwnProperty("message-type") && tags["message-type"] === "whisper") return;
-                if (!tags.hasOwnProperty("room-id") || !tags.hasOwnProperty("user-id")) return;
+                if (msg.channelId === null) return;
                 
-                let streamer = await utils.Twitch.getUserById(tags["room-id"], false, true);
-                let chatter = await utils.Twitch.getUserById(tags["user-id"], false, true);
+                let streamer = await utils.Twitch.getUserById(msg.channelId, false, true);
+                let chatter = await utils.Twitch.getUserById(msg.userInfo.userId, false, true);
         
                 this.listeners.message.forEach(func => {
                     try {
-                        func(this, streamer, chatter, tags, message, self);
+                        func(this, streamer, chatter, msg, message, msg.channelId === config.twitch.id);
                     } catch (e) {
                         console.error(e);
                     }
@@ -76,14 +82,23 @@ class ListenClient {
                 console.error(e);
             }
         },
-        timeout: async (channel, username, reason, duration, userstate) => {
+        /**
+         * 
+         * @param {string} channel 
+         * @param {string} user 
+         * @param {number} duration 
+         * @param {ClearChat} msg 
+         */
+        timeout: async (channel, user, duration, msg) => {
             try {
-                let streamer = await utils.Twitch.getUserById(userstate["room-id"], false, true);
-                let chatter = await utils.Twitch.getUserById(userstate["target-user-id"], false, true);
+                if (msg.targetUserId === null) return;
+
+                let streamer = await utils.Twitch.getUserById(msg.channelId, false, true);
+                let chatter = await utils.Twitch.getUserById(msg.targetUserId, false, true);
         
                 this.listeners.timeout.forEach(func => {
                     try {
-                        func(this, streamer, chatter, duration, userstate["tmi-sent-ts"], userstate);
+                        func(this, streamer, chatter, duration, msg.date, msg);
                     } catch (e) {
                         console.error(e);
                     }
@@ -92,20 +107,25 @@ class ListenClient {
                 console.error(e);
             }
         },
-        ban: async (channel, username, reason, userstate) => {
+        /**
+         * @param {string} channel 
+         * @param {string} user 
+         * @param {ClearChat} msg 
+         */
+        ban: async (channel, user, msg) => {
             try {
-                let streamer = await utils.Twitch.getUserById(userstate["room-id"], false, true);
-                let chatter = await utils.Twitch.getUserById(userstate["target-user-id"], false, true);
+                let streamer = await utils.Twitch.getUserById(msg.channelId, false, true);
+                let chatter = await utils.Twitch.getUserById(msg.targetUserId, false, true);
 
-                if (!this.bannedPerMinute.hasOwnProperty(streamer.id)) this.bannedPerMinute[streamer.id] = [];
-                this.bannedPerMinute[streamer.id] = [
-                    ...this.bannedPerMinute[streamer.id],
+                if (!this.bannedPerMinute.hasOwnProperty(streamer._id)) this.bannedPerMinute[streamer._id] = [];
+                this.bannedPerMinute[streamer._id] = [
+                    ...this.bannedPerMinute[streamer._id],
                     Date.now(),
                 ]
         
                 this.listeners.ban.forEach(func => {
                     try {
-                        func(this, streamer, chatter, userstate["tmi-sent-ts"], userstate, this.bannedPerMinute[streamer.id].length);
+                        func(this, streamer, chatter, msg.date, msg, this.bannedPerMinute[streamer._id].length);
                     } catch (e) {
                         console.error(e);
                     }
@@ -140,9 +160,7 @@ class ListenClient {
         channel = channel.replace("#", "").toLowerCase();
         this.channels = this.channels.filter(x => x !== channel);
         if (this.client)
-            this.client.part(channel).catch(err => {
-                if (err !== "No response from Twitch.") console.error(err);
-            });
+            this.client.part(channel);
     }
 
     /**
@@ -160,7 +178,7 @@ class ListenClient {
                     listener.listener,
                 ];
             } else {
-                this.client.on(listener.eventName, listener.listener);
+                this.client[listener.eventName](listener.listener);
             }
         }
 
@@ -190,32 +208,30 @@ class ListenClient {
             }, 5000);
         }
 
-        this.client.on("message", this.listenerWrappers.message);
-        this.client.on("timeout", this.listenerWrappers.timeout);
-        this.client.on("ban", this.listenerWrappers.ban);
+        this.client.onMessage(this.listenerWrappers.message);
+        this.client.onTimeout(this.listenerWrappers.timeout);
+        this.client.onBan(this.listenerWrappers.ban);
     }
 
     /**
      * Creates the client, initializes it, and connects to TMI
      */
-    connect(username = config.twitch.username, password = config.twitch.oauth) {
-        this.client = new tmi.Client({
-            options: {
-                debug: config.development,
-                joinInterval: this.type === "member" ? 5000 : (this.type === "partner" ? 10000 : 15000),
-                skipMembership: true,
-            },
-            connection: { reconnect: true },
+    connect() {
+        this.client = new ChatClient({
+            authProvider: utils.Twitch.authProvider,
             channels: this.channels,
-            identity: {
-                username: username,
-                password: password,
-            },
+            authIntents: ["tms:chat"],
         });
 
         this.initialize();
 
-        this.client.connect().catch(console.error);
+        this.client.onConnect(() => {
+            console.log(`ListenClient for ${this.type} connected!`);
+        });
+
+        setTimeout(() => {
+            this.client.connect();
+        }, 1000);
     }
 
     /**
@@ -224,6 +240,7 @@ class ListenClient {
      * @return {boolean|null}
      */
     isMod(streamer) {
+        return null; // TODO: This is broken! Fix it or remove it.
         const botState = this.client.userstate["#" + streamer.login];
         if (botState !== undefined) {
             return botState.mod;

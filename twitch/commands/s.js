@@ -1,5 +1,4 @@
-const tmi = require("tmi.js");
-
+const { ChatMessage } = require("@twurple/chat");
 const ListenClient = require("../ListenClient");
 const utils = require("../../utils/");
 
@@ -8,13 +7,14 @@ const command = {
     /**
      * Listener for a message
      * @param {ListenClient} client 
-     * @param {any} streamer 
-     * @param {any} chatter 
-     * @param {tmi.ChatUserstate} tags 
-     * @param {string} message 
+     * @param {utils.Schemas.TwitchUser} streamer 
+     * @param {utils.Schemas.TwitchUser} chatter 
+     * @param {string[]} args
+     * @param {ChatMessage} msg 
+     * @param {string} message
      * @param {function} reply
      */
-    execute: async (client, streamer, chatter, args, tags, message, reply) => {
+    execute: async (client, streamer, chatter, args, msg, message, reply) => {
         if (args.length === 0) return reply("you must specify a streamer login!");
 
         try {
@@ -28,7 +28,7 @@ const command = {
             }
         } catch(err) {
             console.error(err);
-            reply("streamer not found!");
+            reply("Streamer not found!");
         }
     }
 }

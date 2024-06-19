@@ -1,4 +1,4 @@
-const { HelixStream } = require("twitch")
+const { HelixStream } = require("@twurple/api")
 const { EmbedBuilder } = require("discord.js");
 
 const utils = require("../utils/");

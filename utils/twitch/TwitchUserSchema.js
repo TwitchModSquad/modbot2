@@ -7,7 +7,6 @@ const TwitchBan = require("./TwitchBan");
 const TwitchTimeout = require("./TwitchTimeout");
 
 const config = require("../../config.json");
-const con = require("../../old-db");
 const { EmbedBuilder, codeBlock, cleanCodeBlockContent, StringSelectMenuBuilder, ActionRowBuilder } = require('discord.js');
 const TwitchChat = require('./TwitchChat');
 const UserFlag = require('../flag/UserFlag');
@@ -233,13 +232,13 @@ userSchema.methods.public = function() {
 }
 
 userSchema.methods.fetchFollowers = async function () {
-    const followers = (await global.utils.Authentication.Twitch.getChannelFollowers(this._id)).total;
+    const followers = (await global.utils.Twitch.Helix.channels.getChannelFollowerCount(this._id));
     this.follower_count = followers;
     return followers;
 }
 
 userSchema.methods.updateData = async function() {
-    const helixUser = await global.utils.Twitch.Helix.helix.users.getUserById(this._id);
+    const helixUser = await global.utils.Twitch.Helix.users.getUserById(this._id);
     this.login = helixUser.name;
     this.display_name = helixUser.displayName;
     this.type = helixUser.type;
@@ -282,19 +281,9 @@ userSchema.methods.getStreamers = async function(includeInactive = false) {
             .populate("moderator");
 }
 
-userSchema.methods.getTokens = async function(requiredScopes = []) {
+userSchema.methods.getTokens = async function() {
     const tokens = await global.utils.Schemas.TwitchToken.find({user: this._id});
-    let finalTokens = [];
-    for (let i = 0; i < tokens.length; i++) {
-        const token = tokens[i];
-        const scopes = token.scope.split(" ");
-        let validToken = true;
-        for (let s = 0; s < requiredScopes.length; s++) {
-            if (!scopes.includes(requiredScopes[s])) validToken = false;
-        }
-        if (validToken) finalTokens.push(token);
-    }
-    return finalTokens;
+    return tokens;
 }
 
 userSchema.methods.getBans = async function() {
@@ -396,8 +385,9 @@ userSchema.methods.fetchMods = async function() {
     }
 }
 
-userSchema.methods.fetchModdedChannels = async function(accessToken) {
-    const channels = await global.utils.Authentication.Twitch.getModeratedChannels(accessToken, this._id);
+userSchema.methods.fetchModdedChannels = async function() {
+    const channels = (await global.utils.Twitch.Helix.moderation.getModeratedChannels(this._id)).data;
+
     await TwitchRole.updateMany({
         moderator: this,
         time_end: null,
@@ -407,7 +397,7 @@ userSchema.methods.fetchModdedChannels = async function(accessToken) {
     for (let i = 0; i < channels.length; i++) {
         const channel = channels[i];
         try {
-            const streamer = await global.utils.Twitch.getUserById(channel.broadcaster_id, false, true);
+            const streamer = await global.utils.Twitch.getUserById(channel.id, false, true);
             await TwitchRole.findOneAndUpdate({
                 streamer, moderator: this,
             }, {
@@ -425,106 +415,9 @@ userSchema.methods.fetchModdedChannels = async function(accessToken) {
         .populate(["streamer","moderator"]);
 }
 
-let migrating = false;
 userSchema.methods.migrateData = function() {
     return new Promise((resolve, reject) => {
-        if (migrating) return reject("A migration is already taking place!");
-        con.query("select id, streamer_id, user_id, moderator_id, timebanned, reason, active from twitch__ban where user_id = ?;", [this._id], async (err, bans) => {
-            if (err) return reject(err);
-
-            for (let i = 0; i < bans.length; i++) {
-                const ban = bans[i];
-                const streamer = await global.utils.Twitch.getUserById(ban.streamer_id, false, true);
-                const chatter = await global.utils.Twitch.getUserById(ban.user_id, false, true);
-                const moderator = ban.moderator_id ? await global.utils.Twitch.getUserById(ban.moderator_id, false, true) : null;
-
-                await TwitchBan.findOneAndUpdate({
-                    migrate_id: ban.id,
-                }, {
-                    streamer: streamer,
-                    chatter: chatter,
-                    moderator: moderator,
-                    reason: ban.reason,
-                    time_start: new Date(ban.timebanned),
-                    time_end: ban.active ? null : new Date(ban.timebanned + 1000),
-                    migrate_id: ban.id,
-                }, {
-                    upsert: true,
-                    new: true,
-                });
-            }
-
-            con.query("select id, streamer_id, user_id, timeto, duration from twitch__timeout where user_id = ?;", [this._id], async (err2, tos) => {
-                if (err2) return reject(err2);
-
-                for (let t = 0; t < tos.length; t++) {
-                    const to = tos[t];
-                    const streamer = await global.utils.Twitch.getUserById(to.streamer_id, false, true);
-                    const chatter = await global.utils.Twitch.getUserById(to.user_id, false, true);
-
-                    await TwitchTimeout.findOneAndUpdate({
-                        migrate_id: to.id,
-                    }, {
-                        streamer: streamer,
-                        chatter: chatter,
-                        time_start: new Date(to.timeto),
-                        time_end: new Date(to.timeto + (to.duration * 1000)),
-                        duration: to.duration,
-                        migrate_id: to.id,
-                    }, {
-                        upsert: true,
-                        new: true,
-                    });
-                }
-
-                if (!this.migrated) {
-                    migrating = true;
-                    const start = Date.now();
-                    console.log(`Now migrating chat logs from ${this.display_name}`);
-                    con.query("select id, streamer_id, user_id, message, deleted, color, emotes, badges, timesent from twitch__chat where user_id = ? order by timesent desc limit 25000;", [this._id], async (err3, chats) => {
-                        if (err3) {
-                            migrating = false;
-                            console.error(err3);
-                            return;
-                        }
-
-                        console.log(`Received ${chats.length} chat messages from ${this.display_name} at ${Date.now() - start} ms`);
-                        for (let c = 0; c < chats.length; c++) {
-                            const chat = chats[c];
-                            try {
-                                const streamer = await global.utils.Twitch.getUserById(chat.streamer_id, false, true);
-                                const chatter = await global.utils.Twitch.getUserById(chat.user_id, false, true);
-                                await TwitchChat.findOneAndUpdate({
-                                    _id: chat.id,
-                                }, {
-                                    _id: chat.id,
-                                    streamer: streamer,
-                                    chatter: chatter,
-                                    color: chat.color,
-                                    badges: chat.badges,
-                                    emotes: chat.emotes,
-                                    message: chat.message,
-                                    deleted: chat.deleted,
-                                    time_sent: new Date(chat.timesent),
-                                }, {
-                                    upsert: true,
-                                    new: true,
-                                });
-                            } catch(e) {
-                                console.error(e);
-                            }
-                        }
-                        console.log(`Completed migration for ${this.display_name} in ${Date.now() - start} ms!`);
-                        migrating = false;
-                    });
-                }
-
-                this.migrated = true;
-                await this.save();
-
-                resolve();
-            });
-        });
+        reject("Data migration no longer exists!");
     });
 }
 

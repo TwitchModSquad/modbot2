@@ -1,4 +1,4 @@
-const { HelixStream } = require("twitch")
+const { HelixStream } = require("@twurple/api")
 
 const utils = require("../utils/");
 const config = require("../config.json");

@@ -7,26 +7,20 @@ const tokenSchema = new mongoose.Schema({
         required: true,
         index: true,
     },
-    refresh_token: {
-        type: String,
-        required: true,
-    },
-    scope: {
-        type: String,
-        required: true,
+    tokenData: {
+        accessToken: {
+            type: String,
+            required: true,
+        },
+        expiresIn: Number,
+        obtainmentTimestamp: Number,
+        refreshToken: String,
+        scope: [String],
     },
     created_at: {
         type: Date,
         default: Date.now,
     },
-    last_used: {
-        type: Date,
-        default: Date.now,
-    },
-    uses: {
-        type: Number,
-        default: 0,
-    }
 });
 
 tokenSchema.methods.use = async function() {

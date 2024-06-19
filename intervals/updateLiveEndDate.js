@@ -8,7 +8,7 @@ const listenClients = require("../twitch/");
 const updateStreams = async streams => {
     let ids = streams.map(x => x.user._id);
 
-    const helixStreams = await utils.Twitch.Helix.helix.streams.getStreams({userId: ids});
+    const helixStreams = await utils.Twitch.Helix.streams.getStreams({userId: ids});
     for (let i = 0; i < streams.length; i++) {
         const stream = streams[i];
         const helixStream = helixStreams.data.find(x => x.id === stream._id);

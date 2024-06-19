@@ -26,7 +26,7 @@ const listener = {
         if (reason.length < 3) reason = null;
 
         try {
-            user = await utils.Twitch.getUserById(userId);
+            user = await utils.Twitch.getUserById(userId, false, true);
         } catch(e) {
             return interaction.error("Unable to get user!");
         }
@@ -47,35 +47,45 @@ const listener = {
 
         try {
             for (let i = 0; i < twitchUsers.length; i++) {
-                const moderator = twitchUsers[i];
-                const tokens = await moderator.getTokens(["moderator:manage:banned_users"]);
-                let accessToken = null;
-                for (let t = 0; t < tokens.length; t++) {
+                let successfulBans = [];
+                for (let b = 0; b < bansRemaining.length; b++) {
                     try {
-                        accessToken = await utils.Authentication.Twitch.getAccessToken(tokens[t].refresh_token);
-                        await tokens[t].use();
-                        break;
-                    } catch(e) {}
-                }
-                if (accessToken) {
-                    let successfulBans = [];
-                    for (let b = 0; b < bansRemaining.length; b++) {
+                        const streamer = await utils.Twitch.getUserById(bansRemaining[b]);
                         try {
-                            const streamer = await utils.Twitch.getUserById(bansRemaining[b]);
-                            try {
-                                await utils.Authentication.Twitch.banUser(streamer._id, moderator._id, accessToken, user._id, reason);
+                            const bans = await utils.Twitch.Helix.asUser(twitchUsers[i]._id, async ctx => {
+                                return await ctx.moderation.banUser(streamer._id, {
+                                    user: user._id,
+                                    reason,
+                                })
+                            });
+                            if (bans.length > 0) {
                                 successfulBans.push(bansRemaining[b]);
                                 success += `\n${streamer.display_name}`;
-                            } catch(err) {
-                                error += `\n${streamer.display_name} - ${err}`;
+                            } else {
+                                error += `\n${streamer.display_name} - No Ban Returned`;
                             }
-                        } catch(err) {}
-                    }
-                    bansRemaining = bansRemaining.filter(x => !successfulBans.find(y => y === x));
-                } else {
-                    return interaction.error("Unable to retrieve any access token! Please [log in to TMS](https://v2.tms.to/auth/login)")
+                        } catch(err) {
+                            if (err?._statusCode === 403) {
+                                error += `\n${streamer.display_name} - No Permission`;
+                                continue;
+                            }
+
+                            try {
+                                const body = JSON.parse(err?._body);
+
+                                if (body?.message) {
+                                    error += `\n${streamer.display_name} - ${body.message}`
+                                    continue;
+                                }
+                            } catch(err2) {
+                                console.error(err2);
+                            }
+                            console.error(err);
+                            error += `\n${streamer.display_name} - Unknown Error`;
+                        }
+                    } catch(err) {}
                 }
-                if (bansRemaining.length === 0) break;
+                bansRemaining = bansRemaining.filter(x => !successfulBans.find(y => y === x));
             }
 
             const embed = new EmbedBuilder()

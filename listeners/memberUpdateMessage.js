@@ -1,5 +1,5 @@
 const { Message } = require("discord.js");
-const { HelixStream } = require("twitch");
+const { HelixStream } = require("@twurple/api");
 const { EmbedBuilder } = require("discord.js");
 
 const listener = {

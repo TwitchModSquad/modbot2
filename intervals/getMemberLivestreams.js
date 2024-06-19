@@ -1,7 +1,7 @@
 const utils = require("../utils/");
 const config = require("../config.json");
 const {TwitchLivestream, TwitchGame, TwitchTag, TwitchStreamStatus} = require("../utils/twitch/TwitchStream");
-const { HelixStream } = require("twitch");
+const { HelixStream } = require("@twurple/api");
 
 const interval = {
     interval: 30000,
@@ -19,7 +19,7 @@ const interval = {
         const getStreams = async users => {
             streams = [
                 ...streams,
-                ...(await utils.Twitch.Helix.helix.streams.getStreams({userId: users})).data,
+                ...(await utils.Twitch.Helix.streams.getStreams({userId: users})).data,
             ]
         }
 

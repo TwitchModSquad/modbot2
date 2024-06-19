@@ -20,7 +20,7 @@ const interval = {
         if (!config.crawl) return;
 
         try {
-            const streams = await utils.Twitch.Helix.helix.streams.getStreams({after: lastCursor, limit: STREAMS_PER_PAGE, language: "en"});
+            const streams = await utils.Twitch.Helix.streams.getStreams({after: lastCursor, limit: STREAMS_PER_PAGE, language: "en"});
             lastCursor = streams.cursor;
 
             for (let i = 0; i < streams.data.length; i++) {

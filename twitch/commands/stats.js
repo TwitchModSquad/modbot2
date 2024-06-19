@@ -1,7 +1,6 @@
-const tmi = require("tmi.js");
-
+const { ChatMessage } = require("@twurple/chat");
 const ListenClient = require("../ListenClient");
-const utils = require("../../utils");
+const utils = require("../../utils/");
 
 let stats = [];
 let statsIndex = [];
@@ -11,13 +10,14 @@ const command = {
     /**
      * Listener for a message
      * @param {ListenClient} client 
-     * @param {any} streamer 
-     * @param {any} chatter 
-     * @param {tmi.ChatUserstate} tags 
-     * @param {string} message 
+     * @param {utils.Schemas.TwitchUser} streamer 
+     * @param {utils.Schemas.TwitchUser} chatter 
+     * @param {string[]} args
+     * @param {ChatMessage} msg 
+     * @param {string} message
      * @param {function} reply
      */
-    execute: async (client, streamer, chatter, args, tags, message, reply) => {
+    execute: async (client, streamer, chatter, args, msg, message, reply) => {
         let target = chatter;
         if (args.length > 0) {
             if (args[0].toLowerCase() === "top") {
@@ -27,7 +27,7 @@ const command = {
                     const top3 = await utils.Twitch.getUserById(stats[2]._id);
                     const top4 = await utils.Twitch.getUserById(stats[3]._id);
                     const top5 = await utils.Twitch.getUserById(stats[4]._id);
-                    reply(`the top 5 TMS chatters are: ` +
+                    reply(`The top 5 TMS chatters are: ` +
                             `#1. ${top1.display_name} (${utils.comma(stats[0].total)} msgs) | ` +
                             `#2. ${top2.display_name} (${utils.comma(stats[1].total)} msgs) | ` +
                             `#3. ${top3.display_name} (${utils.comma(stats[2].total)} msgs) | ` +
@@ -35,7 +35,7 @@ const command = {
                             `#5. ${top5.display_name} (${utils.comma(stats[4].total)} msgs)`);
                 } catch(e) {
                     console.error(e);
-                    reply("unable to retrieve top users!");
+                    reply("Unable to retrieve top users!");
                 }
                 return;
             }

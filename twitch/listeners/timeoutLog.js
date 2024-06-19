@@ -1,9 +1,20 @@
-const utils = require("../../utils");
+const { ClearChat } = require("@twurple/chat");
+const utils = require("../../utils/");
+const ListenClient = require("../ListenClient");
 
 const listener = {
     name: "timeoutLog",
     eventName: "timeout",
-    listener: async (client, streamer, chatter, duration, timeto, userstate) => {
+    /**
+     * 
+     * @param {ListenClient} client 
+     * @param {utils.Schemas.TwitchUser} streamer 
+     * @param {utils.Schemas.TwitchUser} chatter 
+     * @param {number} duration 
+     * @param {Date} timeto 
+     * @param {ClearChat} msg 
+     */
+    listener: async (client, streamer, chatter, duration, timeto, msg) => {
         try {
             const timeout = await utils.Schemas.TwitchTimeout.create({
                 streamer: streamer,

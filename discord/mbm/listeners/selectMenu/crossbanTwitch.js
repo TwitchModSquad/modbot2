@@ -21,7 +21,7 @@ const listener = {
         let user = null;
 
         try {
-            user = await utils.Twitch.getUserById(userId);
+            user = await utils.Twitch.getUserById(userId, false, true);
         } catch(e) {
             return interaction.error("Unable to get user!");
         }

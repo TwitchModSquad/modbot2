@@ -88,12 +88,6 @@ const command = {
             let migrateError = null;
             try {
                 exactSearch = await utils.Twitch.getUserByName(query, true);
-                try {
-                    await exactSearch.migrateData();
-                } catch(err) {
-                    migrateError = String(err);
-                    console.error(err);
-                }
                 twitchUsers = [exactSearch];
             } catch(err) {}
             if (!exactSearch) {

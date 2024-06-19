@@ -1,40 +1,60 @@
 const utils = require("../../utils/");
+const ListenClient = require('../ListenClient');
+const { ChatMessage } = require('@twurple/chat');
 
 const CAPS_REGEX = /[A-Z]/g;
 
 const listener = {
     name: "messageLog",
     eventName: "message",
-    listener: async (client, streamer, chatter, tags, message, self) => {
+    /**
+     * Listener for a message
+     * @param {ListenClient} client 
+     * @param {utils.Schemas.TwitchUser} streamer 
+     * @param {utils.Schemas.TwitchUser} chatter 
+     * @param {ChatMessage} msg 
+     * @param {string} message 
+     * @param {boolean} self
+     */
+    listener: async (client, streamer, chatter, msg, message, self) => {
         try {
             let messageWithoutEmotes = message;
             let percentEmotes = 0;
             let percentCaps = 0;
 
-            if (tags?.["emotes-raw"]) {
-                const emotes = tags["emotes-raw"].split("/");
-                for (let i = 0; i < emotes.length; i++) {
-                    const emote = emotes[i].split(":");
-                    const locations = emote[1].split(",");
-                    const [loc1, loc2] = locations[0].split("-");
+            let emotes = "";
+            let badges = "";
+            
+            for (let [emote, positions] of msg.emoteOffsets) {
+                positions.forEach(position => {
+                    const [loc1, loc2] = position.split("-");
+                    if (emotes.length > 0) emotes += "/";
+                    emotes += `${emote}:${position}`;
                     try {
                         messageWithoutEmotes = messageWithoutEmotes.replace(RegExp(message.substring(Number(loc1), Number(loc2)+1), "g"), "");
                     } catch(e) {}
-                }
-                messageWithoutEmotes = messageWithoutEmotes.trim();
-                percentEmotes = 1 - (messageWithoutEmotes.length / message.length);
+                });
             }
+
+            for (let [badge, num] of msg.userInfo.badges) {
+                if (badges.length > 0) badges += ",";
+                badges += `${badge}/${num}`;
+            }
+
+            messageWithoutEmotes = messageWithoutEmotes.trim();
+            percentEmotes = 1 - (messageWithoutEmotes.length / message.length);
+            
             let messageWithoutCaps = messageWithoutEmotes.replace(CAPS_REGEX, "");
             if (messageWithoutEmotes.length > 0)
                 percentCaps = 1 - (messageWithoutCaps.length / messageWithoutEmotes.length);
 
             await utils.Schemas.TwitchChat.create({
-                _id: tags["id"],
+                _id: msg.id,
                 streamer: streamer,
                 chatter: chatter,
-                color: tags["color"],
-                badges: tags["badges-raw"],
-                emotes: tags["emotes-raw"],
+                color: msg.userInfo.color,
+                badges,
+                emotes,
                 message: message,
                 percent: {
                     caps: percentCaps,
@@ -42,7 +62,7 @@ const listener = {
                 },
             });
 
-            if (tags?.mod) {
+            if (msg.userInfo.isMod) {
                 await utils.Schemas.TwitchRole.findOneAndUpdate({
                     streamer: streamer,
                     moderator: chatter,

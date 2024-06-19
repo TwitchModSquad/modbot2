@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
-const tmi = require("tmi.js");
 
+const { ChatMessage } = require("@twurple/chat");
+const ListenClient = require("../ListenClient");
 const utils = require("../../utils/");
 
 const GROUP_TIME_CUTOFF = 6 * 60 * 60 * 1000;
@@ -10,15 +11,16 @@ const command = {
     /**
      * Listener for a message
      * @param {ListenClient} client 
-     * @param {any} streamer 
-     * @param {any} chatter 
-     * @param {tmi.ChatUserstate} tags 
-     * @param {string} message 
+     * @param {utils.Schemas.TwitchUser} streamer 
+     * @param {utils.Schemas.TwitchUser} chatter 
+     * @param {string[]} args
+     * @param {ChatMessage} msg 
+     * @param {string} message
      * @param {function} reply
      */
-    execute: async (client, streamer, chatter, args, tags, message, reply) => {
+    execute: async (client, streamer, chatter, args, msg, message, reply) => {
         if (args.length > 0) {
-            if (args[0].toLowerCase() === "join" && (tags.mod || tags["badges-raw"].includes("broadcaster/"))) {
+            if (args[0].toLowerCase() === "join" && (msg.userInfo.isMod || msg.userInfo.isBroadcaster)) {
                 if (args.length > 1) {
                     try {
                         const group = await utils.Schemas.Group.findById(new mongoose.Types.ObjectId(args[1]))

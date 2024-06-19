@@ -1,4 +1,4 @@
-const { HelixStream } = require("twitch")
+const { HelixStream } = require("@twurple/api")
 
 const listener = {
     event: "live",

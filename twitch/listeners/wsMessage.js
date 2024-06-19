@@ -1,23 +1,24 @@
-const tmi = require("tmi.js");
+const utils = require("../../utils/");
+const ListenClient = require('../ListenClient');
+const { ChatMessage } = require('@twurple/chat');
 
 const listener = {
     name: "wsMessage",
     eventName: "message",
     /**
-     * 
-     * @param {tmi.Client} client 
-     * @param {*} streamer 
-     * @param {*} chatter 
-     * @param {tmi.ChatUserstate} tags 
+     * Listener for a message
+     * @param {ListenClient} client 
+     * @param {utils.Schemas.TwitchUser} streamer 
+     * @param {utils.Schemas.TwitchUser} chatter 
+     * @param {ChatMessage} msg 
      * @param {string} message 
-     * @param {*} self 
-     * @returns 
+     * @param {boolean} self
      */
-    listener: async (client, streamer, chatter, tags, message, self) => {
+    listener: async (client, streamer, chatter, msg, message, self) => {
         global.broadcast("chat", streamer._id, {
-            id: tags.id,
+            id: msg.id,
             chatter: chatter.public(),
-            badges: tags["badges-raw"],
+            badges: null, // TODO: Fix badges
             message: message,
         });
     }

@@ -134,6 +134,7 @@ router.post("/", async (req, res) => {
                     return error(`User ${user.display_name} is not listed as a moderator for ${twitchUsers.map(x => x.display_name).join(", ")}`);
                 }
             } catch(e) {
+                console.error(e);
                 return error(`Unable to retrieve user with ID ${req.body.users[i]}!`);
             }
         }

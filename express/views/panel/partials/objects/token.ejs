@@ -9,12 +9,6 @@
         <%= parseDate(token.created_at) %>
     </td>
     <td>
-        <%= parseDate(token.last_used) %>
-    </td>
-    <td>
-        <%= token.uses ? token.uses : "No" %> uses
-    </td>
-    <td>
         <a href="/panel/manage/tokens/<%= token._id %>/delete" aria-label="Delete"><i class="fa-solid fa-trash-can"></i></a>
     </td>
 </tr>

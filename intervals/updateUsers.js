@@ -8,7 +8,6 @@ const interval = {
     onStartup: true,
     run: async () => {
         if (running) return;
-        running = true;
 
         let users = await utils.Schemas.TwitchUser
                 .where("updated_at")
@@ -16,9 +15,13 @@ const interval = {
                 .sort({updated_at: 1})
                 .limit(100);
         
-        users = users.map(x => x.id);
+        users = users.map(x => x._id);
+
+        if (users.length === 0) return;
         
-        const helixUsers = await utils.Twitch.Helix.helix.users.getUsersByIds(users);
+        running = true;
+        
+        const helixUsers = await utils.Twitch.Helix.users.getUsersByIds(users);
 
         for (let i = 0; i < helixUsers.length; i++) {
             const user = helixUsers[i];
