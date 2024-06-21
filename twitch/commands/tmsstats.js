@@ -28,9 +28,9 @@ const command = {
         const discordUsers = await utils.Schemas.DiscordUser.estimatedDocumentCount();
 
         const totalActiveChannels =
-                global.client.listen.member.client.channels.length +
-                global.client.listen.partner.client.channels.length +
-                global.client.listen.affiliate.client.channels.length;
+                global.client.listen.member.client.currentChannels.length +
+                global.client.listen.partner.client.currentChannels.length +
+                global.client.listen.affiliate.client.currentChannels.length;
 
         reply(`TMS Stats -> ` +
                 `${utils.comma(twitchUsers)} Twitch Users | ` +
