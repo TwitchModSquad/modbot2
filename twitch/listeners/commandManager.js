@@ -42,12 +42,15 @@ const listener = {
         if (!streamer?.commands[command]) return;
 
         const reply = async (text, mention = true) => {
-            return await client.client.say(streamer.login, text, {
-                replyTo: mention ? msg.id : null,
+            return await utils.Twitch.Helix.asIntent(["tms:chat"], async ctx => {
+                return await ctx.chat.sendChatMessage(msg.channelId, text, {
+                    replyParentMessageId: mention ? msg.id : null,
+                });
             });
         }
 
         try {
+            console.log(`#${streamer.login}: processing command ${command}`);
             commands[command](client, streamer, chatter, args, msg, message, reply);
         } catch(err) {
             console.error(`Error while processing command ${command}:`)

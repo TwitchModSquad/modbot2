@@ -26,7 +26,7 @@ router.get("/", async (req, res) => {
                 if (accessToken.scope.includes("channel:read:subscriptions")) {
                     utils.Twitch.authProvider.addIntentsToUser(twitchUser._id, ["tms:chat"]);
                 } else {
-                    return res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users user:read:moderated_channels chat:read chat:edit channel:moderate moderator:read:followers channel:read:subscriptions"));
+                    return res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users user:read:moderated_channels chat:read chat:edit channel:moderate moderator:read:followers channel:read:subscriptions user:write:chat"));
                 }
             }
 
@@ -121,7 +121,7 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/bot", (req, res) => {
-    res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users user:read:moderated_channels chat:read chat:edit channel:moderate moderator:read:followers channel:read:subscriptions"));
+    res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users user:read:moderated_channels chat:read chat:edit channel:moderate moderator:read:followers channel:read:subscriptions user:write:chat"));
 });
 
 module.exports = router;
