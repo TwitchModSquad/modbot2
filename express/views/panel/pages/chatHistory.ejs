@@ -20,9 +20,15 @@
                 <div class="container container-md">
                     <div class="col-6">
                         <%- include("../partials/userSelector", {type: "twitch", name: "streamer", label: "Streamer", user: locals?.streamer ? locals.streamer : null, comma: comma}) %>
+                        <% if (locals?.streamer) { %>
+                        <a href="/panel/user/<%= streamer._id %>">View User Information for <%= streamer.display_name %></a>
+                        <% } %>
                     </div>
                     <div class="col-6">
                         <%- include("../partials/userSelector", {type: "twitch", name: "chatter", label: "Chatter", user: locals?.chatter ? locals.chatter : null, comma: comma}) %>
+                        <% if (locals?.chatter) { %>
+                        <a href="/panel/user/<%= chatter._id %>">View User Information for <%= chatter.display_name %></a>
+                        <% } %>
                     </div>
                 </div>
             </section>
