@@ -56,7 +56,7 @@ router.get("/", async (req, res) => {
             }
 
             if (twitchUsers.length === 0) {
-                res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users user:read:moderated_channels"));
+                res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users user:read:moderated_channels chat:read"));
             } else {
                 const joinedGuilds = await discordUser.getJoinedGuilds();
                 if (joinedGuilds.inAny) {

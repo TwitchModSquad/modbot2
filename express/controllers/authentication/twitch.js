@@ -113,10 +113,10 @@ router.get("/", async (req, res) => {
         } catch(err) {
             console.error("Error while logging in:");
             console.error(err);
-            res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users user:read:moderated_channels"));
+            res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users user:read:moderated_channels chat:read"));
         }
     } else {
-        res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users user:read:moderated_channels"));
+        res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users user:read:moderated_channels chat:read"));
     }
 });
 
