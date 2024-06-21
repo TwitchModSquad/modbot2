@@ -73,7 +73,7 @@ class ListenClient {
         
                 this.listeners.message.forEach(func => {
                     try {
-                        func(this, streamer, chatter, msg, message, msg.channelId === config.twitch.id);
+                        func(this, streamer, chatter, msg, message, msg.userInfo.userId === config.twitch.id);
                     } catch (e) {
                         console.error(e);
                     }
@@ -191,11 +191,12 @@ class ListenClient {
 
         if (this.type === "member") {
             let lastJoinTime = Date.now();
-            this.client.on("join", (channel, username, self) => {
-                if (self && channel.replace("#","").toLowerCase() === config.twitch.username) {
+            this.client.onJoin((channel, user) => {
+                console.log(`#${channel}: join`)
+                if (channel.replace("#","").toLowerCase() === config.twitch.username) {
                     joinedChannels.set("Bot");
                 }
-                if (self && lastJoinTime !== null) {
+                if (lastJoinTime !== null) {
                     lastJoinTime = Date.now();
                 }
             });
@@ -232,21 +233,6 @@ class ListenClient {
         setTimeout(() => {
             this.client.connect();
         }, 1000);
-    }
-
-    /**
-     * Returns if the bot is a moderator in a channel
-     * @param {TwitchUser} streamer 
-     * @return {boolean|null}
-     */
-    isMod(streamer) {
-        return null; // TODO: This is broken! Fix it or remove it.
-        const botState = this.client.userstate["#" + streamer.login];
-        if (botState !== undefined) {
-            return botState.mod;
-        } else {
-            return null;
-        }
     }
 
     /**
