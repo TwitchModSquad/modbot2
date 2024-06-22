@@ -36,7 +36,7 @@
                 <section>
                     <h2>Unjoined Channels</h2>
                     <p>These channels could not be joined as the concurrent limit has been reached, TwitchModSquad was banned, or another reason.</p>
-                    <% unjoinedChannels.forEach(channel => { %>
+                    <% unjoinedChannels.forEach(user => { %>
                     <code class="block">#<%= user.login %></code>
                     <% }) %>
                     <% if (unjoinedChannels.length === 0) { %> <code class="block">No channels to show!</code> <% } %>
