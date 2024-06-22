@@ -4,6 +4,9 @@ const config = require("../../config.json");
 const { EmbedBuilder, StringSelectMenuBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, codeBlock, cleanCodeBlockContent } = require("discord.js");
 const { ApiClient } = require("@twurple/api");
 
+const Flag = require("../flag/Flag");
+const oai = require("../gpt");
+
 const banSchema = new mongoose.Schema({
     streamer: {
         type: String,
@@ -23,6 +26,13 @@ const banSchema = new mongoose.Schema({
         index: true,
     },
     reason: String,
+    flags: {
+        type: [{
+            type: mongoose.Types.ObjectId,
+            ref: "Flag",
+        }],
+        default: [],
+    },
     time_start: {
         type: Date,
         default: Date.now,
@@ -44,7 +54,7 @@ banSchema.methods.public = function() {
     };
 }
 
-banSchema.methods.updateData = async function() {
+banSchema.methods.updateData = async function(save = false) {
     if (typeof(this.chatter) === "string" || typeof(this.streamer) === "string") {
         await this.populate(["chatter", "streamer"]);
     }
@@ -66,13 +76,85 @@ banSchema.methods.updateData = async function() {
             this.time_start = ban.creationDate;
             this.moderator = ban.moderatorId;
             this.reason = ban.reason;
-            await this.save();
+            if (save) {
+                await this.save();
+            }
             console.log(`Retrieved ban data for #${this.streamer.login}/${this.chatter.login}`);
         } else {
             console.warn(`Retrieved ban data for #${this.streamer.login}/${this.chatter.login}, but it was empty!`);
         }
     } catch(err) {
         console.warn(`Failed to get ban data for #${this.streamer.login}/${this.chatter.login}: ${err}`);
+    }
+}
+
+const parseFlags = async tags => {
+    const flags = [];
+    for (let i = 0; i < tags.length; i++) {
+        const effectiveName = tags[i].toLowerCase().replace(/[-_]/g, " ");
+        let flag = await Flag.findOne().or([{name: effectiveName}], {aliases: effectiveName});
+        if (!flag) {
+            flag = await Flag.create({
+                name: effectiveName,
+            });
+        }
+        flags.push(flag);
+    }
+    return flags;
+}
+
+banSchema.methods.updateFlags = async function(chatHistory, save = false) {
+    if (chatHistory.length === 0) return;
+    if (config.development) {
+        return console.warn("Will not retrieve flags from GPT as development mode is on!");
+    }
+
+    try {
+        const assistant = await oai.beta.assistants.retrieve(config.gpt.assistants.ban);
+        const thread = await oai.beta.threads.create();
+        const message = await oai.beta.threads.messages.create(thread.id, {
+            role: "user",
+            content: chatHistory.map(x => x.message).join("\n"),    
+        });
+        const run = await oai.beta.threads.runs.createAndPoll(thread.id, {
+            assistant_id: assistant.id,
+        });
+        if (run.status === "completed") {
+            
+            const messages = await oai.beta.threads.messages.list(thread.id);
+            const assistantMessage = messages.data.find(x => x.role === "assistant");
+
+            if (assistantMessage?.content && assistantMessage.content.length > 0) {
+                const message = assistantMessage.content[0].text?.value;
+                if (message) {
+                    try {
+                        const jsonObject = JSON.parse(message);
+                        if (typeof(jsonObject.tags) === "object") {
+                            if (jsonObject.tags.length > 0) {
+                                this.flags = await parseFlags(jsonObject.tags);
+                                if (save) {
+                                    await this.save();
+                                }
+                            } else {
+                                console.log("No tags returned from ban " + this._id);
+                            }
+                            console.log(`Completed parsing flags for ban ${this._id}`)
+                        } else {
+                            console.error("Invalid JSON: " + jsonObject);
+                        }
+                    } catch(err) {
+                        console.error(err);
+                        console.error("Failed to parse json: " + message);
+                    }
+                } else {
+                    console.error("Flag message text is missing from " + this._id);
+                }
+            } else {
+                console.error("Failed to get flag content from " + this._id);
+            }
+        }
+    } catch(err) {
+        console.error(err);
     }
 }
 
@@ -93,7 +175,7 @@ banSchema.methods.getChatHistory = async function() {
     return chatHistory;
 }
 
-banSchema.methods.message = async function(showButtons = false, getData = false, bpm = null) {
+banSchema.methods.message = async function(showButtons = false, getData = false, bpm = null, chatHistory = null) {
     if (typeof(this.chatter) === "string" || typeof(this.streamer) === "string") {
         await this.populate(["chatter", "streamer"]);
     }
@@ -110,6 +192,15 @@ banSchema.methods.message = async function(showButtons = false, getData = false,
             .setThumbnail(this.chatter.profile_image_url)
             .setAuthor({iconURL: this.streamer.profile_image_url, name: this.streamer.display_name, url: `https://twitch.tv/${this.streamer.login}`})
             .setColor(0xe3392d);
+
+    if (this?.flags && this.flags.length > 0) {
+        await this.populate("flags");
+        embed.addFields({
+            name: "Flags",
+            value: codeBlock(this.flags.map(x => `${x.icon ? x.icon + " " : ""}${x.displayName()}`)),
+            inline: true,
+        })
+    }
 
     if (typeof(this.moderator) === "string") {
         await this.populate("moderator");
@@ -129,7 +220,9 @@ banSchema.methods.message = async function(showButtons = false, getData = false,
 
     const components = [];
 
-    const chatHistory = await this.getChatHistory();
+    if (!chatHistory) {
+        chatHistory = await this.getChatHistory();
+    }
 
     let chatHistoryString = "";
     chatHistory.forEach(ch => {

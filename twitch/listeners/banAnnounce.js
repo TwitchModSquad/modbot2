@@ -31,8 +31,16 @@ const listener = {
         // We don't announce bans from channels with more than 5 bans per minute
         if (bpm > 5) return;
 
+        const chatHistory = await ban.getChatHistory();
+
+        if (bpm <= 3) {
+            await ban.updateData(false);
+            await ban.updateFlags(chatHistory, false);
+            await ban.save();
+        }
+
         try {
-            const message = await ban.message(true, true, bpm);
+            const message = await ban.message(true, false, bpm, chatHistory);
 
             const logMessage = async message => {
                 try {

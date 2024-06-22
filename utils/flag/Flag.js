@@ -8,6 +8,10 @@ const flagSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
+    aliases: {
+        type: [String],
+        default: [],
+    },
     icon: {
         type: String,
     },
@@ -17,5 +21,16 @@ const flagSchema = new mongoose.Schema({
         maxLength: 128,
     },
 });
+
+const toTitleCase = str => {
+    return str.replace(
+        /\w\S*/g,
+        text => text.charAt(0).toUpperCase() + text.substring(1).toLowerCase()
+    );
+}
+
+flagSchema.methods.displayName = function() {
+    return toTitleCase(this.name);
+}
 
 module.exports = mongoose.model("Flag", flagSchema);
