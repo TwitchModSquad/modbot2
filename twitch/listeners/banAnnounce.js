@@ -28,9 +28,6 @@ const listener = {
             return;
         }
 
-        // We don't announce bans from non-member channels
-        if (client.type !== "member") return;
-
         // We don't announce bans from channels with more than 5 bans per minute
         if (bpm > 5) return;
 
