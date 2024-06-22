@@ -296,11 +296,7 @@ banSchema.methods.message = async function(showButtons = false, getData = false,
                     new ButtonBuilder()
                         .setCustomId("hide-ban")
                         .setLabel("Hide Ban")
-                        .setStyle(ButtonStyle.Secondary),
-                    new ButtonBuilder()
-                        .setCustomId("flag")
-                        .setLabel("Add Flag")
-                        .setStyle(ButtonStyle.Primary)
+                        .setStyle(ButtonStyle.Secondary)
                 )
         );
     }
