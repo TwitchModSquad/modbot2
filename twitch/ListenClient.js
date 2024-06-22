@@ -30,7 +30,7 @@ class ListenClient {
 
     /**
      * Channels that could not be joined due to excessive concurrent channels
-     * @type {{_id:string,login:string,display_name:string}[]}
+     * @type {{user:{_id:string,login:string,display_name:string},reason:string}[]}
      */
     unjoined = [];
 
@@ -206,7 +206,7 @@ class ListenClient {
         }
 
         if (defaultShard.client.currentChannels.length >= 100) {
-            this.unjoined.push(user);
+            this.unjoined.push({user, reason: "Concurrent Limit"});
             console.warn(`Unable to join ${user.login} due to excessive concurrent channels!`);
             return null;
         }
@@ -215,7 +215,7 @@ class ListenClient {
             await defaultShard.join(user.login);
             return defaultShard;
         } catch(err) {
-            this.unjoined.push(user);
+            this.unjoined.push({user, reason: "Unknown"});
             console.error(`Unable to join ${user.login}: ${err}`);
         }
         return null;
@@ -296,6 +296,10 @@ class ListenClient {
         });
         
         shard.client.onJoinFailure((channel, reason) => {
+            this.unjoined.push({
+                user: channel,
+                reason: String(reason),
+            });
             console.warn(`[${shard.scope}] Unable to join channel ${channel}: ${reason}`);
         });
 
