@@ -14,16 +14,7 @@
         
         <main class="container container-md">
             <div class="col-4">
-                <% if (shards.find(x => x.type === "default")) { defaultChannels = shards.find(x => x.type === "default").client.currentChannels %>
-                <section>
-                    <h2><img src="/assets/images/logos/logo_guy.png" alt="The Mod Squad Logo"> Limited Channels</h2>
-                    <p>These channels do not have a moderator authorized with TMS or have not moderated the TMS bot. Channels in this category are limited to 100.</p>
-                    <% defaultChannels.forEach(user => { %>
-                        <code class="block"><%= user %></code>
-                    <% }) %>
-                    <% if (defaultChannels.length === 0) { %> <code class="block">No channels to show!</code> <% } %>
-                </section>
-                <% } if (shards.find(x => x.type === "tms")) { moddedChannels = shards.find(x => x.type === "tms").client.currentChannels %>
+                <% if (shards.find(x => x.type === "tms")) { moddedChannels = shards.find(x => x.type === "tms").client.currentChannels %>
                 <section>
                     <h2><img src="/assets/images/badges/twitch/moderator.png" alt="Green Sword"> Moderated Channels</h2>
                     <p>These channels have TwitchModSquad listed as a moderator, and therefore TMS can directly connect to these channels without issue.</p>
@@ -42,17 +33,27 @@
                     <% if (unjoinedChannels.length === 0) { %> <code class="block">No channels to show!</code> <% } %>
                 </section>
             </div>
-            <div class="col-8">
-                <div class="container container-sm">
-                    <% shards.filter(x => x.type === "user").forEach(shard => { %>
-                    <section class="col-6">
-                        <h2><img src="<%= shard.user.profile_image_url %>" alt=""> <%= shard.user.display_name %></h2>
-                        <% shard.client.currentChannels.forEach(user => { %>
-                            <code class="block"><%= user %></code>
-                        <% }) %>
-                    </section>
+            <div class="col-4">
+                <% if (shards.find(x => x.type === "default")) { defaultChannels = shards.find(x => x.type === "default").client.currentChannels %>
+                <section>
+                    <h2><img src="/assets/images/logos/logo_guy.png" alt="The Mod Squad Logo"> Limited Channels</h2>
+                    <p>These channels do not have a moderator authorized with TMS or have not moderated the TMS bot. Channels in this category are limited to 100.</p>
+                    <% defaultChannels.forEach(user => { %>
+                        <code class="block"><%= user %></code>
                     <% }) %>
-                </div>
+                    <% if (defaultChannels.length === 0) { %> <code class="block">No channels to show!</code> <% } %>
+                </section>
+                <% } %>
+            </div>
+            <div class="col-4">
+                <% shards.filter(x => x.type === "user").forEach(shard => { %>
+                <section>
+                    <h2><img src="<%= shard.user.profile_image_url %>" alt=""> <%= shard.user.display_name %></h2>
+                    <% shard.client.currentChannels.forEach(user => { %>
+                        <code class="block"><%= user %></code>
+                    <% }) %>
+                </section>
+                <% }) %>
             </div>
         </main>
     </div>
