@@ -3,7 +3,7 @@ const router = express.Router();
 
 const utils = require("../../../utils/");
 
-const {member,partner,affiliate} = require("../../../twitch/");
+const twitchClient = require("../../../twitch/");
 
 const FORCE_UPDATE_MINIMUM = 1 * 60 * 60 * 1000;
 const BAN_HISTORY_BACKLOG = 3 * 60 * 60 * 1000;
@@ -117,9 +117,21 @@ router.get("/:query", async (req, res) => {
 
             data.listeningClients = [];
 
-            if (member.channels.includes(twitchUser.login)) data.listeningClients.push("Member");
-            if (partner.channels.includes(twitchUser.login)) data.listeningClients.push("Partner");
-            if (affiliate.channels.includes(twitchUser.login)) data.listeningClients.push("Affiliate");
+            const shard = twitchClient.getShardFor(twitchUser.login);
+            if (shard) {
+                if (shard.type === "default") {
+                    data.listeningClients = ["Limited Shard"]
+                } else if (shard.type === "tms") {
+                    data.listeningClients = ["Moderator Shard"];
+                } else {
+                    data.listeningClients = [shard.user.display_name + " Shard"];
+                }
+            } else {
+                const unjoinedEntry = twitchClient.unjoined.find(x => x.user === twitchUser.login);
+                if (unjoinedEntry) {
+                    data.listeningClients = ["Unjoinable: " + unjoinedEntry.reason]
+                }
+            }
 
             data.streamers = await twitchUser.getStreamers();
             data.moderators = await twitchUser.getMods();

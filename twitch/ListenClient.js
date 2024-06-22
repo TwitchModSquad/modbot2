@@ -229,7 +229,7 @@ class ListenClient {
     getShardFor(channelName) {
         for (let i = 0; i < this.shards.length; i++) {
             const shard = this.shards[i];
-            if (shard.client.currentChannels.includes(channelName)) {
+            if (shard.client.currentChannels.includes("#" + channelName)) {
                 return shard;
             }
         }
