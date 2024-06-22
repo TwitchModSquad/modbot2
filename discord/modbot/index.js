@@ -39,11 +39,7 @@ client.listeners.forEach(listener => {
 });
 
 setInterval(() => {
-    let totalChannels = 0;
-
-    totalChannels += global.client.listen.member.channels.length;
-    totalChannels += global.client.listen.partner.channels.length;
-    totalChannels += global.client.listen.affiliate.channels.length;
+    let totalChannels = global.client.twitch.totalChannels();
 
     client.user.setPresence({
         activities: [

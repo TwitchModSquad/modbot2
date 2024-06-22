@@ -5,6 +5,8 @@ const fs = require('fs');
 
 global.client = {};
 
+global.twitchAuthReady = false;
+
 const utils = require("./utils/");
 
 const grabFiles = path => fs.readdirSync(path).filter(file => file.endsWith('.js'));

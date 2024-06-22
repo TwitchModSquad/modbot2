@@ -231,11 +231,7 @@ class StatsManager {
         this.generalStatistics.bans = await global.utils.Schemas.TwitchBan.estimatedDocumentCount();
         this.generalStatistics.timeouts = await global.utils.Schemas.TwitchTimeout.estimatedDocumentCount();
 
-        const clients = global.client.listen;
-        this.generalStatistics.streamers =
-                clients.member.channels.length +
-                clients.partner.channels.length +
-                clients.affiliate.channels.length;
+        this.generalStatistics.streamers = global.client.twitch.totalChannels();
     }
 
     /**

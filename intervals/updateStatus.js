@@ -1,6 +1,6 @@
 const utils = require("../utils/");
 
-const listenClients = require("../twitch/");
+const twitchClient = require("../twitch/");
 
 const io = require("@pm2/io");
 
@@ -22,7 +22,7 @@ const interval = {
     interval: 15000,
     onStartup: true,
     run: async () => {
-        memberChannels.set(listenClients.member.channels.length);
+        memberChannels.set(twitchClient.totalChannels());
 
         cachedTwitch.set(Object.keys(utils.Twitch.userCache.objectStore).length);
         cachedDiscord.set(Object.keys(utils.Discord.userCache.objectStore).length);

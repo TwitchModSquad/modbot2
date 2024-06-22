@@ -43,9 +43,7 @@ setInterval(() => {
     if (page === 1) {
         let totalChannels = 0;
     
-        totalChannels += global.client.listen.member.channels.length;
-        totalChannels += global.client.listen.partner.channels.length;
-        totalChannels += global.client.listen.affiliate.channels.length;
+        totalChannels += global.client.twitch.totalChannels();
     
         client.user.setPresence({
             activities: [

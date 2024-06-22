@@ -14,6 +14,24 @@ const authProvider = new RefreshingAuthProvider({
     redirectUri: config.express.domain.root + "auth/twitch",
 });
 
+authProvider.onRefresh((userId, token) => {
+    TwitchToken.findOneAndUpdate({
+        user: userId,
+    }, {
+        tokenData: token,
+    }).then(() => {
+        console.log("Refreshed token for " + userId);
+    }, err => {
+        console.log("Failed to update token refresh for " + userId + "!");
+    });
+});
+
+authProvider.onRefreshFailure((userId, error) => {
+    console.error("Removing refresh token for " + userId + ". Error:");
+    console.error(error);
+    TwitchToken.deleteMany({user: userId}).catch(console.error);
+});
+
 const api = new ApiClient({
     authProvider,
 });
@@ -24,17 +42,17 @@ const api = new ApiClient({
     let foundTMSUser = false;
 
     tokens.forEach(token => {
-        let intents = [];
+        authProvider.addUser(token.user, token.tokenData);
 
         if (token.user === config.twitch.id) {
-            intents.push("tms:chat");
+            authProvider.addIntentsToUser(token.user, ["tms:chat","chat"]);
             foundTMSUser = true;
         }
-
-        authProvider.addUser(token.user, token.tokenData, intents);
     });
 
-    if (!foundTMSUser) {
+    if (foundTMSUser) {
+        global.twitchAuthReady = true;
+    } else {
         console.error("TwitchModSquad is not authenticated! We may not join channels or fetch data.")
     }
 

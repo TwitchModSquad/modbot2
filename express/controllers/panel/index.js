@@ -3,7 +3,7 @@ const router = express.Router();
 
 const utils = require("../../../utils/");
 
-const listenClients = require("../../../twitch/");
+const twitchClient = require("../../../twitch/");
 
 const archive = require("./archive");
 const chatHistory = require("./chatHistory");
@@ -20,10 +20,7 @@ router.get("/", async (req, res) => {
 
     const streamers = await req.session.identity.getStreamers();
 
-    const memberChannels = listenClients.member.channels.length;
-    const partnerChannels = listenClients.partner.channels.length;
-    const affiliateChannels = listenClients.affiliate.channels.length;
-    const totalChannels = memberChannels + partnerChannels + affiliateChannels;
+    const totalChannels = twitchClient.totalChannels();
     
     const cachedTwitchUsers = utils.comma(Object.keys(utils.Twitch.userCache.objectStore).length);
     const cachedDiscordUsers = utils.comma(Object.keys(utils.Discord.userCache.objectStore).length);
@@ -42,10 +39,7 @@ router.get("/", async (req, res) => {
         comma: utils.comma,
         stats: [
             ["Uptime", utils.formatElapsed(Math.floor((Date.now() - global.startTime) / 1000))],
-            ["Member Channels", memberChannels],
-            ["Partner Channels", partnerChannels],
-            ["Affiliate Channels", affiliateChannels],
-            ["Total Channels", totalChannels],
+            ["Joined Channels", totalChannels],
             ["Cached Twitch Users", cachedTwitchUsers],
             ["Cached Discord Users", cachedDiscordUsers],
         ]

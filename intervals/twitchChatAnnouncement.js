@@ -25,6 +25,10 @@ const interval = {
             message = `Visit one of our members - ${stream.user.display_name} playing ${stream.game.name} at twitch.tv/${stream.user.login} !`;
         }
 
+        utils.Twitch.Helix.asIntent(["tms:chat"], ctx => {
+            ctx.chat.sendChatMessage(config.twitch.id, message).catch(console.error);
+        });
+
         global.client.listen.member.client.say(config.twitch.username, message).catch(console.error);
 
         nextIndex++;

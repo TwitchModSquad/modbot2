@@ -19,9 +19,7 @@ const command = {
         chatter.blacklisted = !chatter.blacklisted;
         await chatter.save();
         if (chatter.blacklisted) {
-            global.client.listen.member.part(chatter.login);
-            global.client.listen.partner.part(chatter.login);
-            global.client.listen.affiliate.part(chatter.login);
+            global.client.twitch.part(chatter.login);
             reply(`TMS will no longer join your channel`).catch(console.error);
         } else {
             reply(`TMS ${chatter.chat_listen ? "will" : "may"} now join your channel`).catch(console.error);

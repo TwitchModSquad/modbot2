@@ -1,23 +1,18 @@
-const { ChatClient, ChatMessage, ClearChat } = require("@twurple/chat")
+const { ChatMessage, ClearChat } = require("@twurple/chat")
 const fs = require('fs');
 
 const utils = require("../utils/");
 const config = require("../config.json");
 
-const grabFiles = path => fs.readdirSync(path).filter(file => file.endsWith('.js'));
+const ListenShard = require("./ListenShard");
 
-const TwitchUser = require("../utils/twitch/TwitchUser");
+const grabFiles = path => fs.readdirSync(path).filter(file => file.endsWith('.js'));
 
 const twitchListeners = grabFiles('./twitch/listeners');
 
 const io = require("@pm2/io");
 
-const joinedChannels = io.metric({
-    id: "app/realtime/joinedChannels",
-    name: "Joined Channels",
-});
-
-joinedChannels.set("Joining...");
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 class ListenClient {
 
@@ -28,16 +23,16 @@ class ListenClient {
     type;
 
     /**
-     * Represents the twurple chat client
-     * @type {ChatClient}
+     * Represents the ListenShards
+     * @type {ListenShard[]}
      */
-    client;
+    shards = [];
 
     /**
-     * Channels that the client is currently listening to
-     * @type {string[]}
+     * Channels that could not be joined due to excessive concurrent channels
+     * @type {{_id:string,login:string,display_name:string}[]}
      */
-    channels = [];
+    unjoined = [];
 
     /**
      * Holds listeners for TMI events
@@ -137,19 +132,120 @@ class ListenClient {
     }
 
     /**
-     * Adds channel to channel list & joins it if the client is initialized
-     * @param {string} channel 
+     * Unknown listeners. These listeners are added to the ChatClient manually, without any wrapping.
+     * @type {{name:string,eventName:string,listener:function}[]}
      */
-    join(channel) {
-        channel = channel.replace("#", "").toLowerCase();
-        if (this.channels.includes(channel)) return;
-        this.channels.push(channel);
-        if (this.client)
-            this.client.join(channel).catch(err => {
-                this.channels = this.channels.filter(x => x !== channel);
-                console.error("Error occurred while joining #" + channel + ":");
-                console.error(err);
-            });
+    unknownListeners = [];
+
+    /**
+     * Adds channel to channel list & joins it if the client is initialized
+     * @param {{_id:string,login:string}} user 
+     * @returns {Promise<ListenShard?>}
+     */
+    async join(user) {
+        if (this.getShardFor(user.login)) {
+            return console.warn(`Attempted to join ${channel}, but they have already been joined!`);
+        }
+
+        const moderators = (await user.getMods()).map(x => x.moderator);
+        
+        // First critera: TwitchModSquad is a moderator, use their shard!
+        if (moderators.find(x => x._id === config.twitch.id)) {
+            let tmsShard = this.shards.find(x => x.type === "tms");
+            while (!tmsShard) {
+                console.warn("No TMS client present. Retrying");
+                tmsShard = this.shards.find(x => x.type === "tms");
+                await delay(1000);
+            }
+            tmsShard.join(user.login).catch(console.error);
+            return tmsShard;
+        }
+
+        // Second criteria: If there already is a ListenShard with a moderator of the channel, use their shard!
+        let existingModShard;
+
+        for (let i = 0; i < this.shards.length; i++) {
+            const shard = this.shards[i];
+            if (shard.type !== "user") continue;
+
+            for (let y = 0; y < moderators.length; y++) {
+                const moderator = moderators[y];
+                if (moderator._id === shard.user._id) {
+                    existingModShard = shard;
+                    break;
+                }
+            }
+
+            if (existingModShard) break;
+        }
+        
+        if (existingModShard) {
+            existingModShard.join(user.login).catch(console.error);
+            return existingModShard;
+        }
+
+        // Third criteria: Attempt to find a moderator with a chat:read token
+        for (let i = 0; i < moderators.length; i++) {
+            const moderator = moderators[i];
+            const tokens = await moderator.getTokens();
+            if (tokens.find(x => x.tokenData.scope.includes("chat:read"))) {
+                utils.Twitch.authProvider.addIntentsToUser(moderator._id, [`${moderator._id}:chat`])
+                const modShard = new ListenShard(moderator, "user", `${moderator._id}:chat`);
+                this.initializeShard(modShard);
+                modShard.join(user.login).catch(console.error);
+                return modShard;
+            }
+        }
+
+        // Fourth criteria: If there is enough space on the default shard, join that one!
+        let defaultShard = this.shards.find(x => x.type === "default");
+        while (!defaultShard) {
+            defaultShard = this.shards.find(x => x.type === "default");
+            console.warn("Unable to get default shard! Retrying");
+            await delay(1000);
+        }
+
+        if (defaultShard.client.currentChannels.length >= 100) {
+            this.unjoined.push(user);
+            console.warn(`Unable to join ${user.login} due to excessive concurrent channels!`);
+            return null;
+        }
+
+        try {
+            await defaultShard.join(user.login);
+            return defaultShard;
+        } catch(err) {
+            this.unjoined.push(user);
+            console.error(`Unable to join ${user.login}: ${err}`);
+        }
+        return null;
+    }
+
+    /**
+     * Returns the shard for the specified channel, or null if they are not joined
+     * @param {string} channelName 
+     * @returns {ListenShard?}
+     */
+    getShardFor(channelName) {
+        for (let i = 0; i < this.shards.length; i++) {
+            const shard = this.shards[i];
+            if (shard.client.currentChannels.includes(channelName)) {
+                return shard;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the total channels in this ListenClient
+     * @returns {number}
+     */
+    totalChannels() {
+        let total = 0;
+        this.shards.forEach(shard => {
+            total += shard.totalChannels();
+        });
+        return total;
     }
     
     /**
@@ -163,10 +259,7 @@ class ListenClient {
             this.client.part(channel);
     }
 
-    /**
-     * Internal function to initialize the listeners to this client
-     */
-    initialize() {
+    initializeListeners() {
         for (const file of twitchListeners) {
             const listener = require(`./listeners/${file}`);
 
@@ -178,65 +271,73 @@ class ListenClient {
                     listener.listener,
                 ];
             } else {
-                this.client[listener.eventName](listener.listener);
+                this.unknownListeners.push(listener);
+                console.warn(`Unknown listener ${listener.name} used (of event name ${listener.eventName})`)
             }
         }
+    }
 
+    initializeBPMCounter() {
         setInterval(() => {
             for (const [streamer, timestampList] of Object.entries(this.bannedPerMinute)) {
                 let now = Date.now();
                 this.bannedPerMinute[streamer] = timestampList.filter(ts => now - ts < 60000);
             }
         }, 1000);
-
-        if (this.type === "member") {
-            let lastJoinTime = Date.now();
-            this.client.onJoin((channel, user) => {
-                console.log(`#${channel}: join`)
-                if (channel.replace("#","").toLowerCase() === config.twitch.username) {
-                    joinedChannels.set("Bot");
-                }
-                if (lastJoinTime !== null) {
-                    lastJoinTime = Date.now();
-                }
-            });
-            const interval = setInterval(() => {
-                if (Date.now() - lastJoinTime > 20000) {
-                    joinedChannels.set("All");
-                    clearInterval(interval);
-                    lastJoinTime = null;
-                }
-            }, 5000);
-        }
-
-        this.client.onMessage(this.listenerWrappers.message);
-        this.client.onTimeout(this.listenerWrappers.timeout);
-        this.client.onBan(this.listenerWrappers.ban);
     }
 
     /**
-     * Creates the client, initializes it, and connects to TMI
+     * Internal function to initialize the listeners to this client
+     * @param {ListenShard} shard
      */
-    connect() {
-        this.client = new ChatClient({
-            authProvider: utils.Twitch.authProvider,
-            channels: this.channels,
-            authIntents: ["tms:chat"],
+    initializeShard(shard) {
+        shard.client.onJoin((channel, user) => {
+            console.log(`[${shard.scope}] #${channel}: joined with user ${user}`);
+        });
+        
+        shard.client.onJoinFailure((channel, reason) => {
+            console.warn(`[${shard.scope}] Unable to join channel ${channel}: ${reason}`);
         });
 
-        this.initialize();
+        shard.client.onMessage(this.listenerWrappers.message);
+        shard.client.onTimeout(this.listenerWrappers.timeout);
+        shard.client.onBan(this.listenerWrappers.ban);
 
-        this.client.onConnect(() => {
-            console.log(`ListenClient for ${this.type} connected!`);
+        shard.client.onConnect(() => {
+            if (shard.user) {
+                console.log(`ListenClient ${shard.type} (${shard.user.login}) connected!`);
+            } else {
+                console.log(`ListenClient ${shard.type} connected!`);
+            }
         });
 
-        setTimeout(() => {
-            this.client.connect();
-        }, 1000);
+        this.unknownListeners.forEach(listener => {
+            shard.client.on(listener.eventName, listener.listener);
+        });
+
+        shard.client.connect();
+
+        this.shards.push(shard);
     }
 
     /**
-     * 
+     * Creates the clients, initializes them, and connects to TMI
+     */
+    initialize() {
+        this.initializeListeners();
+        this.initializeBPMCounter();
+
+        // Initialize default TMS shard
+        const defaultShard = new ListenShard(null, "default", ["tms:chat"]);
+        this.initializeShard(defaultShard);
+
+        // Initialize TMS shard (for channels with TwitchModSquad as a moderator)
+        const tmsShard = new ListenShard(null, "tms", ["tms:chat"]);
+        this.initializeShard(tmsShard);
+    }
+
+    /**
+     * Constructor for a ListenClient
      * @param {"member"|"partner"|"affiliate"} type 
      */
     constructor(type) {
