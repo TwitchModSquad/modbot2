@@ -26,7 +26,7 @@ router.get("/", async (req, res) => {
                 if (accessToken.scope.includes("channel:read:subscriptions")) {
                     utils.Twitch.authProvider.addIntentsToUser(twitchUser._id, ["tms:chat"]);
                 } else {
-                    return res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users user:read:moderated_channels chat:read chat:edit channel:moderate moderator:read:followers channel:read:subscriptions user:write:chat"));
+                    return res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users moderation:read user:read:moderated_channels chat:read chat:edit channel:moderate moderator:read:followers channel:read:subscriptions user:write:chat"));
                 }
             }
 
@@ -113,15 +113,15 @@ router.get("/", async (req, res) => {
         } catch(err) {
             console.error("Error while logging in:");
             console.error(err);
-            res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users user:read:moderated_channels chat:read"));
+            res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users moderation:read user:read:moderated_channels chat:read"));
         }
     } else {
-        res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users user:read:moderated_channels chat:read"));
+        res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users moderation:read user:read:moderated_channels chat:read"));
     }
 });
 
 router.get("/bot", (req, res) => {
-    res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users user:read:moderated_channels chat:read chat:edit channel:moderate moderator:read:followers channel:read:subscriptions user:write:chat"));
+    res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users moderation:read user:read:moderated_channels chat:read chat:edit channel:moderate moderator:read:followers channel:read:subscriptions user:write:chat"));
 });
 
 module.exports = router;

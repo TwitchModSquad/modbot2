@@ -24,7 +24,7 @@ router.get("/", async (req, res) => {
     }
 
     res.render("panel/pages/authentication/login", {
-        twitchURI: utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users user:read:moderated_channels chat:read"),
+        twitchURI: utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users moderation:read user:read:moderated_channels chat:read"),
         discordURI: utils.Authentication.Discord.getURL(),
         identity: req.session.identity,
         twitchUsers: twitchUsers,

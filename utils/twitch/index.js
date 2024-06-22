@@ -37,18 +37,29 @@ const api = new ApiClient({
 });
 
 (async function() {
-    const tokens = await TwitchToken.find({});
+    const tokens = await TwitchToken
+        .find({})
+        .populate("user");
 
     let foundTMSUser = false;
 
-    tokens.forEach(token => {
-        authProvider.addUser(token.user, token.tokenData);
+    for (let i = 0; i < tokens.length; i++) {
+        const token = tokens[i];
+        authProvider.addUser(token.user._id, token.tokenData);
 
-        if (token.user === config.twitch.id) {
-            authProvider.addIntentsToUser(token.user, ["tms:chat","chat"]);
+        let intents = [];
+
+        if (token.user._id === config.twitch.id) {
+            intents = ["tms:chat", "chat"];
             foundTMSUser = true;
         }
-    });
+
+        if (token.tokenData.scope.includes("moderation:read")) {
+            intents.push(`${token.user._id}:bandata`);
+        }
+
+        if (intents.length > 0) authProvider.addIntentsToUser(token.user._id, intents);
+    }
 
     if (foundTMSUser) {
         global.twitchAuthReady = true;

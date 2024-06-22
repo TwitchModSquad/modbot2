@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const config = require("../../config.json");
 const { EmbedBuilder, StringSelectMenuBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, codeBlock, cleanCodeBlockContent } = require("discord.js");
+const { ApiClient } = require("@twurple/api");
 
 const banSchema = new mongoose.Schema({
     streamer: {
@@ -43,29 +44,64 @@ banSchema.methods.public = function() {
     };
 }
 
+banSchema.methods.updateData = async function() {
+    if (typeof(this.chatter) === "string" || typeof(this.streamer) === "string") {
+        await this.populate(["chatter", "streamer"]);
+    }
+
+    /**
+     * @type {ApiClient}
+     */
+    const client = global.utils.Twitch.Helix;
+
+    try {
+        const banData = await client.asIntent([`${this.streamer._id}:bandata`], async ctx => {
+            return await ctx.moderation.getBannedUsers(this.streamer._id, {
+                userId: this.chatter._id,
+                limit: 1,
+            })
+        });
+        if (banData.data.length > 0) {
+            const ban = banData.data[0];
+            this.time_start = ban.creationDate;
+            this.moderator = ban.moderatorId;
+            this.reason = ban.reason;
+            await this.save();
+            console.log(`Retrieved ban data for #${this.streamer.login}/${this.chatter.login}`);
+        } else {
+            console.warn(`Retrieved ban data for #${this.streamer.login}/${this.chatter.login}, but it was empty!`);
+        }
+    } catch(err) {
+        console.warn(`Failed to get ban data for #${this.streamer.login}/${this.chatter.login}: ${err}`);
+    }
+}
+
+banSchema.methods.getChatHistory = async function() {
+    const chatHistory = await global.utils.Schemas.TwitchChat
+        .find({
+            streamer: this.streamer,
+            chatter: this.chatter,
+            time_sent: {
+                $lte: this.time_start,
+            }
+        })
+        .sort({time_sent: -1})
+        .limit(10);
+
+    chatHistory.reverse();
+
+    return chatHistory;
+}
+
 banSchema.methods.message = async function(showButtons = false, getData = false, bpm = null) {
-    await this.populate("chatter");
-    await this.populate("streamer");
+    if (typeof(this.chatter) === "string" || typeof(this.streamer) === "string") {
+        await this.populate(["chatter", "streamer"]);
+    }
 
     const startTime = Date.now();
 
-    let banData = null;
     if (getData) {
-        try {
-            const streamerTokens = await this.streamer.getTokens(["moderator:manage:banned_users"]);
-            let accessToken = null;
-            for (let i = 0; i < streamerTokens.length; i++) {
-                try {
-                    accessToken = await utils.Authentication.Twitch.getAccessToken(streamerTokens[i].refresh_token);
-                    await streamerTokens[i].use();
-                } catch(e) {}
-            }
-            if (accessToken) {
-                banData = await utils.Authentication.Twitch.getBan(accessToken, this.streamer._id, this.chatter._id);
-            }
-        } catch(e) {
-            console.error(e);
-        }
+        await this.updateData();
     }
 
     const embed = new EmbedBuilder()
@@ -75,31 +111,30 @@ banSchema.methods.message = async function(showButtons = false, getData = false,
             .setAuthor({iconURL: this.streamer.profile_image_url, name: this.streamer.display_name, url: `https://twitch.tv/${this.streamer.login}`})
             .setColor(0xe3392d);
 
-    if (banData) {
+    if (typeof(this.moderator) === "string") {
+        await this.populate("moderator");
+    }
+
+    if (this?.moderator?.display_name) {
         embed.addFields({
             name: "Moderator",
-            value: codeBlock(banData.moderator_name),
+            value: codeBlock(this.moderator.display_name),
             inline: true,
         }, {
             name: "Reason",
-            value: codeBlock(cleanCodeBlockContent(banData.reason ? banData.reason : "No reason")),
+            value: codeBlock(cleanCodeBlockContent(this.reason ? this.reason : "No reason")),
             inline: true,
         });
     }
 
     const components = [];
 
-    const chatHistory = await utils.Schemas.TwitchChat
-            .find({streamer: this.streamer._id, chatter: this.chatter._id})
-            .sort({time_sent: -1})
-            .limit(10);
-
-    chatHistory.reverse();
+    const chatHistory = await this.getChatHistory();
 
     let chatHistoryString = "";
     chatHistory.forEach(ch => {
         if (chatHistoryString !== "") chatHistoryString += "\n";
-        chatHistoryString += `${utils.formatTime(ch.time_sent)} [${this.chatter.display_name}] ${ch.message}`;
+        chatHistoryString += `${global.utils.formatTime(ch.time_sent)} [${this.chatter.display_name}] ${ch.message}`;
     });
 
     if (chatHistoryString === "")

@@ -117,7 +117,7 @@ class ListenClient {
                     ...this.bannedPerMinute[streamer._id],
                     Date.now(),
                 ]
-        
+                
                 this.listeners.ban.forEach(func => {
                     try {
                         func(this, streamer, chatter, msg.date, msg, this.bannedPerMinute[streamer._id].length);

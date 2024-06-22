@@ -8,7 +8,7 @@ const listenClients = require("../../../twitch/");
 
 router.use(async (req, res, next) => {
     if (!req?.session?.identity) {
-        res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users user:read:moderated_channels chat:read"));
+        res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users moderation:read user:read:moderated_channels chat:read"));
         return;
     }
 
@@ -16,7 +16,7 @@ router.use(async (req, res, next) => {
     const discordUsers = await req.session.identity.getDiscordUsers();
 
     if (twitchUsers.length === 0) {
-        res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users user:read:moderated_channels chat:read"));
+        res.redirect(utils.Authentication.Twitch.getURL("user:read:email moderator:manage:banned_users moderation:read user:read:moderated_channels chat:read"));
         return;
     }
     if (discordUsers.length === 0) {
