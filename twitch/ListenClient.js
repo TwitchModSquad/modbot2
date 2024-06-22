@@ -215,7 +215,6 @@ class ListenClient {
             await defaultShard.join(user.login);
             return defaultShard;
         } catch(err) {
-            this.unjoined.push({user: user.login, reason: "Unknown"});
             console.error(`Unable to join ${user.login}: ${err}`);
         }
         return null;
