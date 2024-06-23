@@ -24,6 +24,9 @@ $(function() {
         message.badgeUrls.forEach(badge => {
             chatterLink.append(`<img src="${badge.url}" alt="${badge.name}" title="${badge.name}">`);
         });
+        const badges = chatterLink.find("img").detach();
+        chatterLink.append(badges);
+        badges.after(" ");
         const chatterSpan = $("<span></span>");
         chatterSpan.css("color", message.color);
         chatterSpan.text(message.chatter.display_name);
