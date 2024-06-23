@@ -1,6 +1,6 @@
 const config = require("../config.json");
 
-const MOST_ACTIVE_TIME = 15 * 1000; // 15 seconds
+const MOST_ACTIVE_TIME = 60 * 1000; // 60 seconds
 const MOST_ACTIVE_CHANNEL_COUNT = 15;
 const MAX_FOLLOWERS = 10;
 const MAX_SUBSCRIBERS = 10;
