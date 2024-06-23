@@ -70,6 +70,22 @@ const api = new ApiClient({
     console.log(`Added ${tokens.length} pre-existing tokens to AuthProvider`)
 })();
 
+const pm2 = require("@pm2/io");
+
+const databaseMetric = pm2.meter({
+    id: "tuser/db-hits",
+    name: "Twitch User DB Hits/Min",
+    samples: 1,
+    timeframe: 60,
+});
+
+const apiMetric = pm2.meter({
+    id: "tuser/api-hits",
+    name: "Twitch User API Hits/Min",
+    samples: 1,
+    timeframe: 60,
+});
+
 class Twitch {
 
     /**
@@ -104,6 +120,7 @@ class Twitch {
     getUserByIdByForce(id) {
         return new Promise(async (resolve, reject) => {
             try {
+                apiMetric.mark();
                 const user = await api.users.getUserByIdBatched(id);
     
                 const dbUser = await TwitchUser.findOneAndUpdate(
@@ -148,6 +165,7 @@ class Twitch {
                 return reject("No user ID was given");
             }
 
+            databaseMetric.mark();
             const user = await TwitchUser.findById(id)
                     .populate("identity");
             if (user) {
@@ -171,6 +189,7 @@ class Twitch {
     getUserByNameByForce(login) {
         return new Promise(async (resolve, reject) => {
             try {
+                apiMetric.mark();
                 let helixUser = await api.helix.users.getUserByName(login);
 
                 if (helixUser) {
@@ -222,6 +241,7 @@ class Twitch {
                         return;
                     } catch(e) {}
                 }
+                databaseMetric.mark();
                 const user = await TwitchUser.findOne({login: login})
                     .populate("identity");
                 if (user) {
@@ -229,6 +249,7 @@ class Twitch {
                     resolve(user);
                 } else {
                     if (requestIfUnavailable) {
+                        apiMetric.mark();
                         this.getUserByNameByForce(login).then(resolve, reject);
                     } else {
                         reject("User not found!");
