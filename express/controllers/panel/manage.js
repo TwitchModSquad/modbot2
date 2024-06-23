@@ -5,7 +5,7 @@ const router = express.Router();
 
 const utils = require("../../../utils/");
 
-const listenClients = require("../../../twitch/");
+const twitchClient = require("../../../twitch/");
 
 const FRIENDLY_SCOPES = {
     "moderator:manage:banned_users": "Manage Banned Users",
@@ -153,11 +153,9 @@ router.post("/streamers", async (req, res) => {
                 let newValue = req.body["active-" + streamer._id] ? true : false;
                 if (newValue !== streamer.chat_listen) {
                     if (newValue) {
-                        listenClients.member.join(streamer.login);
-                        listenClients.partner.part(streamer.login);
-                        listenClients.affiliate.part(streamer.login);
+                        twitchClient.join(streamer);
                     } else {
-                        listenClients.member.part(streamer.login);
+                        twitchClient.part(streamer.login);
                     }
 
                     streamer.chat_listen = newValue;

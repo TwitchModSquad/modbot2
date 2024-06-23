@@ -4,7 +4,7 @@ const router = express.Router();
 
 const utils = require("../../../utils/");
 
-const listenClients = require("../../../twitch/");
+const twitchClient = require("../../../twitch/");
 
 router.use(async (req, res, next) => {
     if (!req?.session?.identity) {
@@ -118,11 +118,9 @@ router.post("/", async (req, res) => {
                     }
                     let listen = req.body.hasOwnProperty(`listen-${user._id}`) && (req.body[`listen-${user._id}`] === "on" || req.body[`listen-${user._id}`] === "true");
                     if (listen) {
-                        listenClients.member.join(user.login);
-                        listenClients.partner.part(user.login);
-                        listenClients.affiliate.part(user.login);
+                        twitchClient.join(user);
                     } else {
-                        listenClients.member.part(user.login);
+                        twitchClient.part(user.login);
                     }
                     user.chat_listen = listen;
                     try {

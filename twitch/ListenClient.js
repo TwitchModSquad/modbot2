@@ -253,9 +253,9 @@ class ListenClient {
      */
     part(channel) {
         channel = channel.replace("#", "").toLowerCase();
-        this.channels = this.channels.filter(x => x !== channel);
-        if (this.client)
-            this.client.part(channel);
+        this.shards.forEach(shard => {
+            shard.part(channel);
+        });
     }
 
     initializeListeners() {

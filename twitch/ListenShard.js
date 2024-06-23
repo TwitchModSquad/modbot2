@@ -45,6 +45,15 @@ class ListenShard {
     }
 
     /**
+     * Parts from the specified channel
+     * @param {string} channel 
+     * @returns {void}
+     */
+    part(channel) {
+        return this.client.part(channel);
+    }
+
+    /**
      * Returns the total channels in this ListenShard
      * @returns {number}
      */

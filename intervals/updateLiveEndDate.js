@@ -64,9 +64,6 @@ const updateStreams = async streams => {
             utils.EventManager.fire("offline", stream.user);
             stream.endDate = Date.now();
             await stream.save();
-            
-            listenClients.partner.part(stream.user.login);
-            listenClients.affiliate.part(stream.user.login);
         }
     }
 }
