@@ -7,6 +7,7 @@ const twitchClient = require("../../../twitch/");
 router.get("/", async (req, res) => {
     res.render("panel/pages/status", {
         unjoinedChannels: twitchClient.unjoined,
+        channelsJoined: global.twitchChannelsJoined,
         shards: twitchClient.shards,
         comma: utils.comma,
     });

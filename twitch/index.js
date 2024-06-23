@@ -30,6 +30,8 @@ const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
                     console.error(err);
                 }
             }
+            console.log(`Channel joining completed!`)
+            global.twitchChannelsJoined = true;
         },
     console.error);
 })();

@@ -6,6 +6,7 @@ const fs = require('fs');
 global.client = {};
 
 global.twitchAuthReady = false;
+global.twitchChannelsJoined = false;
 
 const utils = require("./utils/");
 
