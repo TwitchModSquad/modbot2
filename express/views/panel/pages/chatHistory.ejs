@@ -78,6 +78,9 @@
     </div>
     
     <div class="notifications"></div>
+    <script>
+        let lastTimestamp = <%= history.length > 0 ? history[history.length - 1].time_sent.getTime() : "null" %>;
+    </script>
 <%- include("../partials/javascript") %>
     <script src="/assets/js/userSelector.js"> </script>
     <script src="/assets/js/chatHistory.js"> </script>
