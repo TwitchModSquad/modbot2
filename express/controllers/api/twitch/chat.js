@@ -88,7 +88,11 @@ router.get("/", async (req, res) => {
         .map(msg => {
             msg = msg.public();
             msg.prettyTimeSent = utils.parseDate(msg.time_sent);
-            msg.badgeUrls = badges.filter(badge => msg.badges.includes(badge.text));
+            if (msg.badges) {
+                msg.badgeUrls = badges.filter(badge => msg.badges.includes(badge.text));
+            } else {
+                msg.badgeUrls = [];
+            }
             return msg;
         });
 
