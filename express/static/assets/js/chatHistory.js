@@ -19,7 +19,7 @@ $(function() {
     
         const msgElem = $('<td class="message"></td>');
         msgElem.text(": " + message.message)
-        const chatterLink = $('<a class="chat-user" data-type="chatter"></a>');
+        const chatterLink = $('<a href="#" class="chat-user" data-type="chatter"></a>');
         chatterLink.attr("data-id", message.chatter.id);
         message.badgeUrls.forEach(badge => {
             chatterLink.append(`<img src="${badge.url}" alt="${badge.name}" title="${badge.name}">`);
