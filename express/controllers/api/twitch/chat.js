@@ -80,44 +80,21 @@ router.get("/", async (req, res) => {
         limit = Math.min(500, Math.max(1, limit)); // restricts number from 1 to 500
     }
 
-    let data = [];
-    const initialMessages = await utils.Schemas.TwitchChat
+    const data = (await utils.Schemas.TwitchChat
         .find(searchQuery)
         .sort({time_sent: -1})
-        .limit(limit);
-
-    for (let i = 0; i < initialMessages.length; i++) {
-        const message = initialMessages[i];
-        const streamer = await utils.Twitch.getUserById(message.streamer);
-        const chatter = await utils.Twitch.getUserById(message.chatter);
-
-        let badgeUrls = [];
-        if (message.badges) {
-            badgeUrls = badges.filter(badge => message.badges.includes(badge.text));
-        }
-
-        data.push({
-            id: message._id,
-            streamer: {
-                id: streamer._id,
-                login: streamer.login,
-                display_name: streamer.display_name,
-            },
-            chatter: {
-                id: chatter._id,
-                login: chatter.login,
-                display_name: chatter.display_name,
-            },
-            color: message.color,
-            badges: message.badges,
-            emotes: message.emotes,
-            message: message.message,
-            deleted: message.deleted,
-            time_sent: message.time_sent,
-            prettyTimeSent: utils.parseDate(message.time_sent),
-            badgeUrls,
+        .populate(["streamer","chatter"])
+        .limit(limit))
+        .map(msg => {
+            msg = msg.public();
+            msg.prettyTimeSent = utils.parseDate(msg.time_sent);
+            if (msg.badges) {
+                msg.badgeUrls = badges.filter(badge => msg.badges.includes(badge.text));
+            } else {
+                msg.badgeUrls = [];
+            }
+            return msg;
         });
-    }
 
     res.json({
         ok: true,
