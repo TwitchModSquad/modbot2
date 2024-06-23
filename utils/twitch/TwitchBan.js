@@ -197,7 +197,7 @@ banSchema.methods.message = async function(showButtons = false, getData = false,
         await this.populate("flags");
         embed.addFields({
             name: "Flags",
-            value: codeBlock(this.flags.map(x => `${x.icon ? x.icon + " " : ""}${x.displayName()}`)),
+            value: codeBlock(this.flags.map(x => `${x.icon ? x.icon + " " : ""}${x.displayName()}`).join(", ")),
             inline: true,
         })
     }
