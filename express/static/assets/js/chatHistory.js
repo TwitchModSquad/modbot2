@@ -14,6 +14,7 @@ $(function() {
         }
     
         const date = $('<td class="date"></td>');
+        date.attr("title", lastDate);
         date.text(message.prettyTimeSent);
         msg.append(date);
     
@@ -77,8 +78,13 @@ $(function() {
                 if (data.ok) {
                     const messages = data.data;
                     const chatbox = $(".chat tbody");
+
                     messages.forEach(message => {
                         const msg = parseMessage(message);
+                        if (lastDate !== message.prettyDateSent) {
+                            lastDate = message.prettyDateSent;
+                            chatbox.append(`<tr><th class="date" colspan="${streamer === "none" ? "3" : "2"}"><span>${lastDate}</span></th></tr>`);
+                        }
                         chatbox.append(msg);
                     })
                     lastTimestamp = data.cursor;

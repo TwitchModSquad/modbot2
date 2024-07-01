@@ -34,15 +34,19 @@
             </section>
 
             <section class="col-12">
-                <h2><i class="fa-solid fa-comments"></i> Chat History <small>History Generated in <%= elapsed %> ms</small></h2>
+                <h2><i class="fa-solid fa-comments"></i> Chat History <small>History Generated in <%= elapsed %> ms. All times are in EST</small></h2>
 
                 <table class="chat">
                     <tbody>
-                        <% history.forEach(row => { %>
-                            <% if (row.type === "message") { %>
+                        <% let lastDate = ""; history.forEach(row => { 
+                            if (lastDate !== parseDateOnly(row.time_sent)) { lastDate = parseDateOnly(row.time_sent); %>
+                        <tr>
+                            <th colspan="<%= locals?.streamer ? "2" : "3" %>" class="date"><span><%= lastDate %></span></th>
+                        </tr><% }
+                            if (row.type === "message") { %>
                         <tr>
                             <% if (!locals?.streamer) { %><td class="channel chat-user" data-type="streamer" data-id="<%= row.streamer.id %>">#<%= row.streamer.login %></td><% } %>
-                            <td class="date"><%= parseDate(row.time_sent) %></td>
+                            <td class="date" title="<%= lastDate %>"><%= parseTimeOnly(row.time_sent) %></td>
                             <td class="message">
                                 <a href="#" class="chat-user" data-type="chatter" data-id="<%= row.chatter.id %>">
                                     <% if (row.badges) { %>
@@ -60,13 +64,13 @@
                             <% } else if (row.type === "ban") { %>
                         <tr>
                             <% if (!locals?.streamer) { %><td class="channel chat-user" data-type="streamer" data-id="<%= row.streamer.id %>">#<%= row.streamer.login %></td><% } %>
-                            <td class="date"><%= parseDate(row.time_start) %></td>
+                            <td class="date"><%= parseTimeOnly(row.time_start) %></td>
                             <td class="message"><span class="punishment-message">User <%= row.chatter.display_name %> was banned in channel #<%= row.streamer.login %>!<%- row.time_end ? " <strong><em>(inactive)</em></strong>" : "" %></span></td>
                         </tr>
                             <% } else if (row.type === "timeout") { %>
                         <tr>
                             <% if (!locals?.streamer) { %><td class="channel chat-user" data-type="streamer" data-id="<%= row.streamer.id %>">#<%= row.streamer.login %></td><% } %>
-                            <td class="date"><%= parseDate(row.time_start) %></td>
+                            <td class="date"><%= parseTimeOnly(row.time_start) %></td>
                             <td class="message"><span class="punishment-message">User <%= row.chatter.display_name %> was timed out in channel #<%= row.streamer.login %> for <%= comma(row.duration) %> seconds!<%- Date.now() > row.time_end ? " <strong><em>(inactive)</em></strong>" : "" %></span></td>
                         </tr>
                             <% } %>
@@ -79,6 +83,7 @@
     
     <div class="notifications"></div>
     <script>
+        let lastDate = "<%= history.length > 0 ? parseDateOnly(history[history.length - 1].time_sent) : "" %>";
         let lastTimestamp = <%= history.length > 0 ? history[history.length - 1].time_sent.getTime() : "null" %>;
     </script>
 <%- include("../partials/javascript") %>

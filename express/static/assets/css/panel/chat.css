@@ -22,7 +22,30 @@ table.chat td.channel[data-id] {
 }
 
 table.chat td.date {
+    position: relative;
     color: var(--tertiary-text-color);
+    cursor: default;
+}
+
+table.chat td.date[title]::before {
+    content: attr(title);
+    background-color: var(--primary-background-color);
+    color: var(--primary-text-color);
+    padding: .4em .6em;
+    border-radius: 5px;
+    position: absolute;
+    top: -1.3em;
+    left: -.6em;
+    box-shadow: var(--shadow);
+    visibility: hidden;
+    opacity: 0;
+    transition: 250ms;
+}
+
+table.chat td.date[title]:hover::before {
+    visibility: visible;
+    opacity: 1;
+    top: -2.2em;
 }
 
 table.chat td.message {
@@ -40,16 +63,19 @@ table.chat td.message span {
     text-shadow: 1px 1px 5px rgba(255,255,255,0.05);
 }
 
+table.chat th.date span {
+    display: block;
+    padding-bottom: .2em;
+    margin: .2em 0;
+    font-size: 1.05em;
+    text-align: left;
+    border-bottom: 1px solid var(--tertiary-text-color);
+}
+
 table.chat .punishment-message {
     color: #de4747;
 }
 
 table.chat img {
     height: .9rem;
-}
-
-@media only screen and (max-width: 900px) {
-    table.chat td.date {
-        display: none;
-    }
 }

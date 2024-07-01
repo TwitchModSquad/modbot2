@@ -87,7 +87,8 @@ router.get("/", async (req, res) => {
         .limit(limit))
         .map(msg => {
             msg = msg.public();
-            msg.prettyTimeSent = utils.parseDate(msg.time_sent);
+            msg.prettyDateSent = utils.parseDateOnly(msg.time_sent);
+            msg.prettyTimeSent = utils.parseTimeOnly(msg.time_sent);
             if (msg.badges) {
                 msg.badgeUrls = badges.filter(badge => msg.badges.includes(badge.text));
             } else {
