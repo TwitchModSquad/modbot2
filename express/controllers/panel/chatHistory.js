@@ -102,6 +102,8 @@ const generateData = async (req, res) => {
         chatter: chatter,
         elapsed: Date.now() - startTime,
         parseDate: date => utils.parseDate(date),
+        parseDateOnly: date => utils.parseDateOnly(date),
+        parseTimeOnly: date => utils.parseTimeOnly(date),
         comma: utils.comma,
     };
 }

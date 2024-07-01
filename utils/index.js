@@ -359,11 +359,24 @@ class Utils {
     }
 
     /**
-     * Parses date from a timestamp to MM:DD:YY HH:MM:SS
-     * @param { Number | String | Date | undefined } timestamp - The timestamp to parse, if provided, otherwise the current time is parsed
-     * @returns {String} The parsed Date in the format MM:DD:YY HH:MM:SS
+     * Parses a date MM.DD.YYYY
+     * @param { Number | String | Date | undefined} timestamp 
+     * @returns {String}
      */
-    parseDate(timestamp) {
+    parseDateOnly(timestamp) {
+        let dte = new Date(timestamp);
+
+        let mo = "" + (dte.getMonth() + 1);
+        let dy = "" + dte.getDate();
+        let yr = dte.getFullYear();
+
+        if (mo.length === 1) mo = "0" + mo;
+        if (dy.length === 1) dy = "0" + dy;
+
+        return `${this.parseDay(dte.getDay())} ${mo}.${dy}.${yr}`;
+    }
+
+    parseTimeOnly(timestamp) {
         let dte = new Date(timestamp);
 
         let hr = "" + dte.getHours();
@@ -374,14 +387,16 @@ class Utils {
         if (mn.length === 1) mn = "0" + mn;
         if (sc.length === 1) sc = "0" + sc;
 
-        let mo = "" + (dte.getMonth() + 1);
-        let dy = "" + dte.getDate();
-        let yr = dte.getFullYear();
+        return `${hr}:${mn}:${sc}`;
+    }
 
-        if (mo.length === 1) mo = "0" + mo;
-        if (dy.length === 1) dy = "0" + dy;
-
-        return `${this.parseDay(dte.getDay())} ${mo}.${dy}.${yr} ${hr}:${mn}:${sc}`;
+    /**
+     * Parses date from a timestamp to MM:DD:YY HH:MM:SS
+     * @param { Number | String | Date | undefined } timestamp - The timestamp to parse, if provided, otherwise the current time is parsed
+     * @returns {String} The parsed Date in the format MM:DD:YY HH:MM:SS
+     */
+    parseDate(timestamp) {
+        return `${this.parseDateOnly(timestamp)} ${this.parseTimeOnly(timestamp)}`;
     }
 
     /**
