@@ -317,6 +317,8 @@ userSchema.methods.generateCommunityTable = async function(allChannelHistory = n
 
     let channelHistoryTable = [["Channel", "Last Active", ""]];
 
+    const bans = await TwitchBan.find({chatter: this._id, time_end: null}).populate("streamer");
+
     for (let i = 0; i < Math.min(memberChannelHistory.length, 15); i++) {
         const history = memberChannelHistory[i];
         channelHistoryTable.push([
@@ -330,8 +332,6 @@ userSchema.methods.generateCommunityTable = async function(allChannelHistory = n
 
     if (otherChannelCount > 0)
         channelHistoryTable.push(["", "Other Channels", ""]);
-
-    const bans = await TwitchBan.find({chatter: this._id, time_end: null}).populate("streamer");
     
     for (let i = 0; i < otherChannelCount; i++) {
         const history = channelHistory[i];
