@@ -323,7 +323,7 @@ userSchema.methods.generateCommunityTable = async function(allChannelHistory = n
         const history = memberChannelHistory[i];
         channelHistoryTable.push([
             history.streamer.display_name,
-            global.utils.parseDate(history.last_message),
+            global.utils.parseDateOnly(history.last_message),
             bans.find(x => x.streamer._id === history.streamer._id) ? "❌ Banned" : "",
         ]);
     }
@@ -337,7 +337,7 @@ userSchema.methods.generateCommunityTable = async function(allChannelHistory = n
         const history = channelHistory[i];
         channelHistoryTable.push([
             history.streamer.display_name,
-            global.utils.parseDate(history.last_message),
+            global.utils.parseDateOnly(history.last_message),
             bans.find(x => x.streamer._id === history.streamer._id) ? "❌ Banned" : "",
         ]);
     }
