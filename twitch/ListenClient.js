@@ -150,7 +150,7 @@ class ListenClient {
         const moderators = (await user.getMods()).map(x => x.moderator);
         
         // First critera: TwitchModSquad is a moderator, use their shard!
-        if (moderators.find(x => x._id === config.twitch.id)) {
+        if (moderators.find(x => x._id === config.twitch.id) || user._id === config.twitch.id) {
             let tmsShard = this.shards.find(x => x.type === "tms");
             while (!tmsShard) {
                 console.warn("No TMS client present. Retrying");
@@ -161,7 +161,29 @@ class ListenClient {
             return tmsShard;
         }
 
-        // Second criteria: If there already is a ListenShard with a moderator of the channel, use their shard!
+        // Second criteria: If the user is authorized, use their own shard!
+        // Check if a user has an existing shard
+        for (let i = 0; i < this.shards.length; i++) {
+            const shard = this.shards[i];
+            if (shard.type !== "user") continue;
+
+            if (user._id === shard.user._id) {
+                shard.join(user.login).catch(console.error);
+                return shard;
+            }
+        }
+
+        // Attept to get a shard for the user
+        const tokens = await user.getTokens();
+        if (tokens.find(x => x.tokenData.scope.includes("chat:read"))) {
+            utils.Twitch.authProvider.addIntentsToUser(user._id, [`${user._id}:chat`]);
+            const ownShard = new ListenShard(user, "user", `${user._id}:chat`);
+            this.initializeShard(ownShard);
+            ownShard.join(user.login).catch(console.error);
+            return ownShard;
+        }
+
+        // Third criteria: If there already is a ListenShard with a moderator of the channel, use their shard!
         let existingModShard;
 
         for (let i = 0; i < this.shards.length; i++) {
@@ -184,7 +206,7 @@ class ListenClient {
             return existingModShard;
         }
 
-        // Third criteria: Attempt to find a moderator with a chat:read token
+        // Fourth criteria: Attempt to find a moderator with a chat:read token
         for (let i = 0; i < moderators.length; i++) {
             const moderator = moderators[i];
             const tokens = await moderator.getTokens();
@@ -197,7 +219,7 @@ class ListenClient {
             }
         }
 
-        // Fourth criteria: If there is enough space on the default shard, join that one!
+        // Fifth criteria: If there is enough space on the default shard, join that one!
         let defaultShard = this.shards.find(x => x.type === "default");
         while (!defaultShard) {
             defaultShard = this.shards.find(x => x.type === "default");
