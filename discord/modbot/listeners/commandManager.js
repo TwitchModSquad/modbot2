@@ -34,6 +34,7 @@ const listener = {
         interaction.error = error;
 
         try {
+            console.log(`[MB:${interaction.guild.name}:${interaction.user.username}]: Processing command /${interaction.commandName}`);
             cmd.execute(interaction);
         } catch (error) {
             console.error(error);

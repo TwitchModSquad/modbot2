@@ -51,9 +51,10 @@ const listener = {
 
         if (interaction.tms.guild && interaction.tms.guild.commands[interaction.commandName]) {
             try {
+                console.log(`[MBM:${interaction.guild.name}:${interaction.user.username}]: Processing command /${interaction.commandName}`);
                 cmd.execute(interaction);
             } catch (error) {
-                global.api.Logger.warning(error);
+                console.error(error);
                 interaction.reply('***There was an error trying to execute that command!***');
             }
         } else {
