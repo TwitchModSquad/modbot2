@@ -9,6 +9,14 @@ const messageSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "TwitchBan",
     },
+    discordBan: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "DiscordBan",
+    },
+    discordKick: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "DiscordKick",
+    },
     live: {
         type: String,
         ref: "TwitchLivestream",

@@ -6,7 +6,8 @@ const client = new Discord.Client({
         Discord.GatewayIntentBits.Guilds,
         Discord.GatewayIntentBits.GuildMembers,
         Discord.GatewayIntentBits.GuildMessages,
-        Discord.GatewayIntentBits.MessageContent
+        Discord.GatewayIntentBits.GuildModeration,
+        Discord.GatewayIntentBits.MessageContent,
     ]
 });
 global.client.mbm = client;

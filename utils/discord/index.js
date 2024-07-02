@@ -78,6 +78,7 @@ class Discord {
                     _id: user.id,
                     globalName: user.globalName,
                     displayName: user.displayName,
+                    username: user.username,
                     discriminator: user.discriminator,
                     avatar: user.avatar,
                 });

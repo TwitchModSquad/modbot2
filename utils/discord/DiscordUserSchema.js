@@ -18,6 +18,9 @@ const userSchema = new mongoose.Schema({
         minLength: 1,
         maxLength: 32,
     },
+    username: {
+        type: String,
+    },
     discriminator: {
         type: String,
         maxLength: 4,
@@ -60,6 +63,7 @@ userSchema.methods.public = function() {
         id: this._id,
         globalName: this.globalName,
         displayName: this.displayName,
+        username: this.username,
         discriminator: this.discriminator,
         avatar: this.avatar,
         avatarURL: this.avatarURL(),

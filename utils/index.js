@@ -19,6 +19,7 @@ const ArchiveMessage = require("./archive/ArchiveMessage");
 const ArchiveUser = require("./archive/ArchiveUser");
 
 const DiscordBan = require("./discord/DiscordBan");
+const DiscordKick = require("./discord/DiscordKick");
 const DiscordGuild = require("./discord/DiscordGuild");
 const DiscordUser = require("./discord/DiscordUser");
 const DiscordMessage = require("./discord/DiscordMessage");
@@ -104,6 +105,7 @@ class Utils {
         ArchiveMessage: ArchiveMessage,
         ArchiveUser: ArchiveUser,
         DiscordBan: DiscordBan,
+        DiscordKick: DiscordKick,
         DiscordGuild: DiscordGuild,
         DiscordUser: DiscordUser,
         DiscordMessage: DiscordMessage,

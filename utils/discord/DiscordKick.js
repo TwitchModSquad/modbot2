@@ -1,7 +1,7 @@
 const { EmbedBuilder, codeBlock, cleanCodeBlockContent, ButtonBuilder, ButtonStyle, ActionRowBuilder } = require("discord.js");
 const mongoose = require("mongoose");
 
-const banSchema = new mongoose.Schema({
+const kickSchema = new mongoose.Schema({
     guild: {
         type: String,
         ref: "DiscordGuild",
@@ -28,13 +28,9 @@ const banSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
-    time_end: {
-        type: Date,
-        default: null,
-    }
 });
 
-banSchema.methods.message = async function(ephemeral = false) {
+kickSchema.methods.message = async function(ephemeral = false) {
     const crossbanButton = new ButtonBuilder()
         .setCustomId("cb-d-" + this.user._id)
         .setStyle(ButtonStyle.Danger)
@@ -50,15 +46,14 @@ banSchema.methods.message = async function(ephemeral = false) {
     };
 }
 
-banSchema.methods.embed = async function() {
+kickSchema.methods.embed = async function() {
     await this.populate(["guild","user","executor"]);
 
     const embed = new EmbedBuilder()
-            .setTitle("Discord user has been banned!")
-            .setDescription(`User <@${this.user._id}> (${this.user.globalName}) was banned from guild \`${this.guild.name}\``)
+            .setTitle("Discord user has been kicked!")
+            .setDescription(`User <@${this.user._id}> (${this.user.globalName}) was kicked from guild \`${this.guild.name}\``)
             .setThumbnail(this.user.avatarURL())
-            .setAuthor({iconURL: this.guild.iconURL(), name: this.guild.name})
-            .setColor(0xad2117);
+            .setAuthor({iconURL: this.guild.iconURL(), name: this.guild.name});
 
     if (this.reason) {
         embed.addFields({
@@ -79,4 +74,4 @@ banSchema.methods.embed = async function() {
     return embed;
 }
 
-module.exports = mongoose.model("DiscordBan", banSchema);
+module.exports = mongoose.model("DiscordKick", kickSchema);
