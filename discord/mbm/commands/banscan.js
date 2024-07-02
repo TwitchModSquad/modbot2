@@ -105,9 +105,12 @@ const command = {
     async execute(interaction) {
         await interaction.deferReply({ephemeral: true});
         utils.Twitch.getUserByName(interaction.options.getString("channel", true)).then(async channel => {
+            const logHeader = `[MBM:${interaction.guild.name}:${interaction.user.username}]: /banscan: `;
+            console.log(`${logHeader}Retrieving user chats for channel ${channel.login}`);
             const userChats = await utils.Schemas.TwitchUserChat.find({streamer: channel})
                 .populate("chatter");
             const results = [];
+            console.log(`${logHeader}Retrieved ${userChats.length} user chats in channel ${channel.login}`)
             for (let i = 0; i < userChats.length; i++) {
                 const userChat = userChats[i];
                 const bans = punishmentStore.bans.filter(x => x.chatter === userChat.chatter._id && x.streamer !== channel._id);
@@ -121,6 +124,7 @@ const command = {
                             console.error(err);
                         }
                     }
+                    console.log(`${logHeader}Found user ${userChat.chatter.login} banned in ${channels.map(x => x.login).join(", ")}`);
                     results.push({chatter: userChat.chatter, channels});
                 }
             }
@@ -130,6 +134,8 @@ const command = {
                 results,
                 interaction,
             };
+
+            console.log(`${logHeader}Sending result message`);
 
             if (results.length > 0) {
                 interaction.editReply(command.formatResultMessage(channel, results));
