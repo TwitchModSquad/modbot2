@@ -38,12 +38,12 @@
 
                 <table class="chat">
                     <tbody>
-                        <% let lastDate = ""; history.forEach(row => { 
+                        <% let lastDate = ""; history.forEach(row => {
+                            if (row.type === "message") {  
                             if (lastDate !== parseDateOnly(row.time_sent)) { lastDate = parseDateOnly(row.time_sent); %>
                         <tr>
                             <th colspan="<%= locals?.streamer ? "2" : "3" %>" class="date"><span><%= lastDate %></span></th>
-                        </tr><% }
-                            if (row.type === "message") { %>
+                        </tr><% }%>
                         <tr>
                             <% if (!locals?.streamer) { %><td class="channel chat-user" data-type="streamer" data-id="<%= row.streamer.id %>">#<%= row.streamer.login %></td><% } %>
                             <td class="date" title="<%= lastDate %>"><%= parseTimeOnly(row.time_sent) %></td>
