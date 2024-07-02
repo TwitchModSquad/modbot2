@@ -315,10 +315,7 @@ userSchema.methods.generateCommunityTable = async function(allChannelHistory = n
     let memberChannelHistory = allChannelHistory.filter(x => x.streamer.chat_listen);
     let channelHistory = allChannelHistory.filter(x => !x.streamer.chat_listen);
 
-    let channelHistoryTable = [["Channel", "Last Active"]];
-
-    if (memberChannelHistory.length > 0)
-        channelHistoryTable.push(["", "Member Channels"]);
+    let channelHistoryTable = [["Channel", "Last Active", ""]];
 
     for (let i = 0; i < Math.min(memberChannelHistory.length, 15); i++) {
         let history = memberChannelHistory[i];
@@ -328,11 +325,28 @@ userSchema.methods.generateCommunityTable = async function(allChannelHistory = n
     const otherChannelCount = Math.min(channelHistory.length, 15) - memberChannelHistory.length;
 
     if (otherChannelCount > 0)
-        channelHistoryTable.push(["", "Other Channels"]);
+        channelHistoryTable.push(["", "Other Channels", ""]);
 
+    const bans = await TwitchBan.find({chatter: this._id, time_end: null}).populate("streamer");
+    
     for (let i = 0; i < otherChannelCount; i++) {
-        let history = channelHistory[i];
-        channelHistoryTable.push([history.streamer.display_name, global.utils.parseDate(history.last_message)])
+        const history = channelHistory[i];
+        channelHistoryTable.push([
+            history.streamer.display_name,
+            global.utils.parseDate(history.last_message),
+            bans.find(x.streamer._id === history.streamer._id) ? "❌ Banned" : "",
+        ])
+    }
+
+    for (let i = 0; i < bans.length; i++) {
+        const ban = bans[i];
+        if (!channelHistory.find(x => x.streamer._id === ban.streamer)) {
+            channelHistoryTable.push([
+                ban.streamer.display_name,
+                "No chat logs!",
+                "❌ Banned",
+            ])
+        }
     }
 
     return global.utils.stringTable(channelHistoryTable, 2);
