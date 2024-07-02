@@ -83,13 +83,13 @@ userSchema.pre("save", function(next) {
     next();
 });
 
-userSchema.methods.embed = async function(bans = null, communities = null) {
+userSchema.methods.embed = async function(bans = null, communities = null, streamers = null) {
     const mods = await this.getMods();
-    const streamers = await this.getStreamers();
     const flags = await this.getFlags();
 
     if (!bans) bans = await this.getBans();
     if (!communities) communities = await this.getActiveCommunities();
+    if (!streamers) streamers = await this.getStreamers();
 
     const embed = new EmbedBuilder()
             .setAuthor({name: this.display_name, iconURL: this.profile_image_url, url: `https://twitch.tv/${this.login}`})
@@ -161,8 +161,33 @@ userSchema.methods.embed = async function(bans = null, communities = null) {
 userSchema.methods.message = async function(ephemeral = true) {
     const bans = await this.getBans();
     const communities = await this.getActiveCommunities();
+    const streamers = await this.getStreamers();
 
     const components = [];
+
+    if (streamers.length > 0) {
+        const crossbanSelectMenu = new StringSelectMenuBuilder()
+            .setCustomId("cb-t-" + this._id)
+            .setMinValues(1)
+            .setMaxValues(streamers.length)
+            .setOptions([
+                {label: this.display_name, value: this._id},
+                ...streamers.map(x => {return {label: x.streamer.display_name, value: x.streamer._id}}),
+            ]);
+
+        const tokens = await this.getTokens();
+        if (tokens.find(x => x.tokenData.scope.includes("moderator:manage:banned_users"))) {
+            crossbanSelectMenu.setPlaceholder("Crossban User in Channels");
+        } else {
+            crossbanSelectMenu.setPlaceholder("Re-auth to crossban! tms.to/join");
+            crossbanSelectMenu.setDisabled(true);
+        }
+
+        components.push(
+            new ActionRowBuilder()
+                .setComponents(crossbanSelectMenu)
+        )
+    }
     
     if (bans.length > 0) {
         const banSelectMenu = new StringSelectMenuBuilder()
