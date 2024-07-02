@@ -41,7 +41,7 @@ const listener = {
                 embeds.push(await message.discordKick.embed());
             }
 
-            if (embeds.length > 4) break;
+            if (embeds.length > 9) break;
         }
 
         if (embeds.length > 0) {
