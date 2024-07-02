@@ -64,7 +64,7 @@ const command = {
             const result = results[i];
             const opt = {
                 label: result.chatter.display_name,
-                description: ("Banned in " + result.channels.map(x => x.display_name).join(", ")).substring(1, 100),
+                description: ("Banned in " + result.channels.map(x => x.display_name).join(", ")).substring(0, 100),
                 value: result.chatter._id,
             };
             viewInfoSelect.addOptions(opt);
