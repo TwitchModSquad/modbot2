@@ -334,17 +334,17 @@ userSchema.methods.generateCommunityTable = async function(allChannelHistory = n
         channelHistoryTable.push([
             history.streamer.display_name,
             global.utils.parseDate(history.last_message),
-            bans.find(x.streamer._id === history.streamer._id) ? "❌ Banned" : "",
+            bans.find(x => x.streamer._id === history.streamer._id) ? "❌" : "",
         ])
     }
 
     for (let i = 0; i < bans.length; i++) {
         const ban = bans[i];
-        if (!channelHistory.find(x => x.streamer._id === ban.streamer)) {
+        if (!channelHistory.find(x => x.streamer._id === ban.streamer._id)) {
             channelHistoryTable.push([
                 ban.streamer.display_name,
                 "No chat logs!",
-                "❌ Banned",
+                "❌",
             ])
         }
     }
