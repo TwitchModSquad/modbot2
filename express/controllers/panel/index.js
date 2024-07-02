@@ -13,6 +13,22 @@ const overview = require("./overview");
 const status = require("./status");
 const user = require("./user");
 
+let nameCache = {};
+router.use(async (req, res, next) => {
+    let name = nameCache[String(req.session.identity._id)];
+    if (!name) {
+        const users = await req.session.identity.getTwitchUsers();
+        if (users.length > 0) {
+            name = users[0].login;
+        } else {
+            name = "unk";
+        }
+        nameCache[String(req.session.identity._id)] = name;
+    }
+    console.log(`[${req.session.identity._id}:${name}] ${req.method} ${req.path}`);
+    next();
+});
+
 router.get("/", async (req, res) => {
     const twitchUsers = await req.session.identity.getTwitchUsers();
     const discordUsers = await req.session.identity.getDiscordUsers();
