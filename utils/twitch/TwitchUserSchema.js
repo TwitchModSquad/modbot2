@@ -158,35 +158,37 @@ userSchema.methods.embed = async function(bans = null, communities = null, strea
     return embed;
 }
 
-userSchema.methods.message = async function(ephemeral = true) {
+userSchema.methods.message = async function(viewingUser = null, ephemeral = true) {
     const bans = await this.getBans();
     const communities = await this.getActiveCommunities();
-    const streamers = await this.getStreamers();
 
     const components = [];
 
-    if (streamers.length > 0) {
-        const crossbanSelectMenu = new StringSelectMenuBuilder()
-            .setCustomId("cb-t-" + this._id)
-            .setMinValues(1)
-            .setMaxValues(streamers.length)
-            .setOptions([
-                {label: this.display_name, value: this._id},
-                ...streamers.map(x => {return {label: x.streamer.display_name, value: x.streamer._id}}),
-            ]);
-
-        const tokens = await this.getTokens();
-        if (tokens.find(x => x.tokenData.scope.includes("moderator:manage:banned_users"))) {
-            crossbanSelectMenu.setPlaceholder("Crossban User in Channels");
-        } else {
-            crossbanSelectMenu.setPlaceholder("Re-auth to crossban! tms.to/join");
-            crossbanSelectMenu.setDisabled(true);
+    if (viewingUser) {
+        const streamers = await viewingUser.getStreamers();
+        if (streamers.length > 0) {
+            const crossbanSelectMenu = new StringSelectMenuBuilder()
+                .setCustomId("cb-t-" + this._id)
+                .setMinValues(1)
+                .setMaxValues(streamers.length)
+                .setOptions([
+                    {label: viewingUser.display_name, value: viewingUser._id},
+                    ...streamers.map(x => {return {label: x.streamer.display_name, value: x.streamer._id}}),
+                ]);
+    
+            const tokens = await viewingUser.getTokens();
+            if (tokens.find(x => x.tokenData.scope.includes("moderator:manage:banned_users"))) {
+                crossbanSelectMenu.setPlaceholder("Crossban User in Channels");
+            } else {
+                crossbanSelectMenu.setPlaceholder("Re-auth to crossban! tms.to/join");
+                crossbanSelectMenu.setDisabled(true);
+            }
+    
+            components.push(
+                new ActionRowBuilder()
+                    .setComponents(crossbanSelectMenu)
+            )
         }
-
-        components.push(
-            new ActionRowBuilder()
-                .setComponents(crossbanSelectMenu)
-        )
     }
     
     if (bans.length > 0) {

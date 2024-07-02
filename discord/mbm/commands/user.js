@@ -43,8 +43,17 @@ const command = {
             return;
         }
 
+        let executingTwitchUser = null;
+        if (interaction?.tms?.user?.identity) {
+            const twitchUsers = await interaction.tms.user.identity.getTwitchUsers();
+            if (twitchUsers.length > 0) {
+                executingTwitchUser = twitchUsers[0];
+            }
+        }
+
+
         await interaction.deferReply({ephemeral: true});
-        interaction.editReply(await user.message());
+        interaction.editReply(await user.message(executingTwitchUser));
     }
 };
 

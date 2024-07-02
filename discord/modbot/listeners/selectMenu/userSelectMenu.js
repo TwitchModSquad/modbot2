@@ -21,7 +21,19 @@ const listener = {
 
         let message;
         if (type === "twitch") {
-            message = await (await utils.Twitch.getUserById(id)).message();
+            let executingTwitchUser = null;
+            try {
+                const discordUser = await utils.Discord.getUserById(interaction.user.id);
+                if (discordUser?.identity) {
+                    const twitchUsers = await discordUser.identity.getTwitchUsers();
+                    if (twitchUsers.length > 0) {
+                        executingTwitchUser = twitchUsers[0];
+                    }
+                }
+            } catch(err) {
+                console.error(err);
+            }
+            message = await (await utils.Twitch.getUserById(id)).message(executingTwitchUser);
         } else if (type === "discord") {
             message = await (await utils.Discord.getUserById(id)).message();
         }
