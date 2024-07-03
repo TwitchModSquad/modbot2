@@ -1,4 +1,4 @@
-const { Message } = require("discord.js");
+const { Message, ButtonBuilder, ButtonStyle, ActionRowBuilder } = require("discord.js");
 
 const config = require("../../../config.json");
 const utils = require("../../../utils/");
@@ -45,7 +45,20 @@ const listener = {
         }
 
         if (embeds.length > 0) {
-            message.reply({content: urls.join(" "), embeds});
+            const removeButton = new ButtonBuilder()
+                .setCustomId("delete-message")
+                .setLabel("Delete Message")
+                .setEmoji('❌')
+                .setStyle(ButtonStyle.Secondary);
+            
+            message.reply({
+                content: urls.join(" "),
+                embeds,
+                components: [
+                    new ActionRowBuilder()
+                        .setComponents(removeButton),
+                ],
+            });
         }
     }
 };
