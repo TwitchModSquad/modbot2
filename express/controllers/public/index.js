@@ -3,6 +3,8 @@ const router = express.Router();
 
 const utils = require("../../../utils/");
 
+const policies = require("./policies");
+
 let featured;
 let members;
 
@@ -66,5 +68,7 @@ router.get("/members", async (req, res) => {
         comma: utils.comma,
     });
 });
+
+router.use("/", policies);
 
 module.exports = router;
