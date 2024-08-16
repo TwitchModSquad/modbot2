@@ -499,6 +499,7 @@ class DiscordGuildManager {
      * @param {string} guildId
      */
     async deleteChannel(channelId, guildId) {
+        console.log(`[GuildManager] Deleting channel ${channelId} from guild ${guildId}`);
         await DiscordChannel.findOneAndDelete({
             _id: channelId,
             guild: guildId,
