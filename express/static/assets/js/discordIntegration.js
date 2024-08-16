@@ -5,11 +5,17 @@ function toggleChannelActions() {
 }
 
 function submitActionForm(form) {
-    const inputs = form.find("input[type=checkbox]");
+    const checkboxInputs = form.find("input[type=checkbox]");
+    const textInputs = form.find("input[type=text]");
 
     const data = {};
-    inputs.each((i,input) => {
+    checkboxInputs.each((i,input) => {
         data[$(input).attr("name")] = input.checked;
+    });
+
+    textInputs.each((i,input) => {
+        input = $(input);
+        data[input.attr("name")] = input.val();
     });
 
     const id = form.find("input[name=id]").attr("value");
@@ -91,10 +97,10 @@ $(function() {
 
     $("#commands").submit(function() {
         const form = $(this);
-        const inputs = form.find("input[type=checkbox]");
+        const checkboxInputs = form.find("input[type=checkbox]");
 
         const data = {};
-        inputs.each((i,input) => {
+        checkboxInputs.each((i,input) => {
             data[$(input).attr("name")] = input.checked;
         });
 
