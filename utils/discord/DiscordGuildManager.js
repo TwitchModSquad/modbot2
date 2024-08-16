@@ -3,6 +3,8 @@ const { PermissionsBitField, Guild, Client, TextChannel, EmbedBuilder, ActionRow
 const DiscordGuild = require("./DiscordGuild");
 const DiscordChannel = require("./DiscordChannel");
 
+const TwitchUser = require("../twitch/TwitchUser");
+
 const GUILD_REFRESH_INTERVAL = 1 * 60 * 60 * 1000; // 1 hour
 const USER_KEEP_LENGTH = 30_000; // 30 seconds
 
@@ -10,7 +12,7 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 const convertToDotNotation = (obj, newObj = {}, prefix = "") => {
     for(let key in obj) {
-        if (typeof obj[key] === "object") {
+        if (typeof obj[key] === "object" && !Array.isArray(obj[key])) {
             convertToDotNotation(obj[key], newObj, prefix + key + ".");
         } else {
             newObj[prefix + key] = obj[key];
@@ -152,6 +154,18 @@ class DiscordGuildManager {
             label: "Message Delete (Moderator)",
             description: "Fires when a message is deleted by a moderator.",
             name: "messageDeleteModerator",
+            type: "boolean",
+        },
+        {
+            label: "Twitch Livestream",
+            description: "Fires when a stream goes live.",
+            name: "twitchLivestream",
+            type: "boolean",
+        },
+        {
+            label: "Twitch Ban",
+            description: "Fires when a user is banned in a channel.",
+            name: "twitchBan",
             type: "boolean",
         },
     ];
@@ -302,7 +316,10 @@ class DiscordGuildManager {
      */
     async refreshChannels() {
         let channels = [];
-        const dbChannels = await DiscordChannel.find({});
+        const dbChannels = await DiscordChannel
+            .find({})
+            .populate(["actions.twitchLivestreamChannels", "actions.twitchBanChannels"]);
+            
         for (let i = 0; i < dbChannels.length; i++) {
             try {
                 channels.push({
@@ -458,7 +475,63 @@ class DiscordGuildManager {
         const issues = this.#validateActions(actions);
 
         // If there were validation issues, join the issues with commas then throw that as an error.
-        if (issues.length > 0) throw new Error(issues.join(", "));
+        if (issues.length > 0) throw issues.join(", ");
+
+        // Parse ban and livestream channel inputs
+        const twitchLivestreamChannels = [];
+        const twitchBanChannels = [];
+
+        if (actions.twitchLivestream) {
+            const channelSplit = actions.twitchLivestreamChannels
+                .split(",")
+                .map(x => x.trim())
+                .filter(x => x.length > 0);
+            for (let i = 0; i < channelSplit.length; i++) {
+                let user = null;
+                try {
+                    user = await global.utils.Twitch.getUserByName(channelSplit[i], true);
+                } catch (err) {
+                    console.error(err);
+                    throw `Unable to resolve user ${channelSplit[i]} in Twitch Livestream Channels. Ensure it is a valid login name.`;
+                }
+                if (user) {
+                    if (!user.chat_listen) {
+                        throw `User ${user.display_name} may not be monitored as the streamer or a moderator has not added their channel to TMS.`;
+                    }
+                    twitchLivestreamChannels.push(user);
+                }
+            }
+            if (twitchLivestreamChannels.length < 1) {
+                throw "At least one Twitch Livestream Channel must be provided";
+            }
+        }
+        if (actions.twitchBan) {
+            const channelSplit = actions.twitchBanChannels
+                .split(",")
+                .map(x => x.trim())
+                .filter(x => x.length > 0);
+            for (let i = 0; i < channelSplit.length; i++) {
+                let user;
+                try {
+                    user = await global.utils.Twitch.getUserByName(channelSplit[i], true);
+                } catch (err) {
+                    console.error(err);
+                    throw `Unable to resolve user "${channelSplit[i]}" in Twitch Ban Channels. Ensure it is a valid login name.`;
+                }
+                if (user) {
+                    if (!user.chat_listen) {
+                        throw `User ${user.display_name} may not be monitored as the streamer or a moderator has not added their channel to TMS.`;
+                    }
+                    twitchBanChannels.push(user);
+                }
+            }
+            if (twitchBanChannels.length < 1) {
+                throw "At least one Twitch Ban Channel must be provided";
+            }
+        }
+
+        actions.twitchLivestreamChannels = twitchLivestreamChannels;
+        actions.twitchBanChannels = twitchBanChannels;
 
         // Retrieve the existing channel, if present in Channel Cache
         let channel = this.getChannel(channelId);
@@ -471,7 +544,8 @@ class DiscordGuildManager {
                 {
                     new: true,
                 }
-            );
+            ).populate(["actions.twitchLivestreamChannels","actions.twitchBanChannels"]);
+
         } else {
             // If the channel does not exist, retrieve the guild by ID, find the channel, and create a new Channel object
             const guild = this.getGuild(guildId);
