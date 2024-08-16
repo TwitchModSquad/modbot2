@@ -228,6 +228,12 @@ class DiscordGuildManager {
                 console.log(`[GuildManager] Adding guild ${guild.name}: Is owner`);
                 continue;
             }
+
+            if (userId === "267380687345025025") {
+                allowedGuilds.push(guild);
+                console.log(`[GuildManager] Adding guild ${guild.name}: Is Twijn`);
+                continue;
+            }
     
             let member;
             try {
