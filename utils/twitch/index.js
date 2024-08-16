@@ -190,7 +190,7 @@ class Twitch {
         return new Promise(async (resolve, reject) => {
             try {
                 apiMetric.mark();
-                let helixUser = await api.helix.users.getUserByName(login);
+                let helixUser = await this.Helix.users.getUserByNameBatched(login);
 
                 if (helixUser) {
                     const user = await TwitchUser.findOneAndUpdate(
