@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>No Servers - Discord Integration | Twitch Mod Squad</title>
+<%- include("../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/panel/panel.css">
+</head>
+<body class="panel">
+<%- include("../../partials/header") %>
+
+    <div class="sidebar-container">
+        <%- include("../../partials/sidebar", {active: "discord-integration"}) %>
+        
+        <main class="container container-md">
+            <section class="col-12">
+                <h2><i class="fa-brands fa-discord" aria-hidden="true"></i> Discord Integration</h2>
+                You don't have any servers that you have the Manage Server permission in! Click below to add the MBM bot to your guild.
+            </section>
+        </main>
+    </div>
+    
+    <div class="notifications"></div>
+<%- include("../../partials/javascript") %>
+</body>
+</html>

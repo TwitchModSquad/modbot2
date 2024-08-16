@@ -5,6 +5,7 @@
 <%- include("../../partials/head") %>
 
     <link rel="stylesheet" href="/assets/css/panel/panel.css">
+    <link rel="stylesheet" href="/assets/css/panel/checkboxes.css">
 </head>
 <body class="panel">
 <%- include("../../partials/header") %>
@@ -30,12 +31,21 @@
                 <section>
                     <h2><i class="fa-solid fa-command"></i> <code><%= user.display_name %></code> Commands</h2>
                     <% commands.forEach(command => { %>
-                    <label>
-                        <input type="checkbox" name="<%= command.name %>" id="<%= command.name %>"<%= user?.commands[command.name] ? ` checked="checked"` : "" %>>
-                        <%= command.label %>
-                    </label>
+                        <div class="form-group better-cb">
+                            <input type="checkbox" name="<%= command.name %>" id="cmd-<%= command.name %>"<%- user?.commands[command.name] ? ` checked="checked"` : "" %>>
+                            <label for="cmd-<%= command.name %>">
+                                <span>
+                                    <svg width="12px" height="10px" viewbox="0 0 12 10">
+                                        <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                                    </svg>
+                                </span>
+                                <span>
+                                    <%= command.label %>
+                                </span>
+                            </label>
+                        </div>
                     <% }) %>
-                    <input type="submit" value="Update" class="button full">
+                    <input type="submit" value="Update" class="button full" disabled="disabled">
                 </section>
             </form>
             <% } %>
@@ -44,5 +54,6 @@
     
     <div class="notifications"></div>
 <%- include("../../partials/javascript") %>
+    <script src="/assets/js/saveToggle.js"></script>
 </body>
 </html>

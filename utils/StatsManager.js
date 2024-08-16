@@ -119,9 +119,13 @@ class StatsManager {
             if (log) {
                 this.currentHourlyActivity = log;
             } else {
-                this.currentHourlyActivity = await global.utils.Schemas.HourlyStat.create({
-                    _id: dateNow,
-                });
+                try {
+                    this.currentHourlyActivity = await global.utils.Schemas.HourlyStat.create({
+                        _id: dateNow,
+                    });
+                } catch(err) {
+                    console.error(err);
+                }
             }
         }
         this.currentHourlyActivity[type]++;

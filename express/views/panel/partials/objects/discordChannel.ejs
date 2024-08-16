@@ -1,0 +1,315 @@
+<% const isChannel = locals?.channel?._id ? true : false; %><form method="POST" class="action-channel<%= isChannel ? " closed" : "" %>" id="channel-form-<%= isChannel ? channel._id : "new" %>"<%- isChannel ? `` : ` data-ignoresave="true"` %>>
+    <input type="hidden" name="id" value="<%= isChannel ? channel._id : ":id" %>">
+    <input type="hidden" name="guildId" value="<%= guildId %>">
+    <div class="action-header">
+        <h3>#<span class="name"><%= isChannel ? channel.name : "new" %></span></h3>
+        <div class="action-counter">
+            <span class="count">0</span>/<span class="max">0</span> enabled
+        </div>
+    </div>
+    <div class="action-body container container-md"<%- isChannel ? ` style="display:none;"` : "" %>>
+        <div class="col-4">
+            <div class="action-section">
+                <h4>Guild</h4>
+                <div class="form-group better-cb">
+                    <input type="checkbox" name="guildEdit" id="<%= isChannel ? channel._id : ":id" %>-guild-edit"<%- isChannel && channel.actions.guildEdit ? ` checked="checked"` : "" %>>
+                    <label for="<%= isChannel ? channel._id : ":id" %>-guild-edit">
+                        <span>
+                            <svg width="12px" height="10px" viewbox="0 0 12 10">
+                                <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                            </svg>
+                        </span>
+                        <span>
+                            Guild Edit
+                            <div class="desc">
+                                Fires when the guild is edited.
+                            </div>
+                        </span>
+                    </label>
+                </div>
+            </div>
+            <div class="action-section">
+                <h4>Channel</h4>
+                <div class="form-group better-cb">
+                    <input type="checkbox" name="channelCreate" id="<%= isChannel ? channel._id : ":id" %>-channel-create"<%- isChannel && channel.actions.channelCreate ? ` checked="checked"` : "" %>>
+                    <label for="<%= isChannel ? channel._id : ":id" %>-channel-create">
+                        <span>
+                            <svg width="12px" height="10px" viewbox="0 0 12 10">
+                                <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                            </svg>
+                        </span>
+                        <span>
+                            Channel Create
+                            <div class="desc">
+                                Fires when a channel is created in the guild.
+                            </div>
+                        </span>
+                    </label>
+                </div>
+                <div class="form-group better-cb">
+                    <input type="checkbox" name="channelDelete" id="<%= isChannel ? channel._id : ":id" %>-channel-delete"<%- isChannel && channel.actions.channelDelete ? ` checked="checked"` : "" %>>
+                    <label for="<%= isChannel ? channel._id : ":id" %>-channel-delete">
+                        <span>
+                            <svg width="12px" height="10px" viewbox="0 0 12 10">
+                                <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                            </svg>
+                        </span>
+                        <span>
+                            Channel Delete
+                            <div class="desc">
+                                Fires when a channel is deleted in the guild.
+                            </div>
+                        </span>
+                    </label>
+                </div>
+                <div class="form-group better-cb">
+                    <input type="checkbox" name="channelEdit" id="<%= isChannel ? channel._id : ":id" %>-channel-edit"<%- isChannel && channel.actions.channelEdit ? ` checked="checked"` : "" %>>
+                    <label for="<%= isChannel ? channel._id : ":id" %>-channel-edit">
+                        <span>
+                            <svg width="12px" height="10px" viewbox="0 0 12 10">
+                                <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                            </svg>
+                        </span>
+                        <span>
+                            Channel Edit
+                            <div class="desc">
+                                Fires when a channel is edited in the guild.
+                            </div>
+                        </span>
+                    </label>
+                </div>
+            </div>
+            <div class="action-section">
+                <h4>Invite</h4>
+                <div class="form-group better-cb">
+                    <input type="checkbox" name="inviteCreate" id="<%= isChannel ? channel._id : ":id" %>-invite-create"<%- isChannel && channel.actions.inviteCreate ? ` checked="checked"` : "" %>>
+                    <label for="<%= isChannel ? channel._id : ":id" %>-invite-create">
+                        <span>
+                            <svg width="12px" height="10px" viewbox="0 0 12 10">
+                                <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                            </svg>
+                        </span>
+                        <span>
+                            Invite Create
+                            <div class="desc">
+                                Fires when an invite is created.
+                            </div>
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="action-section">
+                <h4>Member</h4>
+                <div class="form-group better-cb">
+                    <input type="checkbox" name="memberAdd" id="<%= isChannel ? channel._id : ":id" %>-member-add"<%- isChannel && channel.actions.memberAdd ? ` checked="checked"` : "" %>>
+                    <label for="<%= isChannel ? channel._id : ":id" %>-member-add">
+                        <span>
+                            <svg width="12px" height="10px" viewbox="0 0 12 10">
+                                <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                            </svg>
+                        </span>
+                        <span>
+                            Member Add
+                            <div class="desc">
+                                Fires when a member joins the guild.
+                            </div>
+                        </span>
+                    </label>
+                </div>
+                <div class="form-group better-cb">
+                    <input type="checkbox" name="memberRemove" id="<%= isChannel ? channel._id : ":id" %>-member-remove"<%- isChannel && channel.actions.memberRemove ? ` checked="checked"` : "" %>>
+                    <label for="<%= isChannel ? channel._id : ":id" %>-member-remove">
+                        <span>
+                            <svg width="12px" height="10px" viewbox="0 0 12 10">
+                                <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                            </svg>
+                        </span>
+                        <span>
+                            Member Remove
+                            <div class="desc">
+                                Fires when a member leaves the guild.
+                            </div>
+                        </span>
+                    </label>
+                    <div class="suboptions">
+                        <div class="form-group better-cb">
+                            <input type="checkbox" name="memberRemoveLeave"  id="<%= isChannel ? channel._id : ":id" %>-member-remove-leave"<%- !isChannel || channel.actions.memberRemoveLeave ? ` checked="checked"` : "" %>>
+                            <label for="<%= isChannel ? channel._id : ":id" %>-member-remove-leave">
+                                <span>
+                                    <svg width="12px" height="10px" viewbox="0 0 12 10">
+                                        <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                                    </svg>
+                                </span>
+                                <span>
+                                    Member Leave
+                                    <div class="desc">
+                                        Fires when a member leaves the guild on their own accord.
+                                    </div>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="form-group better-cb">
+                            <input type="checkbox" name="memberRemoveKick" id="<%= isChannel ? channel._id : ":id" %>-member-remove-kick"<%- !isChannel || channel.actions.memberRemoveKick ? ` checked="checked"` : "" %>>
+                            <label for="<%= isChannel ? channel._id : ":id" %>-member-remove-kick">
+                                <span>
+                                    <svg width="12px" height="10px" viewbox="0 0 12 10">
+                                        <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                                    </svg>
+                                </span>
+                                <span>
+                                    Member Kicked
+                                    <div class="desc">
+                                        Fires when a member leaves the guild by being kicked or banned.
+                                    </div>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group better-cb">
+                    <input type="checkbox" name="memberEdit" id="<%= isChannel ? channel._id : ":id" %>-member-edit"<%- isChannel && channel.actions.memberEdit ? ` checked="checked"` : "" %>>
+                    <label for="<%= isChannel ? channel._id : ":id" %>-member-edit">
+                        <span>
+                            <svg width="12px" height="10px" viewbox="0 0 12 10">
+                                <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                            </svg>
+                        </span>
+                        <span>
+                            Member Edit
+                            <div class="desc">
+                                Fires when a member or moderator edits their profile.
+                            </div>
+                        </span>
+                    </label>
+                    <div class="suboptions">
+                        <div class="form-group better-cb">
+                            <input type="checkbox" name="memberEditName" id="<%= isChannel ? channel._id : ":id" %>-member-edit-name"<%- !isChannel || channel.actions.memberEditName ? ` checked="checked"` : "" %>>
+                            <label for="<%= isChannel ? channel._id : ":id" %>-member-edit-name">
+                                <span>
+                                    <svg width="12px" height="10px" viewbox="0 0 12 10">
+                                        <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                                    </svg>
+                                </span>
+                                <span>
+                                    Member Edit Name
+                                    <div class="desc">
+                                        Fires when a member or moderator edits their nickname or display name.
+                                    </div>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="form-group better-cb">
+                            <input type="checkbox" name="memberEditAvatar" id="<%= isChannel ? channel._id : ":id" %>-member-edit-avatar"<%- !isChannel || channel.actions.memberEditAvatar ? ` checked="checked"` : "" %>>
+                            <label for="<%= isChannel ? channel._id : ":id" %>-member-edit-avatar">
+                                <span>
+                                    <svg width="12px" height="10px" viewbox="0 0 12 10">
+                                        <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                                    </svg>
+                                </span>
+                                <span>
+                                    Member Edit Avatar
+                                    <div class="desc">
+                                        Fires when a member updates their avatar.
+                                    </div>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="form-group better-cb">
+                            <input type="checkbox" name="memberEditRoles" id="<%= isChannel ? channel._id : ":id" %>-member-edit-roles"<%- !isChannel || channel.actions.memberEditRoles ? ` checked="checked"` : "" %>>
+                            <label for="<%= isChannel ? channel._id : ":id" %>-member-edit-roles">
+                                <span>
+                                    <svg width="12px" height="10px" viewbox="0 0 12 10">
+                                        <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                                    </svg>
+                                </span>
+                                <span>
+                                    Member Edit Roles
+                                    <div class="desc">
+                                        Fires when a member has their roles updated.
+                                    </div>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="action-section">
+                <h4>Message</h4>
+                <div class="form-group better-cb">
+                    <input type="checkbox" name="messageEdit" id="<%= isChannel ? channel._id : ":id" %>-message-edit"<%- isChannel && channel.actions.messageEdit ? ` checked="checked"` : "" %>>
+                    <label for="<%= isChannel ? channel._id : ":id" %>-message-edit">
+                        <span>
+                            <svg width="12px" height="10px" viewbox="0 0 12 10">
+                                <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                            </svg>
+                        </span>
+                        <span>
+                            Message Edit
+                            <div class="desc">
+                                Fires when a message is edited.
+                            </div>
+                        </span>
+                    </label>
+                </div>
+                <div class="form-group better-cb">
+                    <input type="checkbox" name="messageDelete" id="<%= isChannel ? channel._id : ":id" %>-message-delete"<%- isChannel && channel.actions.messageDelete ? ` checked="checked"` : "" %>>
+                    <label for="<%= isChannel ? channel._id : ":id" %>-message-delete">
+                        <span>
+                            <svg width="12px" height="10px" viewbox="0 0 12 10">
+                                <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                            </svg>
+                        </span>
+                        <span>
+                            Message Delete
+                            <div class="desc">
+                                Fires when a message is deleted.
+                            </div>
+                        </span>
+                    </label>
+                    <div class="suboptions">
+                        <div class="form-group better-cb">
+                            <input type="checkbox" name="messageDeleteDelete" id="<%= isChannel ? channel._id : ":id" %>-message-delete-delete"<%- !isChannel || channel.actions.messageDeleteDelete ? ` checked="checked"` : "" %>>
+                            <label for="<%= isChannel ? channel._id : ":id" %>-message-delete-delete">
+                                <span>
+                                    <svg width="12px" height="10px" viewbox="0 0 12 10">
+                                        <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                                    </svg>
+                                </span>
+                                <span>
+                                    Message Delete (Deleted)
+                                    <div class="desc">
+                                        Fires when a message is deleted by the user.
+                                    </div>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="form-group better-cb">
+                            <input type="checkbox" name="messageDeleteModerator" id="<%= isChannel ? channel._id : ":id" %>-message-delete-moderator"<%- !isChannel || channel.actions.messageDeleteModerator ? ` checked="checked"` : "" %>>
+                            <label for="<%= isChannel ? channel._id : ":id" %>-message-delete-moderator">
+                                <span>
+                                    <svg width="12px" height="10px" viewbox="0 0 12 10">
+                                        <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                                    </svg>
+                                </span>
+                                <span>
+                                    Message Delete (Moderator)
+                                    <div class="desc">
+                                        Fires when a message is deleted by a moderator.
+                                    </div>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            <button type="submit" disabled="disabled"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+            <button type="button" class="danger delete-action-channel">Remove #<span class="name"><%= isChannel ? channel.name : "new" %></span></button>
+        </div>
+    </div>
+</form>

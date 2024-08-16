@@ -6,6 +6,8 @@ const DiscordMessage = require("./DiscordMessage");
 const DiscordUser = require("./DiscordUser");
 const DiscordUserSchema = require("./DiscordUserSchema");
 
+const DiscordGuildManager = require("./DiscordGuildManager");
+
 const Cache = require("../Cache/Cache");
 
 class Discord {
@@ -66,6 +68,12 @@ class Discord {
      * @type {string}
      */
     banContent = "";
+
+    /**
+     * Discord Guild Manager
+     * @type {DiscordGuildManager}
+     */
+    guildManager = new DiscordGuildManager();
 
     /**
      * Internal method for retrieving a user if it is not present in the database

@@ -17,18 +17,48 @@ const schema = new mongoose.Schema({
     icon: String,
     banner: String,
     commands: {
-        archive: Boolean,
-        banscan: Boolean,
-        chatdump: Boolean,
-        giveaway: Boolean,
-        mention: Boolean,
-        points: Boolean,
-        user: Boolean,
+        archive: {
+            type: Boolean,
+            default: false,
+        },
+        banscan: {
+            type: Boolean,
+            default: false,
+        },
+        chatdump: {
+            type: Boolean,
+            default: false,
+        },
+        giveaway: {
+            type: Boolean,
+            default: false,
+        },
+        mention: {
+            type: Boolean,
+            default: false,
+        },
+        points: {
+            type: Boolean,
+            default: false,
+        },
+        user: {
+            type: Boolean,
+            default: false,
+        },
     }
 });
 
 schema.methods.iconURL = function() {
     return `https://cdn.discordapp.com/icons/${this._id}/${this.icon}.png`;
+}
+
+schema.methods.public = function() {
+    return {
+        id: this._id,
+        name: this.name,
+        icon: this.iconURL(),
+        commands: this.commands,
+    };
 }
 
 module.exports = mongoose.model("DiscordGuild", schema);

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title><%= selectedGuild.name %> - Discord Integration | Twitch Mod Squad</title>
+<%- include("../../partials/head") %>
+
+    <link rel="stylesheet" href="/assets/css/panel/panel.css">
+    <link rel="stylesheet" href="/assets/css/panel/discordIntegration.css">
+    <link rel="stylesheet" href="/assets/css/panel/checkboxes.css">
+</head>
+<body class="panel">
+<%- include("../../partials/header") %>
+
+    <div class="sidebar-container">
+        <%- include("../../partials/sidebar", {active: "discord-integration"}) %>
+        
+        <main class="container container-md">
+            <div id="community-selector" class="col-12">
+                <div id="active-community" class="community active-community">
+                    <img src="<%= selectedGuild.iconURL() %>" alt="Icon for <%= selectedGuild.name %>">
+                    <div class="info">
+                        <h3 class="name"><%= selectedGuild.name %></h3>
+                        <div class="data">
+                            <span class="id"><%= selectedGuild.id %></span>
+                            &bullet;
+                            Click to select a different guild
+                        </div>
+                    </div>
+                </div>
+                <div id="community-dropdown">
+                    <% allowedGuilds.forEach(guild => { %>
+                    <a class="community<%= guild.id === selectedGuild.id ? " active-community" : "" %>" href="/panel/discord/server/<%= guild.id %>">
+                        <img src="<%= guild.iconURL() %>" alt="Icon for <%= guild.name %>">
+                        <div class="info">
+                            <h3 class="name"><%= guild.name %></h3>
+                            <div class="data">
+                                <span class="id"><%= guild.id %></span>
+                            </div>
+                        </div>
+                    </a>
+                    <% }) %>
+                </div>
+            </div>
+            <section class="col-8" id="actions">
+                <h2><i class="fa-solid fa-explosion"></i> Actions</h2>
+                <form method="POST" id="add-channel" data-ignoresave="true">
+                    <h3>Add a new action channel</h3>
+                    <div class="form-group">
+                        <label for="new-channel">Channel</label>
+                        <select name="new-channel" id="new-channel">
+                            <% channels.filter(x => x.isTextBased() && !x.isVoiceBased() && !actionChannels.find(y => y.channel.id === x.id)).forEach(channel => { %>
+                            <option value="<%= channel.id %>">#<%= channel.name %></option><% }) %>
+                        </select>
+                    </div>
+                    <button class="success" type="submit">
+                        <i class="fa-solid fa-plus"></i> Add Channel
+                    </button>
+                </form>
+
+                <div id="action-channels">
+                    <% actionChannels.forEach(actionChannel => { %>
+                    <%- include("../../partials/objects/discordChannel", {channel: actionChannel.dbChannel, guildId: selectedGuild.id}) %>
+                    <% }) %>
+                </div>
+
+                <%- include("../../partials/objects/discordChannel", {guildId: selectedGuild.id}) %>
+            </section>
+            <div class="col-4">
+                <section class="col-4">
+                    <h2><i class="fa-solid fa-rectangle-terminal"></i> The Mod Squad Commands</h2>
+                    <p class="small">
+                        For security purposes, all MBM commands are disabled in non-TMS guilds, and only guild administrators are allowed to execute them. Adjust permissions for guild commands in your Integration tab on discord, then enable the desired commands below. <strong>Only TMS members are able to execute commands.</strong>
+                    </p>
+                    <form method="POST" id="commands">
+                        <input type="hidden" name="id" value="<%= selectedGuild.id %>">
+                        <input type="hidden" name="name" value="<%= selectedGuild.name %>">
+                        <% discordCommands.forEach(command => { %>
+                        <div class="form-group better-cb">
+                            <input type="checkbox" name="<%= command.name %>" id="cmd-<%= command.name %>"<%- dbGuild?.commands[command.name] ? ` checked="checked"` : "" %>>
+                            <label for="cmd-<%= command.name %>">
+                                <span>
+                                    <svg width="12px" height="10px" viewbox="0 0 12 10">
+                                        <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                                    </svg>
+                                </span>
+                                <span>
+                                    <%= command.label %>
+                                    <div class="desc">
+                                        <%= command.description %>
+                                    </div>
+                                </span>
+                            </label>
+                        </div>
+                        <% }) %>
+                        <button type="submit" disabled="disabled"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+                    </form>
+                </section>
+            </div>
+        </main>
+    </div>
+    
+    <div class="notifications"></div>
+<%- include("../../partials/javascript") %>
+    <script src="/assets/js/discordIntegration.js"></script>
+    <script src="/assets/js/saveToggle.js"></script>
+</body>
+</html>

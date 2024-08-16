@@ -5,6 +5,7 @@ const utils = require("../../../utils");
 
 const user = require("./user");
 const twitch = require("./twitch/");
+const discord = require("./discord/");
 const me = require("./me");
 
 const io = require("@pm2/io");
@@ -55,6 +56,7 @@ router.use(async (req, res, next) => {
 router.use("/user", user);
 
 router.use("/twitch", twitch);
+router.use("/discord", discord);
 
 router.use("/me", me);
 

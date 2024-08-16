@@ -1,0 +1,111 @@
+.small {
+    font-size: .8em;
+}
+
+form h3 {
+    font-size: 1.1em;
+    font-weight: 300;
+    margin: 0;
+    padding: 0;
+}
+
+form:not(.action-channel) h3 {
+    margin: .4em 0 .2em 0;
+    padding-bottom: .2em;
+    border-bottom: 1px solid var(--tertiary-text-color);
+}
+
+.active-community {
+    cursor: pointer;
+    background-color: var(--secondary-tms-color);
+    border-color: var(--secondary-tms-color);
+}
+
+#community-selector {
+    position: relative;
+}
+
+#community-dropdown {
+    position: absolute;
+    top: calc(100% - .5em);
+    left: 0;
+
+    background-color: rgba(255,255,255,0.05);
+    margin: 0.6em;
+    padding: 0.4em;
+    border: 0.1em solid rgba(255,255,255,0.05);
+    border-radius: 8px;
+
+    visibility: hidden;
+    opacity: 0;
+    transform: scale(.8);
+
+    transition: 250ms;
+}
+
+#community-dropdown.open {
+    visibility: visible;
+    opacity: 1;
+    transform: scale(1);
+}
+
+@supports (-webkit-backdrop-filter: none) or (backdrop-filter: none) {
+    #community-dropdown {
+        background-color: var(--primary-background-color);
+        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(20px);
+    }
+}
+
+#channel-form-new {
+    display: none;
+}
+
+.action-channel {
+
+}
+
+.action-channel .action-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    margin: .4em 0 .2em 0;
+    padding-bottom: .2em;
+    border-bottom: 1px solid var(--tertiary-text-color);
+}
+
+.action-channel .action-counter {
+    font-size: .9em;
+    color: var(--secondary-text-color);
+    margin-right: 2em;
+}
+
+.action-channel .action-header::after {
+    font-size: .8em;
+    font-family: 'Font Awesome 6 Pro';
+    font-weight: 900;
+    content: '\f0d8';
+    position: absolute;
+    top: 50%;
+    right: 1em;
+    transform: translateY(-50%);
+    transition: 250ms;
+}
+
+.action-channel.closed .action-header::after {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+.action-channel .action-section {
+    background-color: var(--tertiary-background-color);
+    border: 1px solid var(--primary-background-color);
+    padding: .6em .8em;
+    margin: .4em;
+    border-radius: .2em;
+}
+
+.action-channel .action-section h4 {
+    font-weight: 600;
+}

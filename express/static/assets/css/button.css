@@ -1,7 +1,7 @@
 button, .button {
     background-color: var(--primary-tms-color);
     color: var(--primary-text-color);
-    font-size: 1rem;
+    font-size: .9rem;
     padding: .6em .8em;
     border-radius: .3em;
     border: none;
@@ -24,6 +24,16 @@ button.twitch,
 button.secondary,
 .button.secondary {
     background-color: var(--tertiary-background-color);
+}
+
+button.success,
+.button.success {
+    background-color: #389f38;
+}
+
+button.danger,
+.button.danger {
+    background-color: #ad2e2e;
 }
 
 button[disabled="disabled"],

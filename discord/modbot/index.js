@@ -33,12 +33,16 @@ for (const file of listenerFiles) {
     client.listeners.set(listener.name, listener);
 }
 
+client.setMaxListeners(0);
+
 // Register listeners.
 client.listeners.forEach(listener => {
     client[listener.eventType](listener.eventName, listener.listener);
 });
 
 setInterval(() => {
+    if (!client.isReady()) return;
+    
     let totalChannels = global.client.twitch.totalChannels();
 
     client.user.setPresence({

@@ -4,6 +4,7 @@ const Discord = require('discord.js');
 const client = new Discord.Client({
     intents: [
         Discord.GatewayIntentBits.Guilds,
+        Discord.GatewayIntentBits.GuildInvites,
         Discord.GatewayIntentBits.GuildMembers,
         Discord.GatewayIntentBits.GuildMessages,
         Discord.GatewayIntentBits.GuildModeration,
@@ -16,11 +17,14 @@ client.commands = new Discord.Collection();
 client.listeners = new Discord.Collection();
 
 const config = require("../../config.json");
+const utils = require('../../utils');
 
 const grabFiles = path => fs.readdirSync(path).filter(file => file.endsWith('.js'));
 
 const commandFiles = grabFiles('./discord/mbm/commands');
 const listenerFiles = grabFiles('./discord/mbm/listeners');
+
+const actionListenerFiles = grabFiles('./discord/mbm/listeners/actionListeners');
 
 // process command files
 for (const file of commandFiles) {
@@ -34,6 +38,14 @@ for (const file of listenerFiles) {
     client.listeners.set(listener.name, listener);
 }
 
+// process action listener files
+for (const file of actionListenerFiles) {
+    const listener = require(`./listeners/actionListeners/${file}`);
+    client.listeners.set(listener.name, listener);
+}
+
+client.setMaxListeners(0);
+
 // Register listeners.
 client.listeners.forEach(listener => {
     client[listener.eventType](listener.eventName, listener.listener);
@@ -41,6 +53,10 @@ client.listeners.forEach(listener => {
 
 let page = 1;
 setInterval(() => {
+    if (!client.isReady()) {
+        return;
+    }
+
     if (page === 1) {
         let totalChannels = 0;
     
@@ -70,9 +86,11 @@ setInterval(() => {
     }
 }, 30000);
 
-client.login(config.discord.mbm.token);
+client.login(config.discord.mbm.token).catch(console.error);
 
 // Register slash commands.
 require("./slashCommands")(client);
+
+utils.Discord.guildManager.setClient(client);
 
 module.exports = client;
