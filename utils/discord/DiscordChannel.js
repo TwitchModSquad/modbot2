@@ -91,6 +91,25 @@ const schema = new mongoose.Schema({
             type: Boolean,
             default: true,
         },
+        // Twitch Integration
+        twitchLivestream: {
+            type: Boolean,
+            default: false,
+        },
+        twitchLivestreamChannels: {
+            type: [String],
+            ref: "TwitchUser",
+            default: [],
+        },
+        twitchBan: {
+            type: Boolean,
+            default: false,
+        },
+        twitchBanChannels: {
+            type: [String],
+            ref: "TwitchUser",
+            default: [],
+        },
     },
 });
 
