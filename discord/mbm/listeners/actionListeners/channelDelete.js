@@ -34,7 +34,6 @@ const listener = {
      */
     async listener (log, guild) {
         if (log.targetType !== "Channel" || log.actionType !== "Delete") return;
-        console.log(log);
 
         const executor = log.executor ? log.executor : await guild.members.fetch(log.executorId);
 
