@@ -16,6 +16,7 @@ router.post("/:id", async (req, res) => {
     utils.Discord.guildManager.updateChannelActions(req.params.id, req.guild.id, req.body).then(channel => {
         res.json({ok: true, channel: channel.dbChannel.public()});
     }, error => {
+        console.error(error);
         res.json({ok: false, error})
     });
 });
