@@ -7,26 +7,30 @@
     margin-left: 1em;
 }
 
+.better-cb .suboptions .form-group {
+    margin: .6em 0;
+}
+
 .better-cb input:checked + label + .suboptions {
     display: block;
 }
 
-.better-cb input[type="checkbox"] {
+.better-cb > input[type="checkbox"] {
     display: none;
     visibility: hidden;
 }
 
-.better-cb label {
+.better-cb > label {
     display: flex;
     margin: auto;
     -webkit-user-select: none;
     user-select: none;
     cursor: pointer;
 }
-.better-cb label span {
+.better-cb > label span {
     transform: translate3d(0, 0, 0);
 }
-.better-cb label span:first-child {
+.better-cb > label span:first-child {
     position: relative;
     width: 18px;
     height: 18px;
@@ -37,7 +41,7 @@
     border: 1px solid #9098A9;
     transition: all 0.2s ease;
 }
-.better-cb label span:first-child svg {
+.better-cb > label span:first-child svg {
     position: absolute;
     top: 3px;
     left: 2px;
@@ -52,7 +56,7 @@
     transition-delay: 0.1s;
     transform: translate3d(0, 0, 0);
 }
-.better-cb label span:first-child:before {
+.better-cb > label span:first-child:before {
     content: "";
     width: 100%;
     height: 100%;
@@ -62,22 +66,22 @@
     opacity: 1;
     border-radius: 50%;
 }
-.better-cb label span:last-child {
+.better-cb > label span:last-child {
     padding-left: 8px;
 }
-.better-cb label:hover span:first-child {
+.better-cb > label:hover span:first-child {
     border-color: var(--primary-discord-color);
 }
 
-.better-cb input:checked + label span:first-child {
+.better-cb > input:checked + label span:first-child {
     background: var(--primary-discord-color);
     border-color: var(--primary-discord-color);
     animation: wave-46 0.4s ease;
 }
-.better-cb input:checked + label span:first-child svg {
+.better-cb > input:checked + label span:first-child svg {
     stroke-dashoffset: 0;
 }
-.better-cb input:checked + label span:first-child:before {
+.better-cb > input:checked + label span:first-child:before {
     transform: scale(3.5);
     opacity: 0;
     transition: all 0.6s ease;
