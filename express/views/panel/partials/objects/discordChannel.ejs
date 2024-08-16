@@ -306,6 +306,63 @@
                     </div>
                 </div>
             </div>
+            <div class="action-section">
+                <h4>Twitch Integration</h4>
+                <div class="form-group better-cb">
+                    <input type="checkbox" name="twitchLivestream" id="<%= isChannel ? channel._id : ":id" %>-twitch-livestream"<%- isChannel && channel.actions.twitchLivestream ? ` checked="checked"` : "" %>>
+                    <label for="<%= isChannel ? channel._id : ":id" %>-twitch-livestream">
+                        <span>
+                            <svg width="12px" height="10px" viewbox="0 0 12 10">
+                                <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                            </svg>
+                        </span>
+                        <span>
+                            Twitch Livestream
+                            <div class="desc">
+                                Fires when a stream goes live.
+                            </div>
+                        </span>
+                    </label>
+                    <div class="suboptions">
+                        <div class="form-group">
+                            <label for="<%= isChannel ? channel._id : ":id" %>-twitch-livestream-channels">
+                                Livestream Channels
+                                <div class="desc">
+                                    Channels to send livestream notifications for. Comma separated.
+                                </div>
+                            </label>
+                            <input class="full" type="text" name="twitchLivestreamChannels" id="<%= isChannel ? channel._id : ":id" %>-twitch-livestream-channels" placeholder="toastfps,twitchmodsquad"<%- isChannel ? ` value="${channel.actions.twitchLivestreamChannels.map(x => x.login).join(",")}"` : "" %>>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group better-cb">
+                    <input type="checkbox" name="twitchBan" id="<%= isChannel ? channel._id : ":id" %>-twitch-ban"<%- isChannel && channel.actions.twitchBan ? ` checked="checked"` : "" %>>
+                    <label for="<%= isChannel ? channel._id : ":id" %>-twitch-ban">
+                        <span>
+                            <svg width="12px" height="10px" viewbox="0 0 12 10">
+                                <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                            </svg>
+                        </span>
+                        <span>
+                            Twitch Ban
+                            <div class="desc">
+                                Fires when a user is banned in a livestream.
+                            </div>
+                        </span>
+                    </label>
+                    <div class="suboptions">
+                        <div class="form-group">
+                            <label for="<%= isChannel ? channel._id : ":id" %>-twitch-ban-channels">
+                                Ban Channels
+                                <div class="desc">
+                                    Channels to send ban notifications for. Comma separated.
+                                </div>
+                            </label>
+                            <input class="full" type="text" name="twitchBanChannels" id="<%= isChannel ? channel._id : ":id" %>-twitch-ban-channels" placeholder="toastfps,twitchmodsquad"<%- isChannel ? ` value="${channel.actions.twitchBanChannels.map(x => x.login).join(",")}"` : "" %>>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="col-12">
             <button type="submit" disabled="disabled"><i class="fa-solid fa-floppy-disk"></i> Save</button>
