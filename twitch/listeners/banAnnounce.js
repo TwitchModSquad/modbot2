@@ -60,7 +60,7 @@ const listener = {
 
             console.log(`#${streamer.login}: ${chatter.login} was banned`)
     
-            utils.EventManager.fire("banAnnounce", streamer, chatter, message, bpm);
+            utils.EventManager.fire("banAnnounce", streamer, chatter, message, bpm, ban);
         } catch(err) {
             console.error(err);
         }

@@ -17,6 +17,10 @@ const messageSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "DiscordKick",
     },
+    discordAction: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "DiscordAction",
+    },
     live: {
         type: String,
         ref: "TwitchLivestream",

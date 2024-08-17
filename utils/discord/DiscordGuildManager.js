@@ -1,9 +1,11 @@
 const { PermissionsBitField, Guild, Client, TextChannel, EmbedBuilder, ActionRowBuilder, Message } = require("discord.js");
 
+const DiscordAction = require("./DiscordAction");
 const DiscordGuild = require("./DiscordGuild");
 const DiscordChannel = require("./DiscordChannel");
 
 const TwitchUser = require("../twitch/TwitchUser");
+const DiscordMessage = require("./DiscordMessage");
 
 const GUILD_REFRESH_INTERVAL = 1 * 60 * 60 * 1000; // 1 hour
 const USER_KEEP_LENGTH = 30_000; // 30 seconds
@@ -442,8 +444,85 @@ class DiscordGuildManager {
             }
         }
 
-        if (channels.length > 0) {
-            console.log(`[GuildManager] Emitted action [${actionName}:${subactionName ? subactionName : "(no subaction)"}] to ${channels.length} channels in guild ${guildId}`);
+        if (messages.length > 0) {
+            console.log(`[GuildManager] Emitted action [${actionName}:${subactionName ? subactionName : "(no subaction)"}] to ${messages.length} channels in guild ${guildId}`);
+
+            let embedData = null;
+            if (message.embeds.length > 0) {
+                embedData = JSON.stringify(message.embeds[0].toJSON());
+            }
+
+            const discordAction = await DiscordAction.create({
+                actionName,
+                subactionName,
+                embedData,
+            });
+
+            for (let i = 0; i < messages.length; i++) {
+                const message = messages[i];
+                await DiscordMessage.findByIdAndUpdate(message.id, {
+                    guild: guildId,
+                    channel: message.channelId,
+                    content: message.content,
+                    discordAction,
+                }, {
+                    upsert: true,
+                    new: true,
+                });
+            }
+        }
+
+        return messages;
+    }
+
+    /**
+     * Emits a Twitch ban to all active channels
+     * @param {string} streamerLogin 
+     * @param {{content:string?,embeds:EmbedBuilder[],components:ActionRowBuilder[]}} message 
+     * @param {object} ban
+     * @returns {Promise<Message[]>}
+     */
+    async emitTwitchBan(streamerLogin, message, ban) {
+        const channels = this.#channels.filter(x =>
+            x.dbChannel.actions.twitchBan &&
+            x.dbChannel.actions.twitchBanChannels.find(y => y.login === streamerLogin)
+        );
+
+        const messages = [];
+        for (let i = 0; i < channels.length; i++) {
+            try {
+                messages.push(await channels[i].channel.send(message));
+            } catch(err) {
+                console.error(`Error while sending message to ${channels[i].channel.id}: ${err}`);
+            }
+        }
+
+        if (messages.length > 0) {
+            console.log(`[GuildManager] Emitted action [ban:${streamerLogin}] to ${messages.length} channels`);
+            
+            let embedData = null;
+            if (message.embeds.length > 0) {
+                embedData = JSON.stringify(message.embeds[0].toJSON());
+            }
+            
+            const discordAction = await DiscordAction.create({
+                actionName: "twitchBan",
+                embedData,
+            });
+
+            for (let i = 0; i < messages.length; i++) {
+                const message = messages[i];
+                await DiscordMessage.findByIdAndUpdate(message.id, {
+                    guild: message.guildId,
+                    channel: message.channelId,
+                    content: message.content,
+                    twitchBan: ban,
+                    discordAction,
+                }, {
+                    upsert: true,
+                    new: true,
+                });
+            }
         }
 
         return messages;
