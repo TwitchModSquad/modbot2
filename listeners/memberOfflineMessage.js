@@ -1,5 +1,7 @@
 const { EmbedBuilder } = require("discord.js");
 
+const utils = require("../utils");
+
 const listener = {
     event: "member_live_offline",
     /**
@@ -17,6 +19,8 @@ const listener = {
         messages.forEach(message => {
             message.edit({embeds: [embed]}).catch(console.error);
         });
+
+        utils.Discord.guildManager.emitLivestream(user.login, {embeds: [embed], components: []}, livestream);
     }
 }
 

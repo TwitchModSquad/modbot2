@@ -69,7 +69,7 @@ const interval = {
             if (newLivestream) {
                 utils.EventManager.fire("member_live", user, stream, activity);
             } else {
-                const discordMessages = await utils.Schemas.DiscordMessage.find({live: livestream._id});
+                const discordMessages = await utils.Schemas.DiscordMessage.find({live: livestream._id, discordAction: null});
                 const messages = [];
                 for (let m = 0; m < discordMessages.length; m++) {
                     const discordMessage = discordMessages[m];

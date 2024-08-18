@@ -1,5 +1,5 @@
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { HelixStream } = require("@twurple/api")
-const { EmbedBuilder } = require("discord.js");
 
 const utils = require("../utils/");
 
@@ -38,6 +38,16 @@ const listener = {
                 live: activity.live,
             }).catch(console.error);
         }, console.error);
+
+        const button = new ButtonBuilder()
+            .setStyle(ButtonStyle.Link)
+            .setLabel("Watch Now")
+            .setURL(`https://twitch.tv/${user.login}`);
+
+        const row = new ActionRowBuilder()
+            .setComponents(button);
+
+        utils.Discord.guildManager.emitLivestream(user.login, {embeds: [embed], components: [row]}, activity.live);
     }
 }
 
