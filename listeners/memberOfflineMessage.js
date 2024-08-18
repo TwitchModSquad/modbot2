@@ -20,7 +20,7 @@ const listener = {
             message.edit({embeds: [embed]}).catch(console.error);
         });
 
-        utils.Discord.guildManager.emitLivestream(user.login, {embeds: [embed], components: []}, livestream);
+        utils.Discord.guildManager.emitLivestream(livestream.user.login, {embeds: [embed], components: []}, livestream);
     }
 }
 
