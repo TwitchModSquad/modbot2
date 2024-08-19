@@ -72,8 +72,10 @@ form:not(.action-channel) h3 {
     justify-content: space-between;
     cursor: pointer;
     margin: .4em 0 .2em 0;
-    padding-bottom: .2em;
-    border-bottom: 1px solid var(--tertiary-text-color);
+    padding: .4em .6em;
+    border-radius: .5em;
+    background-color: var(--tertiary-background-color);
+    border: 1px solid var(--primary-background-color);
 }
 
 .action-channel .action-counter {
@@ -96,6 +98,13 @@ form:not(.action-channel) h3 {
 
 .action-channel.closed .action-header::after {
     transform: translateY(-50%) rotate(180deg);
+}
+
+.action-channel .action-body {
+    border-left: 2px solid var(--secondary-tms-color);
+    margin: .4em 0 .4em .4em;
+    padding-left: .4em;
+    border-radius: .1em;
 }
 
 .action-channel .action-section {
