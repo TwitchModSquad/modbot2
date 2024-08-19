@@ -144,7 +144,7 @@ class ListenClient {
      */
     async join(user) {
         if (this.getShardFor(user.login)) {
-            return console.warn(`Attempted to join ${channel}, but they have already been joined!`);
+            return console.warn(`Attempted to join ${user.login}, but they have already been joined!`);
         }
 
         const moderators = (await user.getMods()).map(x => x.moderator);
