@@ -1,10 +1,14 @@
 const utils = require("../utils/");
 
-const MINIMUM_AGE = 3 * 24 * 60 * 60 * 1000;
+const MINIMUM_AGE = 3 * 24 * 60 * 60 * 1000; // 3 days
+
+const ANNOUNCE_INTERVAL = 10 * 60 * 1000; // 10 minutes
+
+let updatedUsers = 0;
 
 let running = false;
 const interval = {
-    interval: 30000,
+    interval: 30_000, // 30 seconds
     onStartup: true,
     run: async () => {
         if (running) return;
@@ -41,10 +45,17 @@ const interval = {
             }
 
             await dbUser.save();
+
+            updatedUsers++;
         }
 
         running = false;
     },
 };
+
+setInterval(() => {
+    console.log(`[UserUpdate] Updated ${updatedUsers} users in ${ANNOUNCE_INTERVAL / 1000 / 60} minutes.`);
+    updatedUsers = 0;
+}, ANNOUNCE_INTERVAL);
 
 module.exports = interval;
