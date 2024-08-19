@@ -767,6 +767,28 @@ class DiscordGuildManager {
     }
 
     /**
+     * 
+     * @param {string} guildId 
+     * @param {"none"|"kick"|"ban"} setting 
+     * @returns {Promise<any>}
+     */
+    async updateSpamModeration(guildId, setting) {
+        const guild = this.getGuild(guildId);
+
+        if (!guild) {
+            throw new Error(`Guild ${guildId} not found!`);
+        }
+
+        if (!["none", "kick", "ban"].includes(setting)) {
+            throw new Error(`Unknown spam moderation setting ${setting}`);
+        }
+
+        return await DiscordGuild.findByIdAndUpdate(guild.id, {
+            spammoderation: setting,
+        }, {new: true});
+    }
+
+    /**
      * Deletes actions for a channel
      * @param {string} channelId 
      * @param {string} guildId

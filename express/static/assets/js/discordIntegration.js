@@ -72,6 +72,42 @@ function deleteActionChannel(form) {
     });
 }
 
+function submitSpamModeration(form) {
+    let data = {};
+    const serialized = form.serializeArray();
+
+    serialized.forEach(input => {
+        data[input.name] = input.value;
+    });
+
+    const guildId = data.id;
+    delete data.id;
+    
+    if (!guildId) return;
+
+    const closeNotif = createNotification("Updating...", "Updating spam moderation settings...");
+    $.ajax(`/api/discord/${guildId}/spammoderation`, {
+        method: "POST",
+        dataType: "json",
+        contentType: "application/json",
+        data: JSON.stringify(data),
+        success: function(data) {
+            closeNotif();
+            if (data.ok) {
+                createNotification("Success!", "Successfully updated spam moderation settings.", 5000);
+                updateForm(form);
+                checkForm(form);
+            } else {
+                createNotification("Error while updating spam moderation settings!", data.error, 5000);
+            }
+        },
+        error: function(data) {
+            closeNotif();
+            createNotification("Error while updating spam moderation settings!", "Please contact an administrator.", 5000);
+        },
+    });
+}
+
 function updateActions(form) {
     const count = form.find(".action-section > .form-group > input:checked").length;
     const max = form.find(".action-section > .form-group > input").length;
@@ -93,6 +129,11 @@ $(function() {
 
     $(".action-channel").each((i, form) => {
         updateActions($(form));
+    });
+
+    $("#spammoderation").submit(function() {
+        submitSpamModeration($(this));
+        return false;
     });
 
     $("#commands").submit(function() {

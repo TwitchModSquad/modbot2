@@ -45,7 +45,12 @@ const schema = new mongoose.Schema({
             type: Boolean,
             default: false,
         },
-    }
+    },
+    spammoderation: {
+        type: String,
+        enum: ["none", "kick", "ban"],
+        default: "none",
+    },
 });
 
 schema.methods.iconURL = function() {
@@ -58,6 +63,7 @@ schema.methods.public = function() {
         name: this.name,
         icon: this.iconURL(),
         commands: this.commands,
+        spammoderation: this.spammoderation,
     };
 }
 

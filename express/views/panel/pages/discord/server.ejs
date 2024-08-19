@@ -41,32 +41,34 @@
                     <% }) %>
                 </div>
             </div>
-            <section class="col-8" id="actions">
-                <h2><i class="fa-solid fa-explosion"></i> Actions</h2>
-                <form method="POST" id="add-channel" data-ignoresave="true">
-                    <h3>Add a new action channel</h3>
-                    <div class="form-group">
-                        <label for="new-channel">Channel</label>
-                        <select name="new-channel" id="new-channel">
-                            <% channels.filter(x => x.isTextBased() && !x.isVoiceBased() && !actionChannels.find(y => y.channel.id === x.id)).forEach(channel => { %>
-                            <option value="<%= channel.id %>">#<%= channel.name %></option><% }) %>
-                        </select>
+            <div class="col-8">
+                <section id="actions">
+                    <h2><i class="fa-solid fa-explosion"></i> Actions</h2>
+                    <form method="POST" id="add-channel" data-ignoresave="true">
+                        <h3>Add a new action channel</h3>
+                        <div class="form-group">
+                            <label for="new-channel">Channel</label>
+                            <select name="new-channel" id="new-channel">
+                                <% channels.filter(x => x.isTextBased() && !x.isVoiceBased() && !actionChannels.find(y => y.channel.id === x.id)).forEach(channel => { %>
+                                <option value="<%= channel.id %>">#<%= channel.name %></option><% }) %>
+                            </select>
+                        </div>
+                        <button class="success" type="submit">
+                            <i class="fa-solid fa-plus"></i> Add Channel
+                        </button>
+                    </form>
+    
+                    <div id="action-channels">
+                        <% actionChannels.forEach(actionChannel => { %>
+                        <%- include("../../partials/objects/discordChannel", {channel: actionChannel.dbChannel, guildId: selectedGuild.id}) %>
+                        <% }) %>
                     </div>
-                    <button class="success" type="submit">
-                        <i class="fa-solid fa-plus"></i> Add Channel
-                    </button>
-                </form>
-
-                <div id="action-channels">
-                    <% actionChannels.forEach(actionChannel => { %>
-                    <%- include("../../partials/objects/discordChannel", {channel: actionChannel.dbChannel, guildId: selectedGuild.id}) %>
-                    <% }) %>
-                </div>
-
-                <%- include("../../partials/objects/discordChannel", {guildId: selectedGuild.id}) %>
-            </section>
+    
+                    <%- include("../../partials/objects/discordChannel", {guildId: selectedGuild.id}) %>
+                </section>
+            </div>
             <div class="col-4">
-                <section class="col-4">
+                <section>
                     <h2><i class="fa-solid fa-rectangle-terminal"></i> The Mod Squad Commands</h2>
                     <p class="small">
                         For security purposes, all MBM commands are disabled in non-TMS guilds, and only guild administrators are allowed to execute them. Adjust permissions for guild commands in your Integration tab on discord, then enable the desired commands below. <strong>Only TMS members are able to execute commands.</strong>
@@ -92,6 +94,61 @@
                             </label>
                         </div>
                         <% }) %>
+                        <button type="submit" disabled="disabled"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+                    </form>
+                </section>
+                <section>
+                    <h2><i class="fa-solid fa-hammer-crash"></i> Spam Moderation</h2>
+                    <form method="POST" id="spammoderation">
+                        <input type="hidden" name="id" value="<%= selectedGuild.id %>">
+                        <div class="form-group better-cb better-radio">
+                            <input type="radio" name="spammoderation" value="none" id="spammoderation-none"<%- dbGuild.spammoderation !== "kick" && dbGuild.spammoderation !== "ban" ? ` checked="checked"` : "" %>>
+                            <label for="spammoderation-none">
+                                <span>
+                                    <svg width="12px" height="10px" viewbox="0 0 12 10">
+                                        <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                                    </svg>
+                                </span>
+                                <span>
+                                    No Spam Moderation
+                                    <div class="desc">
+                                        No action will be taken towards known Discord spam accounts.
+                                    </div>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="form-group better-cb better-radio">
+                            <input type="radio" name="spammoderation" value="kick" id="spammoderation-kick"<%- dbGuild.spammoderation === "kick" ? ` checked="checked"` : "" %>>
+                            <label for="spammoderation-kick">
+                                <span>
+                                    <svg width="12px" height="10px" viewbox="0 0 12 10">
+                                        <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                                    </svg>
+                                </span>
+                                <span>
+                                    Kick Spam Moderation
+                                    <div class="desc">
+                                        Known Discord spam accounts will be kicked from the guild once discovered or on member join.
+                                    </div>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="form-group better-cb better-radio">
+                            <input type="radio" name="spammoderation" value="ban" id="spammoderation-ban"<%- dbGuild.spammoderation === "ban" ? ` checked="checked"` : "" %>>
+                            <label for="spammoderation-ban">
+                                <span>
+                                    <svg width="12px" height="10px" viewbox="0 0 12 10">
+                                        <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                                    </svg>
+                                </span>
+                                <span>
+                                    Ban Spam Moderation
+                                    <div class="desc">
+                                        Known Discord spam accounts will be banned from the guild once discovered or on member join.
+                                    </div>
+                                </span>
+                            </label>
+                        </div>
                         <button type="submit" disabled="disabled"><i class="fa-solid fa-floppy-disk"></i> Save</button>
                     </form>
                 </section>

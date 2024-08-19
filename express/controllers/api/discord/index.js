@@ -26,4 +26,15 @@ router.use("/:id/commands", commands);
 const channel = require("./channel");
 router.use("/:id/channel", channel);
 
+const bodyParser = require("body-parser");
+router.use(bodyParser.json());
+
+router.post("/:id/spammoderation", (req, res) => {
+    utils.Discord.guildManager.updateSpamModeration(req.guild.id, req?.body?.spammoderation).then(guild => {
+        res.json({ok: true, guild: guild.public()})
+    }, error => {
+        res.json({ok: false, error: String(error)});
+    });
+});
+
 module.exports = router;

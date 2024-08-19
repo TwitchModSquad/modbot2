@@ -15,7 +15,8 @@
     display: block;
 }
 
-.better-cb > input[type="checkbox"] {
+.better-cb > input[type="checkbox"],
+.better-cb > input[type="radio"] {
     display: none;
     visibility: hidden;
 }
@@ -41,6 +42,11 @@
     border: 1px solid #9098A9;
     transition: all 0.2s ease;
 }
+
+.better-radio > label span:first-child {
+    border-radius: 50%;
+}
+
 .better-cb > label span:first-child svg {
     position: absolute;
     top: 3px;
