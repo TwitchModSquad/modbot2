@@ -23,7 +23,7 @@ function submitActionForm(form) {
     const name = form.find(".name").first().text();
 
     const closeNotif = createNotification("Updating Actions...", "Updating actions in channel #" + name);
-    $.ajax(`/api/discord/${guildId}/channel/${id}`, {
+    $.ajax(`/api/discord/${guildId}/channel/${id}/actions`, {
         method: "POST",
         dataType: "json",
         contentType: "application/json",

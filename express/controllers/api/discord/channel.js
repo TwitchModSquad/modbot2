@@ -12,7 +12,7 @@ router.delete("/:id", async (req, res) => {
 
 router.use(bodyParser.json({extended: true}));
 
-router.post("/:id", async (req, res) => {
+router.post("/:id/actions", async (req, res) => {
     utils.Discord.guildManager.updateChannelActions(req.params.id, req.guild.id, req.body).then(channel => {
         res.json({ok: true, channel: channel.dbChannel.public()});
     }, error => {
