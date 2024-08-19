@@ -46,6 +46,7 @@ router.use(async (req, res, next) => {
 
     try {
         req.session = await utils.SessionStore.getSessionById(session);
+        console.log(`[${req.session.identity._id}] ${req.method} /api${req.path}`);
         next();
     } catch(err) {
         res.status(401);
