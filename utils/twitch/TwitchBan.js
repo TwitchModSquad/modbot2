@@ -7,6 +7,8 @@ const { ApiClient } = require("@twurple/api");
 const Flag = require("../flag/Flag");
 const oai = require("../gpt");
 
+const NON_GMS_REGEX = /[^A-Za-z0-9 \r\n@£$¥èéùìòÇØøÅå\u0394_\u03A6\u0393\u039B\u03A9\u03A0\u03A8\u03A3\u0398\u039EÆæßÉ!"#$%&'()*+,\-./:;<=>?¡ÄÖÑÜ§¿äöñüà^{}\\\[~\]|\u20AC]/g;
+
 const banSchema = new mongoose.Schema({
     streamer: {
         type: String,
@@ -225,9 +227,16 @@ banSchema.methods.message = async function(showButtons = false, getData = false,
     }
 
     let chatHistoryString = "";
+    let fakeCharString = "";
+
     chatHistory.forEach(ch => {
         if (chatHistoryString !== "") chatHistoryString += "\n";
         chatHistoryString += `${global.utils.formatTime(ch.time_sent)} [${this.chatter.display_name}] ${ch.message}`;
+
+        if (NON_GMS_REGEX.test(ch.message)) {
+            if (fakeCharString !== "") fakeCharString += "\n";
+            fakeCharString += `${global.utils.formatTime(ch.time_sent)} [${this.chatter.display_name}] ${ch.message.replace(NON_GMS_REGEX, "[$&]")}`;
+        }
     });
 
     if (chatHistoryString === "")
@@ -241,7 +250,16 @@ banSchema.methods.message = async function(showButtons = false, getData = false,
     embed.addFields({
         name: "Chat History",
         value: codeBlock(cleanCodeBlockContent(chatHistoryString)),
+        inline: false,
     });
+
+    if (fakeCharString !== "") {
+        embed.addFields({
+            name: "Fake Characters",
+            value: "***Chat history might contain fake characters:***\n" + codeBlock(cleanCodeBlockContent(fakeCharString)),
+            inline: false,
+        })
+    }
 
     if (allChannelHistory.length > 0) {
         embed.addFields({
