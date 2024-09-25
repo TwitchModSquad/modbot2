@@ -10,6 +10,8 @@ const Authentication = require("./authentication/");
 
 const EventManager = require("./EventManager");
 const StatsManager = require("./StatsManager");
+const RegexManager = require("./regex/RegexManager");
+
 const Flag = require("./flag/Flag");
 
 const Archive = require("./archive/Archive");
@@ -89,6 +91,12 @@ class Utils {
      * @type {StatsManager}
      */
     StatsManager = new StatsManager();
+
+    /**
+     * Regex manager for spam detection functions
+     * @type {RegexManager}
+     */
+    RegexManager = new RegexManager();
 
     /**
      * Session store

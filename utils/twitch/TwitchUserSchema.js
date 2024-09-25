@@ -4,11 +4,9 @@ const mongoose = require("mongoose");
 const TwitchRole = require("./TwitchRole");
 
 const TwitchBan = require("./TwitchBan");
-const TwitchTimeout = require("./TwitchTimeout");
 
 const config = require("../../config.json");
 const { EmbedBuilder, codeBlock, cleanCodeBlockContent, StringSelectMenuBuilder, ActionRowBuilder } = require('discord.js');
-const TwitchChat = require('./TwitchChat');
 const UserFlag = require('../flag/UserFlag');
 
 const userSchema = new mongoose.Schema({
@@ -47,6 +45,11 @@ const userSchema = new mongoose.Schema({
     description: String,
     profile_image_url: String,
     offline_image_url: String,
+    enabled_regex_group: {
+        type: [mongoose.Schema.Types.ObjectId],
+        default: [],
+        ref: "RegexGroup",
+    },
     commands: {
         prefix: String,
         blacklist: Boolean,
