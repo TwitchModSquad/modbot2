@@ -267,7 +267,7 @@ banSchema.methods.message = async function(showButtons = false, getData = false,
             name: "Fake Characters",
             value: "*Chat history might contain fake characters:*\n" +
                 codeBlock(cleanCodeBlockContent(fakeCharString)) +
-                `[View unicode character breakdown online](https://unicode.scarfboy.com/?s=${encodeURIComponent(finalMatches.join(""))})`,
+                `**Fake characters found:** ${finalMatches.map(x => `\`${x}\``).join(" ")}\n[View unicode character breakdown online](https://unicode.scarfboy.com/?s=${encodeURIComponent(finalMatches.join(""))})`,
             inline: false,
         })
     }
