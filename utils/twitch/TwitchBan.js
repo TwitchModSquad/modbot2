@@ -256,7 +256,7 @@ banSchema.methods.message = async function(showButtons = false, getData = false,
     if (fakeCharString !== "") {
         embed.addFields({
             name: "Fake Characters",
-            value: "***Chat history might contain fake characters:***\n" + codeBlock(cleanCodeBlockContent(fakeCharString)),
+            value: "*Chat history might contain fake characters:*\n" + codeBlock(cleanCodeBlockContent(fakeCharString)),
             inline: false,
         })
     }
