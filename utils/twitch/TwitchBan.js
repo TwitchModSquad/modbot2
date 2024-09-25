@@ -7,7 +7,7 @@ const { ApiClient } = require("@twurple/api");
 const Flag = require("../flag/Flag");
 const oai = require("../gpt");
 
-const NON_GMS_REGEX = /[^A-Za-z0-9 \r\n@£$¥èéùìòÇØøÅå\u0394_\u03A6\u0393\u039B\u03A9\u03A0\u03A8\u03A3\u0398\u039EÆæßÉ!"#$%&'()*+,\-./:;<=>?¡ÄÖÑÜ§¿äöñüà^{}\\\[~\]|\u20AC]/g;
+const NON_GMS_REGEX = /[^A-Za-z0-9 \r\n@£$¥èéùìòÇØøÅå\u0394_\u03A6\u0393\u039B\u03A9\u03A0\u03A8\u03A3\u0398\u039EÆæßÉ!"#%&'()*+,\-./:;<=>?¡ÄÖÑÜ§¿äöñüà^{}\\\[~\]|\u20AC]/g;
 
 const banSchema = new mongoose.Schema({
     streamer: {
@@ -256,7 +256,9 @@ banSchema.methods.message = async function(showButtons = false, getData = false,
     if (fakeCharString !== "") {
         embed.addFields({
             name: "Fake Characters",
-            value: "*Chat history might contain fake characters:*\n" + codeBlock(cleanCodeBlockContent(fakeCharString)),
+            value: "*Chat history might contain fake characters:*\n" +
+                codeBlock(cleanCodeBlockContent(fakeCharString)) +
+                `\n[View unicode breakdown online](https://unicode.scarfboy.com/?s=${encodeURIComponent(fakeCharString)})`,
             inline: false,
         })
     }
