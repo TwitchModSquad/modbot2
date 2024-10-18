@@ -21,6 +21,11 @@ const archiveSchema = new mongoose.Schema({
         maxLength: 2048,
         required: true,
     },
+    severity: {
+        type: String,
+        enum: ["serious","normal","minor","spam"],
+        default: "normal",
+    },
     submitted: {
         type: Date,
         default: Date.now,
@@ -204,19 +209,19 @@ archiveSchema.methods.message = async function() {
     return data;
 }
 
-archiveSchema.methods.getUsers = async function() {
-    return await global.utils.Schemas.ArchiveUser.find({entry: this._id})
+archiveSchema.methods.getUsers = function() {
+    return global.utils.Schemas.ArchiveUser.find({entry: this._id})
             .populate("twitchUser")
             .populate("discordUser");
 }
 
-archiveSchema.methods.getFiles = async function() {
-    return await global.utils.Schemas.ArchiveFile.find({entry: this._id})
+archiveSchema.methods.getFiles = function() {
+    return global.utils.Schemas.ArchiveFile.find({entry: this._id})
             .sort({remote: -1});
 }
 
-archiveSchema.methods.getMessages = async function() {
-    return await global.utils.Schemas.ArchiveMessage.find({entry: this._id});
+archiveSchema.methods.getMessages = function() {
+    return global.utils.Schemas.ArchiveMessage.find({entry: this._id});
 }
 
 module.exports = mongoose.model("Archive", archiveSchema);

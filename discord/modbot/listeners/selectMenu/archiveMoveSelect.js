@@ -2,6 +2,8 @@ const { StringSelectMenuInteraction, EmbedBuilder, codeBlock, cleanCodeBlockCont
 
 const utils = require("../../../../utils/");
 
+const config = require("../../../../config.json");
+
 const listener = {
     name: 'archiveMoveSelect',
     /**
@@ -20,9 +22,18 @@ const listener = {
                 .populate("entry");
         if (archiveMessage) {
             const archive = archiveMessage.entry;
-            const channel = await global.client.modbot.channels.fetch(interaction.values[0]);
+            const channel = await global.client.modbot.channels.fetch(config.discord.modbot.channels.archive);
 
-            channel.send(await archive.message()).then(message => {
+            const [severity, tagId] = interaction.values[0].split("-");
+
+            await utils.Schemas.Archive.findByIdAndUpdate(archive._id, {severity});
+
+            channel.threads.create({
+                name: archive.offense,
+                message: await archive.message(),
+                appliedTags: [tagId],
+                reason: "Moved by " + interaction.user.id,
+            }).then(message => {
                 utils.Schemas.ArchiveMessage.create({
                     entry: archive._id,
                     channel: channel.id,
