@@ -33,11 +33,11 @@ const listener = {
                 message: await archive.message(),
                 appliedTags: [tagId],
                 reason: "Moved by " + interaction.user.id,
-            }).then(message => {
+            }).then(channel => {
                 utils.Schemas.ArchiveMessage.create({
                     entry: archive._id,
                     channel: channel.id,
-                    message: message.id,
+                    message: channel.id,
                 }).catch(console.error);
 
                 interaction.message.delete().then(() => {

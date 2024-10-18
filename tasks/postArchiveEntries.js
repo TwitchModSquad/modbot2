@@ -14,6 +14,14 @@ const postArchiveEntries = async cb => {
         const entry = entries[i];
         let tagId = null;
 
+        const messages = await entry.getMessages();
+        if (messages.length > 0) {
+            console.log(`Ignoring ${entry._id}: Post already exists`);
+            continue;
+        }
+
+        console.log(`Continuing with ${entry._id}: No post exists`);
+
         if (entry.severity === "serious") {
             tagId = config.discord.modbot.channels.archive_sort_targets[0].value.split("-")[1];
         } else if (entry.severity === "normal") {
@@ -29,15 +37,15 @@ const postArchiveEntries = async cb => {
         console.log("Found tag " + tagId + " for " + entry._id);
 
         archiveChannel.threads.create({
-            name: entry.offense,
+            name: entry.offense.substring(0, 100),
             message: await entry.message(),
             appliedTags: [tagId],
             reason: "Post Archive Entries action",
-        }).then(message => {
+        }).then(channel => {
             utils.Schemas.ArchiveMessage.create({
                 entry: entry._id,
-                channel: archiveChannel.id,
-                message: message.id,
+                channel: channel.id,
+                message: channel.id,
             }).catch(console.error);
 
             console.log("Created post for " + entry._id);
