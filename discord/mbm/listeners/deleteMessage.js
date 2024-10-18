@@ -7,18 +7,15 @@ const listener = {
     eventName: 'messageDelete',
     eventType: 'on',
     /**
-     * Listens for deleted messages and revokes points
+     * Listens for deleted messages and deletes from the database
      * @param {Message} message 
      */
     async listener (message) {
         if (!message.inGuild()) return;
-        
-        const dbMsg = await utils.Schemas.DiscordMessage.findById(message.id);
-        if (dbMsg) {
-            setTimeout(async () => {
-                await dbMsg.deleteOne();
-            }, 5000);
-        }
+
+        console.log(`Deleting stored messages with ID ${message.id}`);
+        utils.Schemas.DiscordMessage.findByIdAndDelete(message.id).catch(console.error);
+        utils.Schemas.ArchiveMessage.deleteMany({id: message.id}).catch(console.error);
     }
 };
 
