@@ -88,9 +88,9 @@ router.post("/", async (req, res) => {
         let warnings = "";
 
         let authenticated = false;
-        if (twitchUsers.find(x => x.broadcaster_type === "partner" || x?.follower_count >= 5000)) {
+        if (twitchUsers.find(x => x.broadcaster_type === "partner" || x?.follower_count >= 3000)) {
             authenticated = true;
-        } else if (streamers.find(x => x.streamer.broadcaster_type === "partner" || x?.streamer.follower_count >= 5000))
+        } else if (streamers.find(x => x.streamer.broadcaster_type === "partner" || x?.streamer.follower_count >= 3000))
             authenticated = true;
 
         for (let i = 0; i < req.body.users.length; i++) {

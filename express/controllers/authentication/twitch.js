@@ -80,7 +80,7 @@ router.get("/", async (req, res) => {
                             removedStreamers.push(streamer);
                         }
                     });
-                    session.identity.authenticated = Boolean(newStreamers.find(x => x.follower_count >= 5000 || x.affiliation === "partner"));
+                    session.identity.authenticated = Boolean(newStreamers.find(x => x.follower_count >= 3000 || x.affiliation === "partner"));
                     await session.identity.save();
                     twitchUser.updated_modded_channels = Date.now();
                     await twitchUser.save();

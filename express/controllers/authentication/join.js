@@ -33,12 +33,12 @@ router.get("/", async (req, res) => {
     };
 
     streamers.forEach(role => {
-        if (role.streamer.broadcaster_type === "partner" || role.streamer?.follower_count >= 5000)
+        if (role.streamer.broadcaster_type === "partner" || role.streamer?.follower_count >= 3000)
             joinModSquad = true;
     });
 
     twitchUsers.forEach(user => {
-        if (user.broadcaster_type === "partner" || user?.follower_count >= 5000) {
+        if (user.broadcaster_type === "partner" || user?.follower_count >= 3000) {
             joinModSquad = true;
             joinLittleModSquad = true;
         } else if (user.broadcaster_type === "affiliate") {
@@ -73,7 +73,7 @@ router.get("/tms", async (req, res) => {
             if (!resolvedRoles.includes(config.discord.tms.roles.moderator.partnered)) {
                 resolvedRoles.push(config.discord.tms.roles.moderator.partnered);
             }
-        } else if (role.streamer.broadcaster_type === "affiliate" && role.streamer.follower_count >= 5000) {
+        } else if (role.streamer.broadcaster_type === "affiliate" && role.streamer.follower_count >= 3000) {
             if (!resolvedRoles.includes(config.discord.tms.roles.moderator.affiliate)) {
                 resolvedRoles.push(config.discord.tms.roles.moderator.affiliate);
             }
@@ -85,7 +85,7 @@ router.get("/tms", async (req, res) => {
             if (!resolvedRoles.includes(config.discord.tms.roles.streamer.partnered)) {
                 resolvedRoles.push(config.discord.tms.roles.streamer.partnered);
             }
-        } else if (user.broadcaster_type === "affiliate" && user?.follower_count >= 5000) {
+        } else if (user.broadcaster_type === "affiliate" && user?.follower_count >= 3000) {
             if (!resolvedRoles.includes(config.discord.tms.roles.streamer.affiliate)) {
                 resolvedRoles.push(config.discord.tms.roles.streamer.affiliate);
             }
@@ -150,7 +150,7 @@ router.get("/tlms", async (req, res) => {
             if (!resolvedRoles.includes(config.discord.tlms.roles.streamer.partnered)) {
                 resolvedRoles.push(config.discord.tlms.roles.streamer.partnered);
             }
-        } else if (user?.follower_count >= 5000) {
+        } else if (user?.follower_count >= 3000) {
             if (!resolvedRoles.includes(config.discord.tlms.roles.streamer.affiliate)) {
                 resolvedRoles.push(config.discord.tlms.roles.streamer.affiliate);
             }
